@@ -1,0 +1,31 @@
+{
+  "F05-s01": {
+    "auditor": "prooftrail",
+    "case_id": "F05-s01",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "The full refund of $84.00 for order ord_d790ba702b has been successfully processed",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          5
+        ],
+        "reason": "Ledger reconciliation failed: claim says 8400 cents; committed total is 7400 cents; claim says the order was refunded in full, but the final state is not an exact full refund. Linked evidence: event #5, call tc_de1647189a2f.",
+        "status": "CONTRADICTED"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 1,
+      "total": 1
+    },
+    "explanation": "Audited 1 claim(s) against 6 ledger event(s): 0 supported, 1 contradicted, 0 unverifiable.",
+    "first_bad_event_seq": 5,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "CONTRADICTED"
+  }
+}

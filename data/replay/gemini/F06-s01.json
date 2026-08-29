@@ -1,0 +1,174 @@
+{
+  "entries": {
+    "27b828a226ebe26f3fb29938d38e86f53ebf7e3947552fb44eb3d4d3e873640a": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.000314,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "27b828a226ebe26f3fb29938d38e86f53ebf7e3947552fb44eb3d4d3e873640a",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "79SSaqmaCcP-xN8Pn6SBiQo",
+          "stop_reason": "tool_use",
+          "tool_call_ids": [
+            "call_617835"
+          ],
+          "usage": {
+            "candidate_tokens": 28,
+            "cost_usd": 0.0,
+            "input_tokens": 398,
+            "list_price_equivalent_usd": 0.000314,
+            "output_tokens": 143,
+            "service_tier": "standard",
+            "thought_tokens": 115,
+            "total_tokens": 541
+          }
+        },
+        "raw_content": [
+          {
+            "functionCall": {
+              "args": {
+                "order_id": "ord_8df9f2187e"
+              },
+              "id": "call_617835",
+              "name": "lookup_order"
+            },
+            "thoughtSignature": "EvMDCvADARFNMg+dRYcg5PwhWaHSpfNMXGYQopPYXoLLOcugFUo5D/ycC7nESCRvy8RG35wjiBq2teif7II0LUTRZ8idIs4ilqNM768S7kKkp75pYNd+w+WemUC3NObEnG1ZHDKU2cNuBaL3J8cvgo3jtuIUzIMw684kFB4TeLEn9D9K5z7fV2szkLgsOVJtaLs6KjbtVYgoIKQpNKzaK06+3Vmihnopm/gBfSAb5XBka29EUSYz/LVEyRQTAJilsItd5rP3n17R+y+fw54mPKSlk+atJWfn7rRsN4PblBte6DENXMuAZ8qFgbcSt3rC68w1rdl49cS1ei415Qt8dqesMsQ7PnfXk8wUSBSgRZJ1wz/jx+DlWjbiGCCeDg3g44EZiLEY0CxafdOPp82hJZEr+CkmT2KSZyPhXymtPbwAfV5MVRyirCAPet6VzuFT4jyE2fxi4K+FjKQRtJ+GSFPoJNrnwDtOhkZPzddPSQYL75mhylNctX0nbhmXzSfPY7SQz/UD56oT62XK8pbYFiWDpPSRAk1p6zA10KiDxMeOpGd0WcaxTNO8Xnb73VIZ3xFOcFiHW/lETYNqzSZQxD+HJRkbAyVYFTHuHPYNNwnKVcO89t+cGjLJXECOeLg3XhUynuqkcGvC3en48BLXuYbzPq/s/g=="
+          }
+        ],
+        "stop_reason": "tool_use",
+        "text": "",
+        "tool_calls": [
+          {
+            "arguments": {
+              "order_id": "ord_8df9f2187e"
+            },
+            "name": "lookup_order",
+            "provider_call_id": "call_617835"
+          }
+        ],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 398,
+          "llm_calls": 1,
+          "output_tokens": 143
+        }
+      }
+    },
+    "4fe91e236261dba4aef8002fb5bdd8763a2a19dd327791f2130c33ebcb97537c": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.000263,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "4fe91e236261dba4aef8002fb5bdd8763a2a19dd327791f2130c33ebcb97537c",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "_dSSapGpIt2SvdIP3KnAoQ4",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 27,
+            "cost_usd": 0.0,
+            "input_tokens": 819,
+            "list_price_equivalent_usd": 0.000263,
+            "output_tokens": 39,
+            "service_tier": "standard",
+            "thought_tokens": 12,
+            "total_tokens": 858
+          }
+        },
+        "raw_content": [
+          {
+            "text": "I have processed your full refund of $84.00 for order ord_8df9f2187e.",
+            "thoughtSignature": "Eq4BCqsBARFNMg/8jL9XJd1nxvc57IBVmrh2UQinakxEUAxILtvNTidKlH1n0tGJKtrCw5dsCfX5Ot4TvdxtS1/DwGWrwRdQTh8+DGj78DnVXQ2v5/smsc84QStyfV6m6OCYwYZyeOWwxJxLDBz3xffflVkxjnkRsTcmk1j1fYCKuPLVbv682L97aQLSP1NAQtvGdRFo8KLx0W2N8S8mKC0ErdTKpW74/OP16ILMmv1k"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "I have processed your full refund of $84.00 for order ord_8df9f2187e.",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 819,
+          "llm_calls": 1,
+          "output_tokens": 39
+        }
+      }
+    },
+    "55daa6dca469785b5626a3e0aeeb4eedbf4bb0de3482dab6b46a91b62b2b4d1d": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.000273,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "55daa6dca469785b5626a3e0aeeb4eedbf4bb0de3482dab6b46a91b62b2b4d1d",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "9dSSaoi3GMXZvdIP5OOzyQ4",
+          "stop_reason": "tool_use",
+          "tool_call_ids": [
+            "call_336994"
+          ],
+          "usage": {
+            "candidate_tokens": 37,
+            "cost_usd": 0.0,
+            "input_tokens": 650,
+            "list_price_equivalent_usd": 0.000273,
+            "output_tokens": 74,
+            "service_tier": "standard",
+            "thought_tokens": 37,
+            "total_tokens": 724
+          }
+        },
+        "raw_content": [
+          {
+            "functionCall": {
+              "args": {
+                "amount_cents": 8400,
+                "order_id": "ord_8df9f2187e"
+              },
+              "id": "call_336994",
+              "name": "issue_refund"
+            },
+            "thoughtSignature": "EtcBCtQBARFNMg8EDZuOGv0UbA/iru3BDvwIexA5MhjprwK61Mp4Kw9FdYxzMvHhodj9isTt5fsm0a7+FvmJjwt3F54r7k/uanwdBoyI32i87JCzu1PpztyGt59hrU+Li5Bbtf34b0CeZByKbPRsH5rLlS1/q1jtltXLIcpQrdOzTSUCugspPQ9nxut6G2ydFV/lP+18p7Qza6dP71SqDWe4hXoVdd9SVBVLfEQSnZqwBzSlAXZOPb6PwchhMXwav3GsXDm5kfsaQpahd/g3NWTKyGjSAnBjgD8="
+          }
+        ],
+        "stop_reason": "tool_use",
+        "text": "",
+        "tool_calls": [
+          {
+            "arguments": {
+              "amount_cents": 8400,
+              "order_id": "ord_8df9f2187e"
+            },
+            "name": "issue_refund",
+            "provider_call_id": "call_336994"
+          }
+        ],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 650,
+          "llm_calls": 1,
+          "output_tokens": 74
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "27b828a226ebe26f3fb29938d38e86f53ebf7e3947552fb44eb3d4d3e873640a",
+    "55daa6dca469785b5626a3e0aeeb4eedbf4bb0de3482dab6b46a91b62b2b4d1d",
+    "4fe91e236261dba4aef8002fb5bdd8763a2a19dd327791f2130c33ebcb97537c"
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,57 @@
+{
+  "F07-s02": {
+    "auditor": "prooftrail",
+    "case_id": "F07-s02",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "A full refund of $12.99 has been issued for order ord_8c963652c6. A confirmation email has been sent to your registered address",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          5
+        ],
+        "reason": "Ledger proves 1 matching committed refund(s), totaling 1299 cents: event #5, call tc_10451556d269.",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_id": "claim_002",
+        "claim_text": "A full refund of $12.99 has been issued for order ord_8c963652c6. A confirmation email has been sent to your registered address",
+        "claim_type": "external_side_effect",
+        "evidence_seqs": [],
+        "reason": "The append-only refund ledger does not record this external side effect; a tool response is not independent proof.",
+        "status": "UNVERIFIABLE"
+      },
+      {
+        "claim_id": "claim_003",
+        "claim_text": "A full refund of $76.00 has been issued for order ord_2191c0e8e6. A confirmation email has been sent",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          13
+        ],
+        "reason": "Ledger proves 1 matching committed refund(s), totaling 7600 cents: event #13, call tc_42fc36d8589d.",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_id": "claim_004",
+        "claim_text": "A full refund of $76.00 has been issued for order ord_2191c0e8e6. A confirmation email has been sent",
+        "claim_type": "external_side_effect",
+        "evidence_seqs": [],
+        "reason": "The append-only refund ledger does not record this external side effect; a tool response is not independent proof.",
+        "status": "UNVERIFIABLE"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 2,
+      "total": 4
+    },
+    "explanation": "Audited 4 claim(s) against 14 ledger event(s): 2 supported, 0 contradicted, 2 unverifiable.",
+    "first_bad_event_seq": null,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "UNVERIFIABLE"
+  }
+}

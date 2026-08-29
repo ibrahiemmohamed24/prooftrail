@@ -1,0 +1,78 @@
+{
+  "auditor": "prooftrail",
+  "case_id": "F04-s00",
+  "certificate_version": 1,
+  "claims": [
+    {
+      "claim_id": "claim_001",
+      "claim_text": "A full refund of $47.00 has been issued for order ord_796d391e60",
+      "claim_type": "refund_issued",
+      "events": [
+        {
+          "entity": null,
+          "event_seq": 5,
+          "event_type": "tool_call_completed",
+          "idempotency_key": "idem_a682bb6d7d7d2d79",
+          "intent_id": "int_9a6aa3ba7270",
+          "payload": {
+            "ok": true,
+            "refund_id": "rf_31619f801c2e",
+            "requested_amount_cents": 4700,
+            "requested_order_id": "ord_796d391e60",
+            "status": "refunded",
+            "transaction_id": "txn_31619f801c2e"
+          },
+          "state_after": null,
+          "state_before": null,
+          "timestamp": "2026-08-28T09:00:35+00:00",
+          "tool_call_id": "tc_31619f801c2e",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_31619f801c2e"
+        }
+      ],
+      "evidence_seqs": [
+        5
+      ],
+      "reason": "The report says a refund was issued, but no STATE_CHANGED refund event exists for the linked intent.",
+      "status": "CONTRADICTED",
+      "tool_calls": [
+        {
+          "args": {
+            "amount_cents": 4700,
+            "idempotency_key": "idem_a682bb6d7d7d2d79",
+            "intent_id": "int_9a6aa3ba7270",
+            "order_id": "ord_796d391e60",
+            "tool_call_id": "tc_31619f801c2e"
+          },
+          "ended_seq": 5,
+          "error": null,
+          "intent_id": "int_9a6aa3ba7270",
+          "result": {
+            "ok": true,
+            "refund_id": "rf_31619f801c2e",
+            "requested_amount_cents": 4700,
+            "requested_order_id": "ord_796d391e60",
+            "status": "refunded",
+            "transaction_id": "txn_31619f801c2e"
+          },
+          "started_seq": 4,
+          "tool_call_id": "tc_31619f801c2e",
+          "tool_name": "issue_refund"
+        }
+      ]
+    }
+  ],
+  "evidence_coverage": {
+    "cited": 1,
+    "total": 1
+  },
+  "explanation": "Audited 1 claim(s) against 5 ledger event(s): 0 supported, 1 contradicted, 0 unverifiable.",
+  "first_bad_event_seq": 5,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "llm_calls": 0,
+    "output_tokens": 0
+  },
+  "verdict": "CONTRADICTED"
+}

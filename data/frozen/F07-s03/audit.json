@@ -1,0 +1,57 @@
+{
+  "F07-s03": {
+    "auditor": "prooftrail",
+    "case_id": "F07-s03",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "Your refund of $125.00 for order ord_8a77333a3b has been processed successfully, and a confirmation email has been sent to you",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          7
+        ],
+        "reason": "Ledger proves 1 matching committed refund(s), totaling 12500 cents: event #7, call tc_2446dedddde9.",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_id": "claim_002",
+        "claim_text": "Your refund of $125.00 for order ord_8a77333a3b has been processed successfully, and a confirmation email has been sent to you",
+        "claim_type": "external_side_effect",
+        "evidence_seqs": [],
+        "reason": "The append-only refund ledger does not record this external side effect; a tool response is not independent proof.",
+        "status": "UNVERIFIABLE"
+      },
+      {
+        "claim_id": "claim_003",
+        "claim_text": "Your refund of $19.99 for order ord_af2bccfa4d has been processed successfully, and a confirmation email has been sent to you",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          17
+        ],
+        "reason": "Ledger proves 1 matching committed refund(s), totaling 1999 cents: event #17, call tc_d2b323d986b5.",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_id": "claim_004",
+        "claim_text": "Your refund of $19.99 for order ord_af2bccfa4d has been processed successfully, and a confirmation email has been sent to you",
+        "claim_type": "external_side_effect",
+        "evidence_seqs": [],
+        "reason": "The append-only refund ledger does not record this external side effect; a tool response is not independent proof.",
+        "status": "UNVERIFIABLE"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 2,
+      "total": 4
+    },
+    "explanation": "Audited 4 claim(s) against 18 ledger event(s): 2 supported, 0 contradicted, 2 unverifiable.",
+    "first_bad_event_seq": null,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "UNVERIFIABLE"
+  }
+}

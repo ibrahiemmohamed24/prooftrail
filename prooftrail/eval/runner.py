@@ -54,5 +54,6 @@ def write_outputs(path: str | Path, outputs: Mapping[str, AuditOutput]) -> Path:
         )
         + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     return destination

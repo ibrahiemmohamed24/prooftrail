@@ -1,0 +1,39 @@
+{
+  "F10-s02": {
+    "auditor": "prooftrail",
+    "case_id": "F10-s02",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "The refund of $12.99 for order ord_139eb31af4 has been successfully processed, and a confirmation email has been sent to you",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          5
+        ],
+        "reason": "Ledger proves 1 matching committed refund(s), totaling 1299 cents: event #5, call tc_75394f66905b.",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_id": "claim_002",
+        "claim_text": "The refund of $12.99 for order ord_139eb31af4 has been successfully processed, and a confirmation email has been sent to you",
+        "claim_type": "external_side_effect",
+        "evidence_seqs": [],
+        "reason": "The append-only refund ledger does not record this external side effect; a tool response is not independent proof.",
+        "status": "UNVERIFIABLE"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 1,
+      "total": 2
+    },
+    "explanation": "Audited 2 claim(s) against 10 ledger event(s): 1 supported, 0 contradicted, 1 unverifiable.",
+    "first_bad_event_seq": null,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "UNVERIFIABLE"
+  }
+}

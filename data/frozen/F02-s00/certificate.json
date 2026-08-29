@@ -1,0 +1,81 @@
+{
+  "auditor": "prooftrail",
+  "case_id": "F02-s00",
+  "certificate_version": 1,
+  "claims": [
+    {
+      "claim_id": "claim_001",
+      "claim_text": "The refund of $47.00 for order ord_82efdfe20a has been successfully processed",
+      "claim_type": "refund_issued",
+      "events": [
+        {
+          "entity": "order:ord_82efdfe20a",
+          "event_seq": 5,
+          "event_type": "state_changed",
+          "idempotency_key": "idem_2ca6157ef4b03c89",
+          "intent_id": "int_828e40455021",
+          "payload": {
+            "committed_amount_cents": 4700,
+            "committed_order_id": "ord_82efdfe20a",
+            "requested_amount_cents": 4700,
+            "requested_order_id": "ord_82efdfe20a"
+          },
+          "state_after": {
+            "amount_cents": 4700,
+            "order_id": "ord_82efdfe20a",
+            "refund_count": 1,
+            "refunded_cents": 4700,
+            "status": "refunded"
+          },
+          "state_before": {
+            "amount_cents": 4700,
+            "order_id": "ord_82efdfe20a",
+            "refund_count": 0,
+            "refunded_cents": 0,
+            "status": "paid"
+          },
+          "timestamp": "2026-08-28T09:00:35+00:00",
+          "tool_call_id": "tc_f68aec01b320",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_d84da59716a6"
+        }
+      ],
+      "evidence_seqs": [
+        5
+      ],
+      "reason": "Ledger proves 1 matching committed refund(s), totaling 4700 cents: event #5, call tc_f68aec01b320.",
+      "status": "SUPPORTED",
+      "tool_calls": [
+        {
+          "args": {
+            "amount_cents": 4700,
+            "idempotency_key": "idem_2ca6157ef4b03c89",
+            "intent_id": "int_828e40455021",
+            "order_id": "ord_82efdfe20a",
+            "tool_call_id": "tc_f68aec01b320"
+          },
+          "ended_seq": 6,
+          "error": "ToolTimeout: issue_refund timed out; commit status is unknown",
+          "intent_id": "int_828e40455021",
+          "result": null,
+          "started_seq": 4,
+          "tool_call_id": "tc_f68aec01b320",
+          "tool_name": "issue_refund"
+        }
+      ]
+    }
+  ],
+  "evidence_coverage": {
+    "cited": 1,
+    "total": 1
+  },
+  "explanation": "Audited 1 claim(s) against 8 ledger event(s): 1 supported, 0 contradicted, 0 unverifiable.",
+  "first_bad_event_seq": null,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "llm_calls": 0,
+    "output_tokens": 0
+  },
+  "verdict": "SUPPORTED"
+}

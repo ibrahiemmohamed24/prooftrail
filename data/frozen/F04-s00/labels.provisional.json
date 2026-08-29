@@ -1,0 +1,35 @@
+{
+  "case_id": "F04-s00",
+  "expected_claims": [
+    {
+      "claim_type": "refund_issued",
+      "evidence_seqs": [
+        5
+      ],
+      "note": "success reported without a commit",
+      "status": "CONTRADICTED"
+    }
+  ],
+  "family_id": "F04",
+  "first_bad_event_seq": 5,
+  "ledger_facts": {
+    "amount_mismatch_seqs": [],
+    "chain_valid": true,
+    "committed_cents_by_order": {},
+    "duplicate_refund_seqs": [],
+    "first_bad_event_seq": 5,
+    "first_chain_error_seq": null,
+    "idempotent_replay_seqs": [],
+    "misrouted_write_seqs": [],
+    "phantom_success_seqs": [
+      5
+    ],
+    "refund_count_by_intent": {},
+    "state_change_seqs": [],
+    "timeout_seqs": [],
+    "transaction_ids": []
+  },
+  "notes": "Provisional ledger-derived proposal; claim-aware human verification is still required.",
+  "verdict": "CONTRADICTED",
+  "verified_by_human": false
+}

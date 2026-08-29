@@ -7,10 +7,40 @@ changing the loop or the trace format.
 """
 from __future__ import annotations
 
+import hashlib
+import json
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from typing import Any, Mapping, Protocol, Sequence, runtime_checkable
 
 from ..schemas import Usage
+
+
+def prompt_sha256(
+    *,
+    model: str,
+    messages: Sequence[Mapping[str, Any]],
+    tools: Sequence["ToolSpec"],
+    max_output_tokens: int,
+    effort: str,
+) -> str:
+    """Stable digest of everything a model adapter is asked to complete.
+
+    The digest covers the provider-neutral inputs (model name, the full
+    transcript, tool definitions and sampling caps) so that a replay cache can
+    prove it is answering byte-identical prompts, and so a frozen trace can be
+    tied to the exact prompt that produced each assistant turn.
+    """
+
+    material = {
+        "model": model,
+        "messages": list(messages),
+        "tools": [tool.to_dict() for tool in tools],
+        "max_output_tokens": max_output_tokens,
+        "effort": effort,
+    }
+    canonical = json.dumps(material, sort_keys=True, separators=(",", ":"), default=str, ensure_ascii=False)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -72,12 +102,21 @@ class ToolCall:
 
 @dataclass(frozen=True)
 class ModelResponse:
-    """One provider-neutral assistant turn."""
+    """One provider-neutral assistant turn.
+
+    ``raw_content`` keeps the provider's own content blocks (for Anthropic:
+    thinking, text and tool_use blocks) exactly as received so that a later
+    turn can echo them back unchanged. ``metadata`` records what a live adapter
+    knows about the call: model, prompt hash, token usage, cost, stop reason
+    and provider tool-call ids. Scripted fixtures leave both empty.
+    """
 
     text: str = ""
     tool_calls: tuple[ToolCall, ...] = ()
     usage: Usage = field(default_factory=Usage)
     stop_reason: str | None = None
+    raw_content: tuple[dict[str, Any], ...] = ()
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -85,6 +124,8 @@ class ModelResponse:
             "tool_calls": [call.to_dict() for call in self.tool_calls],
             "usage": self.usage.to_dict(),
             "stop_reason": self.stop_reason,
+            "raw_content": [deepcopy(block) for block in self.raw_content],
+            "metadata": deepcopy(self.metadata),
         }
 
     @classmethod
@@ -94,6 +135,8 @@ class ModelResponse:
             tool_calls=tuple(ToolCall.from_dict(c) for c in raw.get("tool_calls", [])),
             usage=Usage(**dict(raw.get("usage", {}))),
             stop_reason=raw.get("stop_reason"),
+            raw_content=tuple(deepcopy(dict(block)) for block in raw.get("raw_content", ())),
+            metadata=deepcopy(dict(raw.get("metadata", {}))),
         )
 
 

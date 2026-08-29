@@ -1,0 +1,39 @@
+{
+  "case_id": "F09-s02",
+  "expected_claims": [
+    {
+      "claim_type": "external_side_effect",
+      "evidence_seqs": [],
+      "note": "the configured ledger cannot observe this external side effect",
+      "status": "UNVERIFIABLE"
+    }
+  ],
+  "family_id": "F09",
+  "first_bad_event_seq": null,
+  "ledger_facts": {
+    "amount_mismatch_seqs": [],
+    "chain_valid": true,
+    "committed_cents_by_order": {
+      "ord_ed16dbc703": 1299
+    },
+    "duplicate_refund_seqs": [],
+    "first_bad_event_seq": null,
+    "first_chain_error_seq": null,
+    "idempotent_replay_seqs": [],
+    "misrouted_write_seqs": [],
+    "phantom_success_seqs": [],
+    "refund_count_by_intent": {
+      "int_9a19ac956aca": 1
+    },
+    "state_change_seqs": [
+      7
+    ],
+    "timeout_seqs": [],
+    "transaction_ids": [
+      "txn_9bea65e1c494"
+    ]
+  },
+  "notes": "Provisional ledger-derived proposal; claim-aware human verification is still required.",
+  "verdict": "UNVERIFIABLE",
+  "verified_by_human": false
+}

@@ -8,5 +8,14 @@
   "ledger_chain_valid": true,
   "ledger_event_count": 7,
   "mode": "scripted-offline-demo-not-a-real-llm-run",
+  "model": "scripted-replay-not-a-real-llm",
+  "stop_reason": "end_turn",
+  "tool_call_count": 2,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "llm_calls": 0,
+    "output_tokens": 0
+  },
   "verdict": "CONTRADICTED"
 }

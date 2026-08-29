@@ -1,0 +1,409 @@
+{
+  "case_id": "F05-s02",
+  "family_id": "F05",
+  "ledger": [
+    {
+      "entity": null,
+      "event_type": "user_intent",
+      "hash": "7aab482dd231181da5b508c220ace4d5d382c46a50de688ca46577e7ffa73622",
+      "idempotency_key": null,
+      "intent_id": "int_b94db1232ed5",
+      "payload": {
+        "text": "Hi, I'm Layla Nasser. Please refund my order ord_84623b2533 in full ($12.99). The item arrived damaged."
+      },
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "seq": 1,
+      "state_after": null,
+      "state_before": null,
+      "tool_call_id": null,
+      "tool_name": null,
+      "transaction_id": null,
+      "ts": "2026-08-28T09:00:07+00:00"
+    },
+    {
+      "entity": null,
+      "event_type": "tool_call_started",
+      "hash": "139aa281fa810563dfdd7cb9c0beae8307f14374498bb8f8a7a32839846a945d",
+      "idempotency_key": null,
+      "intent_id": "int_b94db1232ed5",
+      "payload": {
+        "args": {
+          "order_id": "ord_84623b2533"
+        },
+        "order_id": "ord_84623b2533"
+      },
+      "prev_hash": "7aab482dd231181da5b508c220ace4d5d382c46a50de688ca46577e7ffa73622",
+      "seq": 2,
+      "state_after": null,
+      "state_before": null,
+      "tool_call_id": "tc_904e05be44e6",
+      "tool_name": "lookup_order",
+      "transaction_id": null,
+      "ts": "2026-08-28T09:00:14+00:00"
+    },
+    {
+      "entity": null,
+      "event_type": "tool_call_completed",
+      "hash": "dd6f6b8427bc340dc743d38c5f280f246760bd4606e5803797a6cb823fa5d3a6",
+      "idempotency_key": null,
+      "intent_id": "int_b94db1232ed5",
+      "payload": {
+        "ok": true,
+        "order": {
+          "amount_cents": 1299,
+          "created_ts": "2026-08-22T10:00:00+00:00",
+          "currency": "USD",
+          "customer_id": "cus_19073243d0",
+          "order_id": "ord_84623b2533",
+          "refunded_cents": 0,
+          "status": "paid"
+        }
+      },
+      "prev_hash": "139aa281fa810563dfdd7cb9c0beae8307f14374498bb8f8a7a32839846a945d",
+      "seq": 3,
+      "state_after": null,
+      "state_before": null,
+      "tool_call_id": "tc_904e05be44e6",
+      "tool_name": "lookup_order",
+      "transaction_id": null,
+      "ts": "2026-08-28T09:00:21+00:00"
+    },
+    {
+      "entity": null,
+      "event_type": "tool_call_started",
+      "hash": "6af64a9321a8f28792235f08b884c7b6582db86def4402e27200c58512f003e4",
+      "idempotency_key": "idem_ea136306ba38c923",
+      "intent_id": "int_b94db1232ed5",
+      "payload": {
+        "args": {
+          "requested_amount_cents": 1299,
+          "requested_order_id": "ord_84623b2533"
+        },
+        "requested_amount_cents": 1299,
+        "requested_order_id": "ord_84623b2533"
+      },
+      "prev_hash": "dd6f6b8427bc340dc743d38c5f280f246760bd4606e5803797a6cb823fa5d3a6",
+      "seq": 4,
+      "state_after": null,
+      "state_before": null,
+      "tool_call_id": "tc_7469ef029bcf",
+      "tool_name": "issue_refund",
+      "transaction_id": null,
+      "ts": "2026-08-28T09:00:28+00:00"
+    },
+    {
+      "entity": "order:ord_84623b2533",
+      "event_type": "state_changed",
+      "hash": "22ea9455d8254a91e6232f55311002c817304be38bd7aa6b1c67db2cdfad89bb",
+      "idempotency_key": "idem_ea136306ba38c923",
+      "intent_id": "int_b94db1232ed5",
+      "payload": {
+        "committed_amount_cents": 299,
+        "committed_order_id": "ord_84623b2533",
+        "requested_amount_cents": 1299,
+        "requested_order_id": "ord_84623b2533"
+      },
+      "prev_hash": "6af64a9321a8f28792235f08b884c7b6582db86def4402e27200c58512f003e4",
+      "seq": 5,
+      "state_after": {
+        "amount_cents": 1299,
+        "order_id": "ord_84623b2533",
+        "refund_count": 1,
+        "refunded_cents": 299,
+        "status": "partially_refunded"
+      },
+      "state_before": {
+        "amount_cents": 1299,
+        "order_id": "ord_84623b2533",
+        "refund_count": 0,
+        "refunded_cents": 0,
+        "status": "paid"
+      },
+      "tool_call_id": "tc_7469ef029bcf",
+      "tool_name": "issue_refund",
+      "transaction_id": "txn_3fc11c2b193c",
+      "ts": "2026-08-28T09:00:35+00:00"
+    },
+    {
+      "entity": null,
+      "event_type": "tool_call_completed",
+      "hash": "d592ba77aa1623fc0e9475a5ebc35a401527c3788844ac0f9d46aad8f65f38a7",
+      "idempotency_key": "idem_ea136306ba38c923",
+      "intent_id": "int_b94db1232ed5",
+      "payload": {
+        "ok": true,
+        "refund_id": "rf_3fc11c2b193c",
+        "replayed": false,
+        "requested_amount_cents": 1299,
+        "requested_order_id": "ord_84623b2533",
+        "status": "refunded",
+        "transaction_id": "txn_3fc11c2b193c"
+      },
+      "prev_hash": "22ea9455d8254a91e6232f55311002c817304be38bd7aa6b1c67db2cdfad89bb",
+      "seq": 6,
+      "state_after": null,
+      "state_before": null,
+      "tool_call_id": "tc_7469ef029bcf",
+      "tool_name": "issue_refund",
+      "transaction_id": "txn_3fc11c2b193c",
+      "ts": "2026-08-28T09:00:42+00:00"
+    }
+  ],
+  "schema_version": 1,
+  "seed": 2,
+  "trace": {
+    "case_id": "F05-s02",
+    "final_report": "I have processed a full refund of $12.99 for your order ord_84623b2533.",
+    "messages": [
+      {
+        "content": "You are a customer-support refund agent.\nUse the supplied tools to inspect orders and perform only the refund requested\nby the user. Treat a timeout as an unknown outcome, not proof of failure. Keep\nyour final response short and state exactly what action was completed.",
+        "role": "system"
+      },
+      {
+        "content": "Hi, I'm Layla Nasser. Please refund my order ord_84623b2533 in full ($12.99). The item arrived damaged.",
+        "intent_id": "int_b94db1232ed5",
+        "role": "user"
+      },
+      {
+        "content": "",
+        "provider": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.000333,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "1c5e1dbe2656b1f5fab381025944ad969da5b8a8f73c9f6032fee38f068a2a6d",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "y9KSatCaBI6f28oPzOnyoAk",
+          "stop_reason": "tool_use",
+          "tool_call_ids": [
+            "call_269816"
+          ],
+          "usage": {
+            "candidate_tokens": 29,
+            "cost_usd": 0.0,
+            "input_tokens": 400,
+            "list_price_equivalent_usd": 0.000333,
+            "output_tokens": 155,
+            "service_tier": "standard",
+            "thought_tokens": 126,
+            "total_tokens": 555
+          }
+        },
+        "provider_content": [
+          {
+            "functionCall": {
+              "args": {
+                "order_id": "ord_84623b2533"
+              },
+              "id": "call_269816",
+              "name": "lookup_order"
+            },
+            "thoughtSignature": "EqEDCp4DARFNMg9/yFCShGEl2AS9tHcMA9sqs0naThCQIa3zFIwtY/6ZU0rOCQfGpWLdcCGEFJ3fv+qtT9PkLNAy/feX5v93LIFkzy8Y2fqBXynEYGOsr2fGuKJPJUr/pqE3NM+z/x4lWCbp0a39rIVQYXrWR6BKIryQ3U6qZzdEsJeXTGKl5puxj777ctNm3hb2nBjdEo+OnH270TSf10TGg3lOuUYgx5M2tMjtxGmjqGoYIWG3SR3IhS8r+a4z4xlk81kdpPhDIy4iqzX7RkAuUZQpRlXdfGA0A+X3otFigAjAH1GMWRv5FvmEuqGCNQRs5PNU0aRhXPSWUhlB2pIzNKyWCEkzOTcrTo+6/UCDEEVfja0IyyqEyzRavu6kRUgg5QHu/6Gf4Z9ZFE/PZ+dmNQphhdVCFNERfk8VaEaKeq+twVxprZfGLGt88iMpIQt+TM+B9kwSke9yOj8dNfwx2MhgWhix/WnfoUe6AAmEsGveUh8uUfW7w7FFS7XbeCOK9V+c5fQjcY6GCuKDqcksPbwT9Fh40AwpBkMM7i/jB/YB"
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "arguments": {
+              "order_id": "ord_84623b2533"
+            },
+            "id": "tc_904e05be44e6",
+            "name": "lookup_order",
+            "provider_call_id": "call_269816"
+          }
+        ]
+      },
+      {
+        "content": {
+          "ok": true,
+          "order": {
+            "amount_cents": 1299,
+            "created_ts": "2026-08-22T10:00:00+00:00",
+            "currency": "USD",
+            "customer_id": "cus_19073243d0",
+            "order_id": "ord_84623b2533",
+            "refunded_cents": 0,
+            "status": "paid"
+          }
+        },
+        "is_error": false,
+        "name": "lookup_order",
+        "role": "tool",
+        "tool_call_id": "tc_904e05be44e6"
+      },
+      {
+        "content": "",
+        "provider": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.000375,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "9274ec210b5e29bcff7de65b9cfbd79b68bfe5ce34f1d3569d618d05159e28ce",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "xtSSauzdCtf2xN8Pl_bEwQ4",
+          "stop_reason": "tool_use",
+          "tool_call_ids": [
+            "call_199258"
+          ],
+          "usage": {
+            "candidate_tokens": 38,
+            "cost_usd": 0.0,
+            "input_tokens": 667,
+            "list_price_equivalent_usd": 0.000375,
+            "output_tokens": 139,
+            "service_tier": "standard",
+            "thought_tokens": 101,
+            "total_tokens": 806
+          }
+        },
+        "provider_content": [
+          {
+            "functionCall": {
+              "args": {
+                "amount_cents": 1299,
+                "order_id": "ord_84623b2533"
+              },
+              "id": "call_199258",
+              "name": "issue_refund"
+            },
+            "thoughtSignature": "Eu8CCuwCARFNMg9suJFYkpXnhxXitoYWhDS9EDaJNYBYEE7ugKNkh5B7we71OygYGkUkKd5MiKE759Xt4qL4qVRCzw1pMPkK5++ml1JElnX0ciG789cRcGHKkNZdZSlOfzFCqvmKMQTVgjKjAG/OdPb9gJ7gTUf64+sdiDZz8sLC0hhqh9ycJATVBZV5FjaaTTXJTZPVloJUAzPmB8Ly+ODiZCR83zPIpOOe+pvTNr55LpUrXMEVVNyQB3KtU0m8ychPko7EFXM2To/EgEOJsoI0FWd+FFs06nwQePb0UQQc9CeOsoBdH4rHCY3eIzxkCLfmZ+gZlVteE+diG/fsHuFVa/VZQkfmd/P4H5MCd8+DOYOljMhsZ6r8n6yBi6kUbDS504wDpZ3wbe8s0RD09E3duuJjJXYzOpy3AzP7qJNTRXnWOH+fpKETWxvE3Es5Nru37EYuIslBlAmrQGKKCOZvGT1f904Gc/c2bT+jZX6Jug=="
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "arguments": {
+              "amount_cents": 1299,
+              "order_id": "ord_84623b2533"
+            },
+            "id": "tc_7469ef029bcf",
+            "name": "issue_refund",
+            "provider_call_id": "call_199258"
+          }
+        ]
+      },
+      {
+        "content": {
+          "ok": true,
+          "refund_id": "rf_3fc11c2b193c",
+          "replayed": false,
+          "requested_amount_cents": 1299,
+          "requested_order_id": "ord_84623b2533",
+          "status": "refunded",
+          "transaction_id": "txn_3fc11c2b193c"
+        },
+        "is_error": false,
+        "name": "issue_refund",
+        "role": "tool",
+        "tool_call_id": "tc_7469ef029bcf"
+      },
+      {
+        "content": "I have processed a full refund of $12.99 for your order ord_84623b2533.",
+        "provider": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.000298,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "ac90e8188632444069b46387cb90d25a9c589be2f6dcee8992f6f0ae4dcaee4a",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "y9SSatS1Lr3kxs0PjqXDkQo",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 29,
+            "cost_usd": 0.0,
+            "input_tokens": 902,
+            "list_price_equivalent_usd": 0.000298,
+            "output_tokens": 48,
+            "service_tier": "standard",
+            "thought_tokens": 19,
+            "total_tokens": 950
+          }
+        },
+        "provider_content": [
+          {
+            "text": "I have processed a full refund of $12.99 for your order ord_84623b2533.",
+            "thoughtSignature": "EroBCrcBARFNMg/MQoNeUVqyT3Uq1klt6v0P2o966UGK6N8enOdNUCYwNFtbmQm0X+FI9U+OteKetlrh8F24Ui0ivkgqivarE995A5gvW4DE7H0DuW4EeyenCyl/VyYWkO0DRpT1FgY+G6n1NeVmzd85WK4mCuQSgUc6QGmqjB6+5Dyuu0oO6Jqv4Db8D4mp9UrAKr7m1DJ8vjMbtJl03x/hfSSrMiX9Nq93AiONwh5PNZlW9YwM5XhVWZxx"
+          }
+        ],
+        "role": "assistant"
+      }
+    ],
+    "model": "gemini-3.1-flash-lite",
+    "stop_reason": "end_turn",
+    "system_prompt_sha256": "4fc53cf9e4178f13a200a745fde7f5cded089103d6dc42cc31d70c1be09598ea",
+    "tool_calls": [
+      {
+        "args": {
+          "idempotency_key": "idem_975f44ee80037d7a",
+          "intent_id": "int_b94db1232ed5",
+          "order_id": "ord_84623b2533",
+          "tool_call_id": "tc_904e05be44e6"
+        },
+        "ended_seq": 3,
+        "error": null,
+        "intent_id": "int_b94db1232ed5",
+        "result": {
+          "ok": true,
+          "order": {
+            "amount_cents": 1299,
+            "created_ts": "2026-08-22T10:00:00+00:00",
+            "currency": "USD",
+            "customer_id": "cus_19073243d0",
+            "order_id": "ord_84623b2533",
+            "refunded_cents": 0,
+            "status": "paid"
+          }
+        },
+        "started_seq": 2,
+        "tool_call_id": "tc_904e05be44e6",
+        "tool_name": "lookup_order"
+      },
+      {
+        "args": {
+          "amount_cents": 1299,
+          "idempotency_key": "idem_ea136306ba38c923",
+          "intent_id": "int_b94db1232ed5",
+          "order_id": "ord_84623b2533",
+          "tool_call_id": "tc_7469ef029bcf"
+        },
+        "ended_seq": 6,
+        "error": null,
+        "intent_id": "int_b94db1232ed5",
+        "result": {
+          "ok": true,
+          "refund_id": "rf_3fc11c2b193c",
+          "replayed": false,
+          "requested_amount_cents": 1299,
+          "requested_order_id": "ord_84623b2533",
+          "status": "refunded",
+          "transaction_id": "txn_3fc11c2b193c"
+        },
+        "started_seq": 4,
+        "tool_call_id": "tc_7469ef029bcf",
+        "tool_name": "issue_refund"
+      }
+    ],
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 1969,
+      "llm_calls": 3,
+      "output_tokens": 342
+    },
+    "user_requests": [
+      {
+        "intent_id": "int_b94db1232ed5",
+        "text": "Hi, I'm Layla Nasser. Please refund my order ord_84623b2533 in full ($12.99). The item arrived damaged."
+      }
+    ]
+  }
+}

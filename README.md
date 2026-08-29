@@ -2,11 +2,15 @@
 
 **Evidence-linked auditing of what an AI agent *says* it did versus what the ledger *proves* it did.**
 
-> Status: working offline milestone (≈55% of the submission plan). The $47 → $94 path now runs
-> end to end: stateful tools, trace recording, ledger reconciliation, first-bad-event detection,
-> certificates, fair-baseline contract, metrics and CLI. **98 tests pass.** The real-LLM adapter,
-> frozen 40-case benchmark, human label verification and final competition assets are still pending.
-> See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and current handoff target.
+> Status: live providers plus the frozen 40-case dataset (75 / 100 of the submission plan).
+> The $47 → $94 path runs end to end: stateful tools, trace recording, ledger reconciliation,
+> first-bad-event detection, certificates, fair-baseline contract, metrics and CLI. A paid
+> Anthropic adapter (budget guard, prompt hashing) and a zero-billed Gemini Free Tier adapter
+> use the same provider-namespaced replay mechanism. **All 40 real-model traces are frozen in
+> `data/frozen/` (Gemini Free Tier, `gemini-3.1-flash-lite`, billed $0.00) and replay with no
+> key; 194 tests pass (94% coverage), none of them touch the network.** Human label verification, the B1
+> comparison over the frozen inputs and final competition assets are still pending. See
+> [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and handoff target.
 
 ---
 
@@ -35,13 +39,16 @@ Real LLM Refund Agent ──► Mock Tools ──► SQLite State + Append-only 
                                                    │
                     Frozen Trace + Same Raw Ledger ◄┘
                     ├── B1  (fair baseline): one-shot LLM sees trace + ledger
-                    └── ProofTrail: LLM claim extraction → deterministic reconciliation
-                                    + temporal/intent verification → evidence certificate
+                    └── ProofTrail: deterministic claim extraction (LLM-backed extractor planned)
+                                    → deterministic reconciliation + temporal/intent verification
+                                    → evidence certificate
 ```
 
 Three rules that make the comparison worth anything:
 
-1. **Same evidence** — B1 and ProofTrail get byte-identical input (same model, same caps, same schema).
+1. **Same evidence** — the B1 contract and ProofTrail receive the same frozen trace + ledger
+   (byte-identical input, same schema). Running B1 over the frozen dataset, and model/caps parity
+   for that run, are still pending.
 2. **Independent truth** — labels come from the ledger, never from any model's opinion.
 3. **Frozen traces** — the agent runs once; every evaluation replays. Judges need no API key.
 
@@ -85,8 +92,99 @@ Hash chain    : valid
 
 This command deliberately uses `ScriptedModelClient`, a deterministic offline
 fixture. It proves the integration and replay path; it is **not** reported as
-evidence of real-model behaviour. Live LLM traces will be generated and frozen
-once in the next milestone, after which judges will replay them with no key.
+evidence of real-model behaviour. Live LLM traces are generated with the
+command below and frozen once, after which judges replay them with no key.
+
+---
+
+## Live run — one real-model case, then replay it for free
+
+```powershell
+python -m pip install -e ".[dev,live]"     # adds the anthropic SDK
+$env:ANTHROPIC_API_KEY = "<your key>"      # never committed; read from the environment only
+$env:PROOFTRAIL_BUDGET_USD = "30"          # hard spend ceiling across ALL live runs
+
+python -m prooftrail agent run --live --fresh --family F02 --seed 0   # record a NEW trace
+python -m prooftrail agent run --replay --family F02 --seed 0          # no key, no network
+```
+
+`--fresh` discards `data/replay/F02-s00.json` before recording. Without it a live
+run first serves every prompt it already has in that cache and only calls the API
+for prompts it has not seen — useful to resume an interrupted recording cheaply,
+but it means the result is a continuation of the earlier trace, not a fresh
+sample of model behaviour. A cache recorded with a different model is refused
+before any request is sent.
+
+What a live run records, per assistant turn, inside `evidence/runs/live/<case>/case.json`:
+
+| Field | Where |
+|---|---|
+| model name | `trace.model`, `messages[].provider.model` |
+| prompt hash (sha256 of model + transcript + tools + caps) | `messages[].provider.prompt_sha256` |
+| input / output / cache tokens and USD cost | `messages[].provider.usage`, summed in `trace.usage` |
+| stop reason (`tool_use`, `end_turn`, `max_tokens`, `refusal`) | `messages[].provider.stop_reason` |
+| provider tool-call ids and verbatim content blocks (thinking included) | `messages[].tool_calls[].provider_call_id`, `messages[].provider_content` |
+
+Freezing the dataset uses the same machinery for all 40 cases. The committed
+dataset in `data/frozen/` was recorded on the Gemini Free Tier
+(`gemini-3.1-flash-lite`, billed $0.00), so its caches live in
+`data/replay/gemini/` and the judge commands need `--provider gemini`:
+
+```powershell
+python -m prooftrail replay --provider gemini --all                 # judges: no key, no network
+python -m prooftrail manifest --provider gemini                     # 40/40 + invariants
+```
+
+Recording a fresh dataset (either provider; a dataset never mixes providers or models):
+
+```powershell
+python -m prooftrail freeze --live --provider gemini --case F02-s00,F03-s00,F10-s00   # smoke first
+python -m prooftrail freeze --live --provider gemini --all --skip-frozen              # then everything, resumable
+python -m prooftrail freeze --live --case F02-s00,F03-s00,F10-s00                    # paid Anthropic route, budget-guarded
+```
+
+Guard rails: the `BudgetGuard` refuses any call whose worst-case cost would push
+the cumulative spend in `data/replay/cost_ledger.jsonl` past `PROOFTRAIL_BUDGET_USD`
+(worst case = every UTF-8 byte of the request counted as an input token, the full
+output cap, and every retry attempt billed; models without a configured price are refused);
+transient network / 429 / 5xx failures are retried at most three times, and a retry
+only re-sends the model request — tool actions are never re-executed. Every live
+response is written to `data/replay/<case>.json` keyed by prompt hash, so `--replay`
+reproduces the identical trace with zero API calls and fails loudly on any divergence.
+
+### Zero-billed real calls with Gemini Free Tier
+
+The competition does not require a paid provider. ProofTrail can record the same
+real tool-using agent loop with Google's documented Gemini Free Tier. Gemini
+3.7 Flash supports function calling; Egypt is an available region. The free
+tier bills input and output tokens at USD 0, subject to the active project's
+rate limits. Free-tier content may be used by Google to improve its products,
+so this path is restricted to ProofTrail's synthetic benchmark data.
+
+Create a key in [Google AI Studio](https://aistudio.google.com/apikey) and check
+that its **Plan** column says **Free**. Do not enable billing and do not paste the
+key into this repository or a chat. In PowerShell:
+
+```powershell
+$geminiSecret = Read-Host "Gemini API key" -AsSecureString
+$env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new("", $geminiSecret).Password
+$env:PROOFTRAIL_GEMINI_FREE_TIER = "1"
+$env:PROOFTRAIL_MODEL = "gemini-3.1-flash-lite"
+
+python -m prooftrail agent run --live --provider gemini --family F02 --seed 0 --fresh
+Remove-Item Env:GEMINI_API_KEY
+python -m prooftrail agent run --replay --provider gemini --family F02 --seed 0
+```
+
+The REST adapter has no third-party dependency. It records model version,
+prompt hash, provider function-call IDs, token usage, stop reason and Gemini 3
+thought signatures. `cost_usd` is the billed Free Tier amount (`0.0`); provider
+metadata also records a paid-tier list-price equivalent so the report does not
+hide the economic value of the calls. Requests are paced and replay caches make
+a quota-interrupted 40-case recording resumable. See Google's official
+[pricing](https://ai.google.dev/gemini-api/docs/pricing),
+[function-calling guide](https://ai.google.dev/gemini-api/docs/function-calling),
+and [available regions](https://ai.google.dev/gemini-api/docs/available-regions).
 
 ---
 
@@ -100,10 +198,11 @@ once in the next milestone, after which judges will replay them with no key.
 | Scenarios | 10 families, deterministic seed data, generator, provisional ground truth | ✅ |
 | Agent | Provider-neutral tool loop, trace recorder and explicit offline replay client | ✅ |
 | ProofTrail | Claims → evidence → reconciliation → temporal verifier → certificate | ✅ |
-| Fair baseline | B1 one-call contract sees the same trace + ledger and fails closed | ✅ contract; data pending |
+| Fair baseline | B1 one-call contract sees the same trace + ledger and fails closed | ✅ contract; B1 run over the frozen dataset pending |
 | Evaluation | Family weighting, Macro-F1, first-bad hit rate, coverage, reports | ✅ |
 | Reproduction | CLI demo + JSON/Markdown evidence + secret scan | ✅ offline milestone |
-| Live benchmark | Real model adapter, 40 frozen traces, human-approved labels, repeats | ⏳ |
+| Live providers | Anthropic paid adapter or Gemini Free Tier REST adapter + prompt-hash replay | ✅ offline provider tests; 40 real traces frozen (Gemini Free Tier, $0.00) |
+| Live benchmark | 40 frozen traces, human-approved labels, repeats | ✅ traces 40/40 (`data/frozen/`, no-key replay); ⏳ human labels, repeats |
 
 Run `pytest` from this folder.
 
@@ -115,7 +214,7 @@ Run `pytest` from this folder.
   so no family can dominate. Macro-F1 over all instances reported alongside.
 * **Secondary:** first-bad-event hit rate, evidence coverage (claims with ≥1 cited event).
 * **Required rows:** primary outcome · human time per task · cost per task — for B0, B1, ProofTrail.
-* **Cases:** 10 families × 4 seeds = 40 instances, all with human-verified labels.
+* **Cases:** 10 families × 4 seeds = 40 instances, with provisional ledger-derived labels; human review pending.
 * **Repeats:** every LLM-dependent number is mean ± spread over 3 runs.
 
 See [docs/SCENARIO_FAMILIES.md](docs/SCENARIO_FAMILIES.md).

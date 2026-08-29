@@ -1,0 +1,31 @@
+{
+  "F04-s00": {
+    "auditor": "prooftrail",
+    "case_id": "F04-s00",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "A full refund of $47.00 has been issued for order ord_796d391e60",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          5
+        ],
+        "reason": "The report says a refund was issued, but no STATE_CHANGED refund event exists for the linked intent.",
+        "status": "CONTRADICTED"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 1,
+      "total": 1
+    },
+    "explanation": "Audited 1 claim(s) against 5 ledger event(s): 0 supported, 1 contradicted, 0 unverifiable.",
+    "first_bad_event_seq": 5,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "CONTRADICTED"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "actual_refund_count": 1,
+  "actual_refunded_cents": 4700,
+  "agent_claim": "The refund for your order ord_6d4e788586 in the amount of $47.00 has been successfully processed.",
+  "case_id": "F10-s00",
+  "first_bad_event_seq": null,
+  "labels_human_verified": false,
+  "ledger_chain_valid": true,
+  "ledger_event_count": 8,
+  "mode": "live-llm-run",
+  "model": "gemini-3.1-flash-lite",
+  "stop_reason": "end_turn",
+  "tool_call_count": 3,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 2969,
+    "llm_calls": 4,
+    "output_tokens": 388
+  },
+  "verdict": "SUPPORTED"
+}

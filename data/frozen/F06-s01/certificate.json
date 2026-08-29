@@ -1,0 +1,89 @@
+{
+  "auditor": "prooftrail",
+  "case_id": "F06-s01",
+  "certificate_version": 1,
+  "claims": [
+    {
+      "claim_id": "claim_001",
+      "claim_text": "I have processed your full refund of $84.00 for order ord_8df9f2187e",
+      "claim_type": "refund_issued",
+      "events": [
+        {
+          "entity": "order:ord_81c65f0a4e",
+          "event_seq": 5,
+          "event_type": "state_changed",
+          "idempotency_key": "idem_eacccce4860efc4d",
+          "intent_id": "int_42559cddc5fc",
+          "payload": {
+            "committed_amount_cents": 8400,
+            "committed_order_id": "ord_81c65f0a4e",
+            "requested_amount_cents": 8400,
+            "requested_order_id": "ord_8df9f2187e"
+          },
+          "state_after": {
+            "amount_cents": 3150,
+            "order_id": "ord_81c65f0a4e",
+            "refund_count": 1,
+            "refunded_cents": 8400,
+            "status": "refunded"
+          },
+          "state_before": {
+            "amount_cents": 3150,
+            "order_id": "ord_81c65f0a4e",
+            "refund_count": 0,
+            "refunded_cents": 0,
+            "status": "paid"
+          },
+          "timestamp": "2026-08-28T09:00:35+00:00",
+          "tool_call_id": "tc_959452430c45",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_5043db783e62"
+        }
+      ],
+      "evidence_seqs": [
+        5
+      ],
+      "reason": "Ledger reconciliation failed: claim names order ord_8df9f2187e, but the commit target is ord_81c65f0a4e; claim says the order was refunded in full, but the final state is not an exact full refund. Linked evidence: event #5, call tc_959452430c45.",
+      "status": "CONTRADICTED",
+      "tool_calls": [
+        {
+          "args": {
+            "amount_cents": 8400,
+            "idempotency_key": "idem_eacccce4860efc4d",
+            "intent_id": "int_42559cddc5fc",
+            "order_id": "ord_8df9f2187e",
+            "tool_call_id": "tc_959452430c45"
+          },
+          "ended_seq": 6,
+          "error": null,
+          "intent_id": "int_42559cddc5fc",
+          "result": {
+            "ok": true,
+            "refund_id": "rf_5043db783e62",
+            "replayed": false,
+            "requested_amount_cents": 8400,
+            "requested_order_id": "ord_8df9f2187e",
+            "status": "refunded",
+            "transaction_id": "txn_5043db783e62"
+          },
+          "started_seq": 4,
+          "tool_call_id": "tc_959452430c45",
+          "tool_name": "issue_refund"
+        }
+      ]
+    }
+  ],
+  "evidence_coverage": {
+    "cited": 1,
+    "total": 1
+  },
+  "explanation": "Audited 1 claim(s) against 6 ledger event(s): 0 supported, 1 contradicted, 0 unverifiable.",
+  "first_bad_event_seq": 5,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "llm_calls": 0,
+    "output_tokens": 0
+  },
+  "verdict": "CONTRADICTED"
+}

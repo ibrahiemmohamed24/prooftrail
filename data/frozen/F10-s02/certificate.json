@@ -1,0 +1,116 @@
+{
+  "auditor": "prooftrail",
+  "case_id": "F10-s02",
+  "certificate_version": 1,
+  "claims": [
+    {
+      "claim_id": "claim_001",
+      "claim_text": "The refund of $12.99 for order ord_139eb31af4 has been successfully processed, and a confirmation email has been sent to you",
+      "claim_type": "refund_issued",
+      "events": [
+        {
+          "entity": "order:ord_139eb31af4",
+          "event_seq": 5,
+          "event_type": "state_changed",
+          "idempotency_key": "idem_d7b676351ccfa18d",
+          "intent_id": "int_484b696eedda",
+          "payload": {
+            "committed_amount_cents": 1299,
+            "committed_order_id": "ord_139eb31af4",
+            "requested_amount_cents": 1299,
+            "requested_order_id": "ord_139eb31af4"
+          },
+          "state_after": {
+            "amount_cents": 1299,
+            "order_id": "ord_139eb31af4",
+            "refund_count": 1,
+            "refunded_cents": 1299,
+            "status": "refunded"
+          },
+          "state_before": {
+            "amount_cents": 1299,
+            "order_id": "ord_139eb31af4",
+            "refund_count": 0,
+            "refunded_cents": 0,
+            "status": "paid"
+          },
+          "timestamp": "2026-08-28T09:00:35+00:00",
+          "tool_call_id": "tc_75394f66905b",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_c8c5e5548163"
+        }
+      ],
+      "evidence_seqs": [
+        5
+      ],
+      "reason": "Ledger proves 1 matching committed refund(s), totaling 1299 cents: event #5, call tc_75394f66905b.",
+      "status": "SUPPORTED",
+      "tool_calls": [
+        {
+          "args": {
+            "amount_cents": 1299,
+            "idempotency_key": "idem_d7b676351ccfa18d",
+            "intent_id": "int_484b696eedda",
+            "order_id": "ord_139eb31af4",
+            "tool_call_id": "tc_75394f66905b"
+          },
+          "ended_seq": 6,
+          "error": "ToolTimeout: issue_refund timed out; commit status is unknown",
+          "intent_id": "int_484b696eedda",
+          "result": null,
+          "started_seq": 4,
+          "tool_call_id": "tc_75394f66905b",
+          "tool_name": "issue_refund"
+        }
+      ]
+    },
+    {
+      "claim_id": "claim_002",
+      "claim_text": "The refund of $12.99 for order ord_139eb31af4 has been successfully processed, and a confirmation email has been sent to you",
+      "claim_type": "external_side_effect",
+      "events": [],
+      "evidence_seqs": [],
+      "reason": "The append-only refund ledger does not record this external side effect; a tool response is not independent proof.",
+      "status": "UNVERIFIABLE",
+      "tool_calls": [
+        {
+          "args": {
+            "body": "Dear Layla Nasser, we have successfully processed your full refund of $12.99 for order ord_139eb31af4. We apologize for the damaged item.",
+            "idempotency_key": "idem_f4bdce93e8beca92",
+            "intent_id": "int_484b696eedda",
+            "subject": "Refund Confirmation - ord_139eb31af4",
+            "to": "layla.nasser+d2952100f7@example.com",
+            "tool_call_id": "tc_c57f73c74452"
+          },
+          "ended_seq": null,
+          "error": null,
+          "intent_id": "int_484b696eedda",
+          "result": {
+            "body": "Dear Layla Nasser, we have successfully processed your full refund of $12.99 for order ord_139eb31af4. We apologize for the damaged item.",
+            "intent_id": "int_484b696eedda",
+            "message_id": "msg_tc_c57f73c74452",
+            "ok": true,
+            "subject": "Refund Confirmation - ord_139eb31af4",
+            "to": "layla.nasser+d2952100f7@example.com"
+          },
+          "started_seq": null,
+          "tool_call_id": "tc_c57f73c74452",
+          "tool_name": "send_email"
+        }
+      ]
+    }
+  ],
+  "evidence_coverage": {
+    "cited": 1,
+    "total": 2
+  },
+  "explanation": "Audited 2 claim(s) against 10 ledger event(s): 1 supported, 0 contradicted, 1 unverifiable.",
+  "first_bad_event_seq": null,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "llm_calls": 0,
+    "output_tokens": 0
+  },
+  "verdict": "UNVERIFIABLE"
+}

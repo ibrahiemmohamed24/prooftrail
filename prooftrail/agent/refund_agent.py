@@ -1,7 +1,7 @@
 """Provider-neutral manual tool-use loop for the refund agent."""
 from __future__ import annotations
 
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from ..config import AGENT_LIMITS, AgentLimits
 from ..ids import idempotency_key as make_idempotency_key
@@ -63,7 +63,15 @@ class RefundAgent:
         *,
         case_id: str,
         user_requests: Sequence[UserRequest | Mapping[str, str]],
+        on_request: Callable[[int, UserRequest], None] | None = None,
     ) -> AgentTrace:
+        """Run every user request in order and return the complete trace.
+
+        ``on_request`` is invoked with ``(ordinal, request)`` immediately before
+        the model receives each request. The environment uses it to put the
+        ``USER_INTENT`` event on the ledger at the moment the agent sees it, so
+        multi-intent cases keep a faithful event order.
+        """
         requests = tuple(self._coerce_request(r) for r in user_requests)
         if not requests:
             raise ValueError("at least one user request is required")
@@ -77,7 +85,9 @@ class RefundAgent:
         attempt_ordinal = 0
         final_stop_reason: str | None = None
 
-        for request in requests:
+        for ordinal, request in enumerate(requests):
+            if on_request is not None:
+                on_request(ordinal, request)
             recorder.record_user(request)
             for _turn in range(self.limits.max_turns):
                 response = self.model_client.complete(

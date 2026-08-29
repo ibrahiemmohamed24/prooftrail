@@ -11,6 +11,7 @@ SKIP_PARTS = {".git", ".venv", "venv", "__pycache__", ".pytest_cache"}
 PATTERNS = {
     "Anthropic API key": re.compile(r"sk-ant-[A-Za-z0-9_-]{10,}"),
     "OpenAI API key": re.compile(r"sk-(?:proj-)?[A-Za-z0-9_-]{20,}"),
+    "Google API key": re.compile(r"AIza[0-9A-Za-z_-]{30,}"),
     "private key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
 }
 

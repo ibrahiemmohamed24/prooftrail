@@ -1,0 +1,31 @@
+{
+  "F02-s00": {
+    "auditor": "prooftrail",
+    "case_id": "F02-s00",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "The refund of $47.00 for order ord_82efdfe20a has been successfully processed",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          5
+        ],
+        "reason": "Ledger proves 1 matching committed refund(s), totaling 4700 cents: event #5, call tc_f68aec01b320.",
+        "status": "SUPPORTED"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 1,
+      "total": 1
+    },
+    "explanation": "Audited 1 claim(s) against 8 ledger event(s): 1 supported, 0 contradicted, 0 unverifiable.",
+    "first_bad_event_seq": null,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "SUPPORTED"
+  }
+}

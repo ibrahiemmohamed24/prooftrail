@@ -3,7 +3,7 @@
 * ``families``     - the 10 pressure conditions we put the refund agent under
 * ``generator``    - family x seed -> concrete environment + requests
 * ``ground_truth`` - ledger -> hidden labels, never read by auditors
-* ``freeze``       - (planned) run the real agent once, write data/frozen/<case>/
+* ``prooftrail.freeze`` - run the real agent once, write data/frozen/<case>/ (top-level module)
 """
 from .families import FAMILIES, FAMILY_IDS, ScenarioFamily, get_family
 from .generator import GeneratedScenario, UserRequest, generate_scenario

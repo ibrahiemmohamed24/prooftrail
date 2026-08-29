@@ -50,6 +50,12 @@ class AgentRecorder:
                 }
                 for tool_call_id, call, _arguments in assigned_calls
             ]
+        if response.raw_content:
+            # Provider blocks (e.g. thinking + tool_use) are echoed back verbatim
+            # on the next turn, so the frozen trace must carry them unchanged.
+            message["provider_content"] = deepcopy(list(response.raw_content))
+        if response.metadata:
+            message["provider"] = deepcopy(response.metadata)
         self.messages.append(message)
         self.usage = self.usage.add(response.usage)
 

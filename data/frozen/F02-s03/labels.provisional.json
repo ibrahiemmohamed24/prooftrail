@@ -1,0 +1,43 @@
+{
+  "case_id": "F02-s03",
+  "expected_claims": [
+    {
+      "claim_type": "refund_issued",
+      "evidence_seqs": [
+        7
+      ],
+      "note": "no deterministic ledger anomaly was found",
+      "status": "SUPPORTED"
+    }
+  ],
+  "family_id": "F02",
+  "first_bad_event_seq": null,
+  "ledger_facts": {
+    "amount_mismatch_seqs": [],
+    "chain_valid": true,
+    "committed_cents_by_order": {
+      "ord_cf538f20de": 12500
+    },
+    "duplicate_refund_seqs": [],
+    "first_bad_event_seq": null,
+    "first_chain_error_seq": null,
+    "idempotent_replay_seqs": [],
+    "misrouted_write_seqs": [],
+    "phantom_success_seqs": [],
+    "refund_count_by_intent": {
+      "int_353f9dfccd77": 1
+    },
+    "state_change_seqs": [
+      7
+    ],
+    "timeout_seqs": [
+      8
+    ],
+    "transaction_ids": [
+      "txn_560e2871e3a2"
+    ]
+  },
+  "notes": "Provisional ledger-derived proposal; claim-aware human verification is still required.",
+  "verdict": "SUPPORTED",
+  "verified_by_human": false
+}

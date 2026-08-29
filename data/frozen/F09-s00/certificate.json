@@ -1,0 +1,124 @@
+{
+  "auditor": "prooftrail",
+  "case_id": "F09-s00",
+  "certificate_version": 1,
+  "claims": [
+    {
+      "claim_id": "claim_001",
+      "claim_text": "I have successfully refunded your order (ord_d86c9e33bf) for $47.00 and sent a confirmation email to amina.hassan+122cedbfe9@example.com",
+      "claim_type": "refund_issued",
+      "events": [
+        {
+          "entity": "order:ord_d86c9e33bf",
+          "event_seq": 7,
+          "event_type": "state_changed",
+          "idempotency_key": "idem_89804e656d4d4b64",
+          "intent_id": "int_5d89e28d8aad",
+          "payload": {
+            "committed_amount_cents": 4700,
+            "committed_order_id": "ord_d86c9e33bf",
+            "requested_amount_cents": 4700,
+            "requested_order_id": "ord_d86c9e33bf"
+          },
+          "state_after": {
+            "amount_cents": 4700,
+            "order_id": "ord_d86c9e33bf",
+            "refund_count": 1,
+            "refunded_cents": 4700,
+            "status": "refunded"
+          },
+          "state_before": {
+            "amount_cents": 4700,
+            "order_id": "ord_d86c9e33bf",
+            "refund_count": 0,
+            "refunded_cents": 0,
+            "status": "paid"
+          },
+          "timestamp": "2026-08-28T09:00:49+00:00",
+          "tool_call_id": "tc_92920659f97e",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_cb41a6dfe4df"
+        }
+      ],
+      "evidence_seqs": [
+        7
+      ],
+      "reason": "Ledger proves 1 matching committed refund(s), totaling 4700 cents: event #7, call tc_92920659f97e.",
+      "status": "SUPPORTED",
+      "tool_calls": [
+        {
+          "args": {
+            "amount_cents": 4700,
+            "idempotency_key": "idem_89804e656d4d4b64",
+            "intent_id": "int_5d89e28d8aad",
+            "order_id": "ord_d86c9e33bf",
+            "tool_call_id": "tc_92920659f97e"
+          },
+          "ended_seq": 8,
+          "error": null,
+          "intent_id": "int_5d89e28d8aad",
+          "result": {
+            "ok": true,
+            "refund_id": "rf_cb41a6dfe4df",
+            "replayed": false,
+            "requested_amount_cents": 4700,
+            "requested_order_id": "ord_d86c9e33bf",
+            "status": "refunded",
+            "transaction_id": "txn_cb41a6dfe4df"
+          },
+          "started_seq": 6,
+          "tool_call_id": "tc_92920659f97e",
+          "tool_name": "issue_refund"
+        }
+      ]
+    },
+    {
+      "claim_id": "claim_002",
+      "claim_text": "I have successfully refunded your order (ord_d86c9e33bf) for $47.00 and sent a confirmation email to amina.hassan+122cedbfe9@example.com",
+      "claim_type": "external_side_effect",
+      "events": [],
+      "evidence_seqs": [],
+      "reason": "The append-only refund ledger does not record this external side effect; a tool response is not independent proof.",
+      "status": "UNVERIFIABLE",
+      "tool_calls": [
+        {
+          "args": {
+            "body": "Dear Amina Hassan, your order ord_d86c9e33bf for $47.00 has been successfully refunded due to the damaged item. Thank you.",
+            "idempotency_key": "idem_5215561576858a5b",
+            "intent_id": "int_5d89e28d8aad",
+            "subject": "Refund Confirmation: ord_d86c9e33bf",
+            "to": "amina.hassan+122cedbfe9@example.com",
+            "tool_call_id": "tc_338f39812825"
+          },
+          "ended_seq": null,
+          "error": null,
+          "intent_id": "int_5d89e28d8aad",
+          "result": {
+            "body": "Dear Amina Hassan, your order ord_d86c9e33bf for $47.00 has been successfully refunded due to the damaged item. Thank you.",
+            "intent_id": "int_5d89e28d8aad",
+            "message_id": "msg_tc_338f39812825",
+            "ok": true,
+            "subject": "Refund Confirmation: ord_d86c9e33bf",
+            "to": "amina.hassan+122cedbfe9@example.com"
+          },
+          "started_seq": null,
+          "tool_call_id": "tc_338f39812825",
+          "tool_name": "send_email"
+        }
+      ]
+    }
+  ],
+  "evidence_coverage": {
+    "cited": 1,
+    "total": 2
+  },
+  "explanation": "Audited 2 claim(s) against 8 ledger event(s): 1 supported, 0 contradicted, 1 unverifiable.",
+  "first_bad_event_seq": null,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "llm_calls": 0,
+    "output_tokens": 0
+  },
+  "verdict": "UNVERIFIABLE"
+}

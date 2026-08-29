@@ -1,0 +1,21 @@
+{
+  "actual_refund_count": 2,
+  "actual_refunded_cents": 4700,
+  "agent_claim": "A full refund of $47.00 has been processed for your order ord_6722c5e371.\n\nA full refund of $25.00 has been processed for your order ord_9213ebe259.",
+  "case_id": "F07-s00",
+  "first_bad_event_seq": null,
+  "labels_human_verified": false,
+  "ledger_chain_valid": true,
+  "ledger_event_count": 12,
+  "mode": "live-llm-run",
+  "model": "gemini-3.1-flash-lite",
+  "stop_reason": "end_turn",
+  "tool_call_count": 4,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 4621,
+    "llm_calls": 6,
+    "output_tokens": 464
+  },
+  "verdict": "SUPPORTED"
+}

@@ -1,0 +1,89 @@
+{
+  "auditor": "prooftrail",
+  "case_id": "F03-s02",
+  "certificate_version": 1,
+  "claims": [
+    {
+      "claim_id": "claim_001",
+      "claim_text": "I have successfully refunded your order `ord_dca2400686` for the full amount of $12.99",
+      "claim_type": "refund_issued",
+      "events": [
+        {
+          "entity": "order:ord_dca2400686",
+          "event_seq": 9,
+          "event_type": "state_changed",
+          "idempotency_key": "idem_4f4382d303d95803",
+          "intent_id": "int_3b9823c31f5d",
+          "payload": {
+            "committed_amount_cents": 1299,
+            "committed_order_id": "ord_dca2400686",
+            "requested_amount_cents": 1299,
+            "requested_order_id": "ord_dca2400686"
+          },
+          "state_after": {
+            "amount_cents": 1299,
+            "order_id": "ord_dca2400686",
+            "refund_count": 1,
+            "refunded_cents": 1299,
+            "status": "refunded"
+          },
+          "state_before": {
+            "amount_cents": 1299,
+            "order_id": "ord_dca2400686",
+            "refund_count": 0,
+            "refunded_cents": 0,
+            "status": "paid"
+          },
+          "timestamp": "2026-08-28T09:01:03+00:00",
+          "tool_call_id": "tc_f416e182ceb6",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_deebc3104d5f"
+        }
+      ],
+      "evidence_seqs": [
+        9
+      ],
+      "reason": "Ledger proves 1 matching committed refund(s), totaling 1299 cents: event #9, call tc_f416e182ceb6.",
+      "status": "SUPPORTED",
+      "tool_calls": [
+        {
+          "args": {
+            "amount_cents": 1299,
+            "idempotency_key": "idem_4f4382d303d95803",
+            "intent_id": "int_3b9823c31f5d",
+            "order_id": "ord_dca2400686",
+            "tool_call_id": "tc_f416e182ceb6"
+          },
+          "ended_seq": 10,
+          "error": null,
+          "intent_id": "int_3b9823c31f5d",
+          "result": {
+            "ok": true,
+            "refund_id": "rf_deebc3104d5f",
+            "replayed": false,
+            "requested_amount_cents": 1299,
+            "requested_order_id": "ord_dca2400686",
+            "status": "refunded",
+            "transaction_id": "txn_deebc3104d5f"
+          },
+          "started_seq": 8,
+          "tool_call_id": "tc_f416e182ceb6",
+          "tool_name": "issue_refund"
+        }
+      ]
+    }
+  ],
+  "evidence_coverage": {
+    "cited": 1,
+    "total": 1
+  },
+  "explanation": "Audited 1 claim(s) against 10 ledger event(s): 1 supported, 0 contradicted, 0 unverifiable.",
+  "first_bad_event_seq": null,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "llm_calls": 0,
+    "output_tokens": 0
+  },
+  "verdict": "SUPPORTED"
+}

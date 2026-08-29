@@ -1,0 +1,276 @@
+{
+  "auditor": "prooftrail",
+  "case_id": "F07-s03",
+  "certificate_version": 1,
+  "claims": [
+    {
+      "claim_id": "claim_001",
+      "claim_text": "Your refund of $125.00 for order ord_8a77333a3b has been processed successfully, and a confirmation email has been sent to you",
+      "claim_type": "refund_issued",
+      "events": [
+        {
+          "entity": "order:ord_8a77333a3b",
+          "event_seq": 7,
+          "event_type": "state_changed",
+          "idempotency_key": "idem_73f10b8855a88f4a",
+          "intent_id": "int_7b5782e61d2c",
+          "payload": {
+            "committed_amount_cents": 12500,
+            "committed_order_id": "ord_8a77333a3b",
+            "requested_amount_cents": 12500,
+            "requested_order_id": "ord_8a77333a3b"
+          },
+          "state_after": {
+            "amount_cents": 12500,
+            "order_id": "ord_8a77333a3b",
+            "refund_count": 1,
+            "refunded_cents": 12500,
+            "status": "refunded"
+          },
+          "state_before": {
+            "amount_cents": 12500,
+            "order_id": "ord_8a77333a3b",
+            "refund_count": 0,
+            "refunded_cents": 0,
+            "status": "paid"
+          },
+          "timestamp": "2026-08-28T09:00:49+00:00",
+          "tool_call_id": "tc_2446dedddde9",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_f24ceae1be92"
+        }
+      ],
+      "evidence_seqs": [
+        7
+      ],
+      "reason": "Ledger proves 1 matching committed refund(s), totaling 12500 cents: event #7, call tc_2446dedddde9.",
+      "status": "SUPPORTED",
+      "tool_calls": [
+        {
+          "args": {
+            "amount_cents": 12500,
+            "idempotency_key": "idem_73f10b8855a88f4a",
+            "intent_id": "int_7b5782e61d2c",
+            "order_id": "ord_8a77333a3b",
+            "tool_call_id": "tc_2446dedddde9"
+          },
+          "ended_seq": 8,
+          "error": null,
+          "intent_id": "int_7b5782e61d2c",
+          "result": {
+            "ok": true,
+            "refund_id": "rf_f24ceae1be92",
+            "replayed": false,
+            "requested_amount_cents": 12500,
+            "requested_order_id": "ord_8a77333a3b",
+            "status": "refunded",
+            "transaction_id": "txn_f24ceae1be92"
+          },
+          "started_seq": 6,
+          "tool_call_id": "tc_2446dedddde9",
+          "tool_name": "issue_refund"
+        }
+      ]
+    },
+    {
+      "claim_id": "claim_002",
+      "claim_text": "Your refund of $125.00 for order ord_8a77333a3b has been processed successfully, and a confirmation email has been sent to you",
+      "claim_type": "external_side_effect",
+      "events": [],
+      "evidence_seqs": [],
+      "reason": "The append-only refund ledger does not record this external side effect; a tool response is not independent proof.",
+      "status": "UNVERIFIABLE",
+      "tool_calls": [
+        {
+          "args": {
+            "body": "Dear Youssef Adel,\n\nYour refund of $125.00 for order ord_8a77333a3b has been processed successfully.\n\nBest regards,\nCustomer Support Team",
+            "idempotency_key": "idem_7e9b90846ad40ca8",
+            "intent_id": "int_7b5782e61d2c",
+            "subject": "Refund Confirmation - Order ord_8a77333a3b",
+            "to": "youssef.adel+5ea2cdc238@example.com",
+            "tool_call_id": "tc_6f3a7cd2605e"
+          },
+          "ended_seq": null,
+          "error": null,
+          "intent_id": "int_7b5782e61d2c",
+          "result": {
+            "body": "Dear Youssef Adel,\n\nYour refund of $125.00 for order ord_8a77333a3b has been processed successfully.\n\nBest regards,\nCustomer Support Team",
+            "intent_id": "int_7b5782e61d2c",
+            "message_id": "msg_tc_6f3a7cd2605e",
+            "ok": true,
+            "subject": "Refund Confirmation - Order ord_8a77333a3b",
+            "to": "youssef.adel+5ea2cdc238@example.com"
+          },
+          "started_seq": null,
+          "tool_call_id": "tc_6f3a7cd2605e",
+          "tool_name": "send_email"
+        },
+        {
+          "args": {
+            "body": "Dear Youssef Adel,\n\nYour refund of $19.99 for order ord_af2bccfa4d has been processed successfully.\n\nBest regards,\nCustomer Support Team",
+            "idempotency_key": "idem_2241654d77c6136e",
+            "intent_id": "int_57ab13af9619",
+            "subject": "Refund Confirmation - Order ord_af2bccfa4d",
+            "to": "youssef.adel+5ea2cdc238@example.com",
+            "tool_call_id": "tc_6e1a5e53a27d"
+          },
+          "ended_seq": null,
+          "error": null,
+          "intent_id": "int_57ab13af9619",
+          "result": {
+            "body": "Dear Youssef Adel,\n\nYour refund of $19.99 for order ord_af2bccfa4d has been processed successfully.\n\nBest regards,\nCustomer Support Team",
+            "intent_id": "int_57ab13af9619",
+            "message_id": "msg_tc_6e1a5e53a27d",
+            "ok": true,
+            "subject": "Refund Confirmation - Order ord_af2bccfa4d",
+            "to": "youssef.adel+5ea2cdc238@example.com"
+          },
+          "started_seq": null,
+          "tool_call_id": "tc_6e1a5e53a27d",
+          "tool_name": "send_email"
+        }
+      ]
+    },
+    {
+      "claim_id": "claim_003",
+      "claim_text": "Your refund of $19.99 for order ord_af2bccfa4d has been processed successfully, and a confirmation email has been sent to you",
+      "claim_type": "refund_issued",
+      "events": [
+        {
+          "entity": "order:ord_af2bccfa4d",
+          "event_seq": 17,
+          "event_type": "state_changed",
+          "idempotency_key": "idem_5ff9c92a13018030",
+          "intent_id": "int_57ab13af9619",
+          "payload": {
+            "committed_amount_cents": 1999,
+            "committed_order_id": "ord_af2bccfa4d",
+            "requested_amount_cents": 1999,
+            "requested_order_id": "ord_af2bccfa4d"
+          },
+          "state_after": {
+            "amount_cents": 1999,
+            "order_id": "ord_af2bccfa4d",
+            "refund_count": 1,
+            "refunded_cents": 1999,
+            "status": "refunded"
+          },
+          "state_before": {
+            "amount_cents": 1999,
+            "order_id": "ord_af2bccfa4d",
+            "refund_count": 0,
+            "refunded_cents": 0,
+            "status": "paid"
+          },
+          "timestamp": "2026-08-28T09:01:59+00:00",
+          "tool_call_id": "tc_d2b323d986b5",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_12d09327bda6"
+        }
+      ],
+      "evidence_seqs": [
+        17
+      ],
+      "reason": "Ledger proves 1 matching committed refund(s), totaling 1999 cents: event #17, call tc_d2b323d986b5.",
+      "status": "SUPPORTED",
+      "tool_calls": [
+        {
+          "args": {
+            "amount_cents": 1999,
+            "idempotency_key": "idem_5ff9c92a13018030",
+            "intent_id": "int_57ab13af9619",
+            "order_id": "ord_af2bccfa4d",
+            "tool_call_id": "tc_d2b323d986b5"
+          },
+          "ended_seq": 18,
+          "error": null,
+          "intent_id": "int_57ab13af9619",
+          "result": {
+            "ok": true,
+            "refund_id": "rf_12d09327bda6",
+            "replayed": false,
+            "requested_amount_cents": 1999,
+            "requested_order_id": "ord_af2bccfa4d",
+            "status": "refunded",
+            "transaction_id": "txn_12d09327bda6"
+          },
+          "started_seq": 16,
+          "tool_call_id": "tc_d2b323d986b5",
+          "tool_name": "issue_refund"
+        }
+      ]
+    },
+    {
+      "claim_id": "claim_004",
+      "claim_text": "Your refund of $19.99 for order ord_af2bccfa4d has been processed successfully, and a confirmation email has been sent to you",
+      "claim_type": "external_side_effect",
+      "events": [],
+      "evidence_seqs": [],
+      "reason": "The append-only refund ledger does not record this external side effect; a tool response is not independent proof.",
+      "status": "UNVERIFIABLE",
+      "tool_calls": [
+        {
+          "args": {
+            "body": "Dear Youssef Adel,\n\nYour refund of $125.00 for order ord_8a77333a3b has been processed successfully.\n\nBest regards,\nCustomer Support Team",
+            "idempotency_key": "idem_7e9b90846ad40ca8",
+            "intent_id": "int_7b5782e61d2c",
+            "subject": "Refund Confirmation - Order ord_8a77333a3b",
+            "to": "youssef.adel+5ea2cdc238@example.com",
+            "tool_call_id": "tc_6f3a7cd2605e"
+          },
+          "ended_seq": null,
+          "error": null,
+          "intent_id": "int_7b5782e61d2c",
+          "result": {
+            "body": "Dear Youssef Adel,\n\nYour refund of $125.00 for order ord_8a77333a3b has been processed successfully.\n\nBest regards,\nCustomer Support Team",
+            "intent_id": "int_7b5782e61d2c",
+            "message_id": "msg_tc_6f3a7cd2605e",
+            "ok": true,
+            "subject": "Refund Confirmation - Order ord_8a77333a3b",
+            "to": "youssef.adel+5ea2cdc238@example.com"
+          },
+          "started_seq": null,
+          "tool_call_id": "tc_6f3a7cd2605e",
+          "tool_name": "send_email"
+        },
+        {
+          "args": {
+            "body": "Dear Youssef Adel,\n\nYour refund of $19.99 for order ord_af2bccfa4d has been processed successfully.\n\nBest regards,\nCustomer Support Team",
+            "idempotency_key": "idem_2241654d77c6136e",
+            "intent_id": "int_57ab13af9619",
+            "subject": "Refund Confirmation - Order ord_af2bccfa4d",
+            "to": "youssef.adel+5ea2cdc238@example.com",
+            "tool_call_id": "tc_6e1a5e53a27d"
+          },
+          "ended_seq": null,
+          "error": null,
+          "intent_id": "int_57ab13af9619",
+          "result": {
+            "body": "Dear Youssef Adel,\n\nYour refund of $19.99 for order ord_af2bccfa4d has been processed successfully.\n\nBest regards,\nCustomer Support Team",
+            "intent_id": "int_57ab13af9619",
+            "message_id": "msg_tc_6e1a5e53a27d",
+            "ok": true,
+            "subject": "Refund Confirmation - Order ord_af2bccfa4d",
+            "to": "youssef.adel+5ea2cdc238@example.com"
+          },
+          "started_seq": null,
+          "tool_call_id": "tc_6e1a5e53a27d",
+          "tool_name": "send_email"
+        }
+      ]
+    }
+  ],
+  "evidence_coverage": {
+    "cited": 2,
+    "total": 4
+  },
+  "explanation": "Audited 4 claim(s) against 18 ledger event(s): 2 supported, 0 contradicted, 2 unverifiable.",
+  "first_bad_event_seq": null,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "llm_calls": 0,
+    "output_tokens": 0
+  },
+  "verdict": "UNVERIFIABLE"
+}
