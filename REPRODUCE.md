@@ -119,6 +119,8 @@ and family-blind auditor views.
 
 `prooftrail demo` uses a class named `ScriptedModelClient` and records the mode
 as `scripted-offline-demo-not-a-real-llm-run`. The one-case 100% result proves
-the pipeline works; it is not the competition headline result. That result must
-wait for a real LLM agent, 40 frozen traces, human-verified labels and a B1 run
-over the byte-identical trace-plus-ledger inputs.
+the pipeline works; it is not the competition headline result. The real agent
+run and the 40 frozen traces are done (`data/frozen/`, Gemini Free Tier, billed
+$0.00, replayable with no key). What remains before any headline number is
+human verification of the provisional labels and the B1 run over the
+byte-identical trace-plus-ledger inputs.

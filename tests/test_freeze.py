@@ -367,6 +367,7 @@ def test_committed_manifest_matches_the_files_on_disk():
     assert rebuilt["totals"] == manifest["totals"]
     assert rebuilt["problems"] == manifest["problems"] == []
     assert [c["case_sha256"] for c in rebuilt["cases"]] == [c["case_sha256"] for c in manifest["cases"]]
+    assert [c["labels_sha256"] for c in rebuilt["cases"]] == [c["labels_sha256"] for c in manifest["cases"]]
     assert manifest["invariants"]["single_model"] is True
     assert manifest["invariants"]["single_provider"] is True
     assert manifest["invariants"]["all_labels_provisional"] is True

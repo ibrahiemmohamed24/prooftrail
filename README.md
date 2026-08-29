@@ -6,9 +6,9 @@
 > The $47 → $94 path runs end to end: stateful tools, trace recording, ledger reconciliation,
 > first-bad-event detection, certificates, fair-baseline contract, metrics and CLI. A paid
 > Anthropic adapter (budget guard, prompt hashing) and a zero-billed Gemini Free Tier adapter
-> share one no-key replay cache. **All 40 real-model traces are frozen in `data/frozen/`
-> (Gemini Free Tier, `gemini-3.1-flash-lite`, billed $0.00) and replay with no key; 194 tests
-> pass (94% coverage), none of them touch the network.** Human label verification, the B1
+> use the same provider-namespaced replay mechanism. **All 40 real-model traces are frozen in
+> `data/frozen/` (Gemini Free Tier, `gemini-3.1-flash-lite`, billed $0.00) and replay with no
+> key; 194 tests pass (94% coverage), none of them touch the network.** Human label verification, the B1
 > comparison over the frozen inputs and final competition assets are still pending. See
 > [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and handoff target.
 
@@ -39,13 +39,16 @@ Real LLM Refund Agent ──► Mock Tools ──► SQLite State + Append-only 
                                                    │
                     Frozen Trace + Same Raw Ledger ◄┘
                     ├── B1  (fair baseline): one-shot LLM sees trace + ledger
-                    └── ProofTrail: LLM claim extraction → deterministic reconciliation
-                                    + temporal/intent verification → evidence certificate
+                    └── ProofTrail: deterministic claim extraction (LLM-backed extractor planned)
+                                    → deterministic reconciliation + temporal/intent verification
+                                    → evidence certificate
 ```
 
 Three rules that make the comparison worth anything:
 
-1. **Same evidence** — B1 and ProofTrail get byte-identical input (same model, same caps, same schema).
+1. **Same evidence** — the B1 contract and ProofTrail receive the same frozen trace + ledger
+   (byte-identical input, same schema). Running B1 over the frozen dataset, and model/caps parity
+   for that run, are still pending.
 2. **Independent truth** — labels come from the ledger, never from any model's opinion.
 3. **Frozen traces** — the agent runs once; every evaluation replays. Judges need no API key.
 
@@ -211,7 +214,7 @@ Run `pytest` from this folder.
   so no family can dominate. Macro-F1 over all instances reported alongside.
 * **Secondary:** first-bad-event hit rate, evidence coverage (claims with ≥1 cited event).
 * **Required rows:** primary outcome · human time per task · cost per task — for B0, B1, ProofTrail.
-* **Cases:** 10 families × 4 seeds = 40 instances, all with human-verified labels.
+* **Cases:** 10 families × 4 seeds = 40 instances, with provisional ledger-derived labels; human review pending.
 * **Repeats:** every LLM-dependent number is mean ± spread over 3 runs.
 
 See [docs/SCENARIO_FAMILIES.md](docs/SCENARIO_FAMILIES.md).

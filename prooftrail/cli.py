@@ -93,9 +93,14 @@ def _parser() -> argparse.ArgumentParser:
 
     freeze = commands.add_parser(
         "freeze",
-        help="run the real model once per case and write data/frozen/<case>/ (needs ANTHROPIC_API_KEY)",
+        help="run the real model once per case and write data/frozen/<case>/ (uses the selected provider's key only on a cache miss)",
     )
-    freeze.add_argument("--live", action="store_true", required=True, help="explicit opt-in: this spends money")
+    freeze.add_argument(
+        "--live",
+        action="store_true",
+        required=True,
+        help="explicit opt-in to call the selected provider on cache misses (Anthropic is billed under the budget guard; Gemini Free Tier is billed $0)",
+    )
     which = freeze.add_mutually_exclusive_group(required=True)
     which.add_argument("--all", action="store_true", help="all 10 families x 4 seeds (40 cases)")
     which.add_argument("--case", action="append", metavar="CASE_ID", help="one case id, repeatable (e.g. F02-s00)")
