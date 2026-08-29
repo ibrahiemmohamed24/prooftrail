@@ -21,7 +21,7 @@ from prooftrail.agent.anthropic_client import (
     is_transient_error,
     to_anthropic_messages,
 )
-from prooftrail.config import cost_usd
+from prooftrail.config import UnknownModelPricingError, cost_usd
 from prooftrail.ids import intent_id
 
 from fakes import FakeAnthropic, FakeBlock, FakeMessage, FakeUsage, text_turn, tool_turn
@@ -206,6 +206,53 @@ def test_budget_guard_blocks_before_the_call_and_records_real_spend(tmp_path):
     assert rows[0]["prompt_sha256"] == response.metadata["prompt_sha256"]
     # A fresh guard over the same ledger sees the spend, so the cap persists across processes.
     assert BudgetGuard(1.0, CostLedger(ledger.path)).spent_usd == rows[0]["cost_usd"]
+
+
+def test_budget_estimate_counts_every_utf8_byte_and_every_retry_attempt():
+    per_attempt = cost_usd("claude-opus-5", 1000, 4096)
+    assert BudgetGuard.estimate_call_cost("claude-opus-5", prompt_bytes=1000, max_output_tokens=4096) == pytest.approx(per_attempt)
+    assert BudgetGuard.estimate_call_cost(
+        "claude-opus-5", prompt_bytes=1000, max_output_tokens=4096, attempts=4
+    ) == pytest.approx(4 * per_attempt)
+    # bytes, not characters: a 2-byte character counts twice
+    assert BudgetGuard.estimate_call_cost("claude-opus-5", prompt_bytes=len("é".encode()), max_output_tokens=1) > \
+        BudgetGuard.estimate_call_cost("claude-opus-5", prompt_bytes=1, max_output_tokens=1)
+    with pytest.raises(UnknownModelPricingError):
+        BudgetGuard.estimate_call_cost("claude-mystery-9", prompt_bytes=10, max_output_tokens=10)
+
+
+def test_budget_guard_reserves_worst_case_for_all_retry_attempts(tmp_path):
+    messages = [{"role": "user", "content": "hello"}]
+    probe = _client([text_turn("hi")], max_retries=3)
+    request = probe.build_request(messages=messages, tools=(), max_output_tokens=64, effort="low")
+    prompt_bytes = len(json.dumps(request, default=str, ensure_ascii=False).encode("utf-8"))
+    one_attempt = cost_usd("claude-opus-5", prompt_bytes, 64)
+
+    # Enough for one attempt but not for the four the retry policy may make -> refused up front.
+    fake = FakeAnthropic([text_turn("hi")])
+    guard = BudgetGuard(one_attempt * 2, CostLedger(tmp_path / "a.jsonl"))
+    client = AnthropicModelClient(model="claude-opus-5", client=fake, budget=guard, max_retries=3, sleep=lambda _s: None)
+    with pytest.raises(BudgetExceededError):
+        client.complete(messages=messages, tools=(), max_output_tokens=64, effort="low")
+    assert fake.messages.requests == []
+
+    # With retries disabled a single attempt is all that is reserved.
+    client = AnthropicModelClient(model="claude-opus-5", client=fake, budget=guard, max_retries=0, sleep=lambda _s: None)
+    assert client.complete(messages=messages, tools=(), max_output_tokens=64, effort="low").text == "hi"
+
+
+def test_models_without_a_configured_price_are_refused_before_any_key_or_call(monkeypatch):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    fake = FakeAnthropic([text_turn("never")])
+    with pytest.raises(UnknownModelPricingError, match="claude-mystery-9"):
+        AnthropicModelClient(model="claude-mystery-9", client=fake)
+    with pytest.raises(UnknownModelPricingError):
+        AnthropicModelClient(model="claude-mystery-9")  # no fake, no key: pricing is checked first
+    with pytest.raises(UnknownModelPricingError):
+        cost_usd("gpt-whatever", 1, 1)
+    with pytest.raises(UnknownModelPricingError):
+        compute_cost_usd("claude-mystery-9", input_tokens=1, output_tokens=1)
+    assert fake.messages.requests == []
 
 
 def test_budget_guard_reads_env_and_rejects_non_positive_limits(monkeypatch, tmp_path):

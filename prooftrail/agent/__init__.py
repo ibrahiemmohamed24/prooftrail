@@ -8,7 +8,7 @@ from .anthropic_client import (
     ProviderTransientError,
 )
 from .budget import BUDGET_ENV, BudgetExceededError, BudgetGuard, CostLedger
-from .cache import CachingModelClient, ReplayCache, ReplayCacheMiss
+from .cache import CachingModelClient, ReplayCache, ReplayCacheMiss, ReplayCacheModelMismatch
 from .interfaces import (
     AgentTool,
     ModelClient,
@@ -48,6 +48,7 @@ __all__ = [
     "REFUND_TOOL_SPECS",
     "ReplayCache",
     "ReplayCacheMiss",
+    "ReplayCacheModelMismatch",
     "ScriptExhaustedError",
     "ScriptedModelClient",
     "ToolCall",

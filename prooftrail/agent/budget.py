@@ -13,14 +13,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from ..config import COST_LEDGER_PATH, cost_usd
+from ..config import COST_LEDGER_PATH, cost_usd, pricing_for
 
 BUDGET_ENV = "PROOFTRAIL_BUDGET_USD"
 DEFAULT_BUDGET_USD = 30.0
-
-# Conservative pre-call estimate: ~3 characters per input token, and the full
-# output cap is assumed to be used. Overestimating keeps the guard honest.
-_CHARS_PER_INPUT_TOKEN = 3
 
 
 class BudgetExceededError(RuntimeError):
@@ -86,9 +82,24 @@ class BudgetGuard:
         return round(self.limit_usd - self.spent_usd, 6)
 
     @staticmethod
-    def estimate_call_cost(model: str, *, prompt_chars: int, max_output_tokens: int) -> float:
-        estimated_input = max(1, prompt_chars // _CHARS_PER_INPUT_TOKEN)
-        return cost_usd(model, estimated_input, max_output_tokens)
+    def estimate_call_cost(
+        model: str,
+        *,
+        prompt_bytes: int,
+        max_output_tokens: int,
+        attempts: int = 1,
+    ) -> float:
+        """Worst-case cost of one completion including every retry attempt.
+
+        Deliberately pessimistic: every UTF-8 byte of the serialised request is
+        counted as one input token (real tokenisers need ~3-4 bytes per token),
+        the full output cap is assumed to be produced, and every attempt the
+        retry policy may make is assumed to be billed in full. Unknown models
+        raise instead of being priced by a fallback.
+        """
+        pricing_for(model)
+        per_attempt = cost_usd(model, max(1, int(prompt_bytes)), max_output_tokens)
+        return round(per_attempt * max(1, int(attempts)), 6)
 
     def authorize(self, estimated_cost_usd: float, *, description: str = "") -> None:
         spent = self.spent_usd

@@ -36,9 +36,26 @@ PRICING_PER_MTOK: dict[str, tuple[float, float]] = {
 }
 
 
+class UnknownModelPricingError(KeyError):
+    """A model without an entry in ``PRICING_PER_MTOK`` must never be billed blindly."""
+
+
+def pricing_for(model: str) -> tuple[float, float]:
+    """(input, output) USD per 1M tokens. Unknown models are refused, not guessed:
+    a fallback price could be lower than the real one and silently defeat the
+    budget guard."""
+    try:
+        return PRICING_PER_MTOK[model]
+    except KeyError:
+        raise UnknownModelPricingError(
+            f"no price is configured for model {model!r}; add it to PRICING_PER_MTOK "
+            f"(known: {', '.join(sorted(PRICING_PER_MTOK))}) before running live"
+        ) from None
+
+
 def cost_usd(model: str, input_tokens: int, output_tokens: int) -> float:
-    """Cost of one call. Unknown model -> priced as Opus 5 (conservative)."""
-    inp, out = PRICING_PER_MTOK.get(model, PRICING_PER_MTOK["claude-opus-5"])
+    """Cost of one call at the configured first-party price."""
+    inp, out = pricing_for(model)
     return (input_tokens * inp + output_tokens * out) / 1_000_000
 
 

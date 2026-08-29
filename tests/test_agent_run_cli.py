@@ -102,6 +102,23 @@ def test_budget_guard_stops_a_live_run(tmp_path, monkeypatch, capsys):
     assert not (tmp_path / "cost_ledger.jsonl").exists()
 
 
+def test_live_run_with_a_different_model_than_the_cache_is_refused_without_spending(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(cli, "build_live_client", _fake_live_factory(blind_retry_script))
+    common = ["--family", "F02", "--seed", "0", "--cache-dir", str(tmp_path), "--output", str(tmp_path / "out"), "--budget-usd", "1"]
+    assert cli.main(["agent", "run", "--live", *common, "--json"]) == 0
+    spent_before = (tmp_path / "cost_ledger.jsonl").read_text(encoding="utf-8")
+    capsys.readouterr()
+
+    code = cli.main(["agent", "run", "--live", "--model", "claude-sonnet-5", *common])
+    assert code == 5
+    assert "recorded with 'claude-opus-5'" in capsys.readouterr().err
+    assert (tmp_path / "cost_ledger.jsonl").read_text(encoding="utf-8") == spent_before, "no paid call was made"
+
+    code = cli.main(["agent", "run", "--live", "--model", "claude-mystery-9", *common])
+    assert code == 5
+    assert "no price is configured" in capsys.readouterr().err
+
+
 def test_human_readable_live_output_mentions_budget_and_cache(tmp_path, monkeypatch, capsys):
     def happy(**_kwargs):
         return [text_turn("I did not issue a refund; please confirm the order first.")]

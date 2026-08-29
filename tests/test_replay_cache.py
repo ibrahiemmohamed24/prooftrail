@@ -8,6 +8,7 @@ from prooftrail.agent import (
     RefundAgent,
     ReplayCache,
     ReplayCacheMiss,
+    ReplayCacheModelMismatch,
     ScriptedModelClient,
     ToolCall,
 )
@@ -69,10 +70,28 @@ def test_cache_totals_and_model_consistency(tmp_path):
     cache.put("k1", ModelResponse(text="a2", usage=Usage(5, 1, 0.001, 1)), model="m")
     assert cache.order == ("k1", "k2")
     assert cache.total_usage() == {"input_tokens": 12, "output_tokens": 3, "cost_usd": 0.003, "llm_calls": 2}
-    with pytest.raises(ValueError):
+    with pytest.raises(ReplayCacheModelMismatch):
         cache.put("k3", ModelResponse(text="c"), model="other")
+    # atomic save: only the final file exists, never a temp file
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["c.json"]
     cache.clear()
     assert not cache.path.exists() and len(cache) == 0
+
+
+def test_model_mismatch_is_rejected_before_any_live_call(tmp_path):
+    path = tmp_path / "F01-s00.json"
+    CachingModelClient(ReplayCache(path), _script())  # records with claude-opus-5
+    RefundAgent(CachingModelClient(ReplayCache(path), _script()), [EchoTool()]).run_request(case_id="F01-s00", text="Echo hello")
+
+    other = ScriptedModelClient([ModelResponse(text="never", stop_reason="end_turn")], model_name="claude-sonnet-5")
+    with pytest.raises(ReplayCacheModelMismatch, match="recorded with 'claude-opus-5'"):
+        CachingModelClient(ReplayCache(path), other)
+    assert other.calls == [], "the mismatch must be raised before a single completion"
+    with pytest.raises(ReplayCacheModelMismatch):
+        CachingModelClient(ReplayCache(path), None, model_name="claude-sonnet-5")
+    # The recorded model is accepted explicitly or by default.
+    assert CachingModelClient(ReplayCache(path), None, model_name="claude-opus-5").model_name == "claude-opus-5"
+    assert CachingModelClient(ReplayCache(path), None).model_name == "claude-opus-5"
 
 
 def test_run_case_records_every_user_intent_in_order_and_is_family_agnostic():

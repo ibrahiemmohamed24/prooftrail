@@ -7,7 +7,8 @@
 - **Overall completion:** 55 / 100
 - **Last verified:** 2026-08-29
 - **Default branch:** `main`
-- **Offline tests:** 121 passed (no test uses the network or an API key)
+- **Offline tests:** 129 passed (no test uses the network or an API key; the SDK is exercised over an in-process mock transport)
+- **Real spend to date:** $0.00 — live runs are deferred under the free plan until explicitly funded
 - **Statement coverage:** 94%
 - **Working demo:** F02 claims one $47 refund; the ledger proves two commits and $94; ProofTrail returns `CONTRADICTED` with first bad event `#6`.
 - **Live provider:** `AnthropicModelClient` behind `ModelClient`, budget guard over `data/replay/cost_ledger.jsonl`, prompt-hash replay cache, `python -m prooftrail agent run --live|--replay --family F02 --seed 0`.
