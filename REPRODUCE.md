@@ -60,6 +60,29 @@ any call that could exceed `PROOFTRAIL_BUDGET_USD`. Replay serves the recorded
 responses by prompt hash and exits with code 4 on a cache miss instead of
 silently calling the API.
 
+### Real calls with no billing setup
+
+Gemini Free Tier is the zero-billed recording route. In Google AI Studio,
+create a key whose **Plan** column says **Free**; do not attach billing. The
+benchmark is fully synthetic, which is important because Google states that
+free-tier content may be used to improve its products.
+
+```powershell
+$geminiSecret = Read-Host "Gemini API key" -AsSecureString
+$env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new("", $geminiSecret).Password
+$env:PROOFTRAIL_GEMINI_FREE_TIER = "1"
+$env:PROOFTRAIL_MODEL = "gemini-3.7-flash"
+python -m prooftrail agent run --live --provider gemini --family F02 --seed 0 --fresh
+Remove-Item Env:GEMINI_API_KEY
+python -m prooftrail agent run --replay --provider gemini --family F02 --seed 0
+```
+
+Gemini live caches use `data/replay/gemini/` by default. A real response records
+token usage and Free Tier billed cost `$0.00`; a list-price equivalent is kept
+separately in provider metadata. The default four-second request spacing and
+bounded 429 retry protect the free quota. If a daily quota is reached, rerun the
+same command later without `--fresh` to resume from cached provider responses.
+
 ## Honesty boundary
 
 `prooftrail demo` uses a class named `ScriptedModelClient` and records the mode

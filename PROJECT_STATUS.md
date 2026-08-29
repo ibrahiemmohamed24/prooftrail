@@ -7,10 +7,10 @@
 - **Overall completion:** 55 / 100
 - **Last verified:** 2026-08-29
 - **Default branch:** `main`
-- **Offline tests:** 121 passed (no test uses the network or an API key)
+- **Offline tests:** 130 passed (no test uses the network or an API key)
 - **Statement coverage:** 94%
 - **Working demo:** F02 claims one $47 refund; the ledger proves two commits and $94; ProofTrail returns `CONTRADICTED` with first bad event `#6`.
-- **Live provider:** `AnthropicModelClient` behind `ModelClient`, budget guard over `data/replay/cost_ledger.jsonl`, prompt-hash replay cache, `python -m prooftrail agent run --live|--replay --family F02 --seed 0`.
+- **Live providers:** paid `AnthropicModelClient` plus zero-billed `GeminiModelClient` Free Tier route behind the same `ModelClient`; both use the prompt-hash replay cache.
 - **Honesty boundary:** the demo still uses `ScriptedModelClient`; no real-model trace has been frozen yet, so no benchmark number exists.
 
 ## Scoring model
@@ -40,7 +40,8 @@ Owner(s) should complete both items on feature branches:
    dataset" row stay at 0 until item 2 lands, because its definition of done
    covers both.
 2. Forty frozen traces: 10 families × 4 fixed seeds, replayable without an API key. **Pending**
-   (needs `ANTHROPIC_API_KEY` in the environment and a 2–3 case smoke run first).
+   (use Gemini Free Tier for real calls at billed cost $0; a key whose AI Studio
+   Plan says Free and a 2–3 case smoke run are still required).
 
 The milestone is complete only when:
 

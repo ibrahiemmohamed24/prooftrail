@@ -6,7 +6,7 @@
 > cases complete the 55 → 75 step). The $47 → $94 path runs end to end: stateful tools, trace
 > recording, ledger reconciliation, first-bad-event detection, certificates, fair-baseline
 > contract, metrics and CLI. A real Anthropic adapter with a budget guard, prompt hashing and a
-> no-key replay cache is in place. **121 tests pass (94% coverage), none of them touch the network.**
+> no-key replay cache is in place. **130 tests pass (94% coverage), none of them touch the network.**
 > The frozen 40-case benchmark, human label verification and final competition assets are still
 > pending. See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and handoff target.
 
@@ -120,6 +120,40 @@ only re-sends the model request — tool actions are never re-executed. Every li
 response is written to `data/replay/<case>.json` keyed by prompt hash, so `--replay`
 reproduces the identical trace with zero API calls and fails loudly on any divergence.
 
+### Zero-billed real calls with Gemini Free Tier
+
+The competition does not require a paid provider. ProofTrail can record the same
+real tool-using agent loop with Google's documented Gemini Free Tier. Gemini
+3.7 Flash supports function calling; Egypt is an available region. The free
+tier bills input and output tokens at USD 0, subject to the active project's
+rate limits. Free-tier content may be used by Google to improve its products,
+so this path is restricted to ProofTrail's synthetic benchmark data.
+
+Create a key in [Google AI Studio](https://aistudio.google.com/apikey) and check
+that its **Plan** column says **Free**. Do not enable billing and do not paste the
+key into this repository or a chat. In PowerShell:
+
+```powershell
+$geminiSecret = Read-Host "Gemini API key" -AsSecureString
+$env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new("", $geminiSecret).Password
+$env:PROOFTRAIL_GEMINI_FREE_TIER = "1"
+$env:PROOFTRAIL_MODEL = "gemini-3.7-flash"
+
+python -m prooftrail agent run --live --provider gemini --family F02 --seed 0 --fresh
+Remove-Item Env:GEMINI_API_KEY
+python -m prooftrail agent run --replay --provider gemini --family F02 --seed 0
+```
+
+The REST adapter has no third-party dependency. It records model version,
+prompt hash, provider function-call IDs, token usage, stop reason and Gemini 3
+thought signatures. `cost_usd` is the billed Free Tier amount (`0.0`); provider
+metadata also records a paid-tier list-price equivalent so the report does not
+hide the economic value of the calls. Requests are paced and replay caches make
+a quota-interrupted 40-case recording resumable. See Google's official
+[pricing](https://ai.google.dev/gemini-api/docs/pricing),
+[function-calling guide](https://ai.google.dev/gemini-api/docs/function-calling),
+and [available regions](https://ai.google.dev/gemini-api/docs/available-regions).
+
 ---
 
 ## What exists right now
@@ -135,7 +169,7 @@ reproduces the identical trace with zero API calls and fails loudly on any diver
 | Fair baseline | B1 one-call contract sees the same trace + ledger and fails closed | ✅ contract; data pending |
 | Evaluation | Family weighting, Macro-F1, first-bad hit rate, coverage, reports | ✅ |
 | Reproduction | CLI demo + JSON/Markdown evidence + secret scan | ✅ offline milestone |
-| Live provider | `agent/anthropic_client.py` + budget guard + prompt-hash replay cache + `agent run --live/--replay` | ✅ offline tests with a fake provider |
+| Live providers | Anthropic paid adapter or Gemini Free Tier REST adapter + prompt-hash replay | ✅ offline provider tests; real traces pending |
 | Live benchmark | 40 frozen traces, human-approved labels, repeats | ⏳ |
 
 Run `pytest` from this folder.

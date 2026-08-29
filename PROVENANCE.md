@@ -25,12 +25,17 @@ agent loop, auditor, baseline runner, evaluator, CLI or end-to-end demo.
   temporal verifier and JSON/Markdown evidence certificate.
 - Fair B1 input/output contract, offline metrics, runner and report rendering.
 - CLI, reproducible F02 demo, 98-test suite, license and secret scanner.
+- Paid Anthropic and zero-billed Gemini Free Tier provider adapters, with
+  provider-neutral tool calls, usage metadata and prompt-hash replay.
 
 ## Still to be produced
 
-- Live-provider adapter and real-model traces.
 - Forty frozen benchmark cases and cached model responses.
 - Human-approved labels and repeated B1/ProofTrail comparison.
 - Final trajectories, video and submission report.
 
 No generated demo output is described as a real-model result.
+
+The Gemini free route sends only the synthetic refund benchmark to Google. Per
+Google's Free Tier terms, that content may be used to improve Google products.
+No customer data, personal data or repository credential is sent.

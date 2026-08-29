@@ -1,4 +1,4 @@
-"""Provider-neutral refund agent, live Anthropic adapter and offline replay support."""
+"""Provider-neutral refund agent, live providers and offline replay support."""
 
 from .adapters import DispatchToolSuite, ToolSuiteAction
 from .anthropic_client import (
@@ -9,6 +9,17 @@ from .anthropic_client import (
 )
 from .budget import BUDGET_ENV, BudgetExceededError, BudgetGuard, CostLedger
 from .cache import CachingModelClient, ReplayCache, ReplayCacheMiss
+from .gemini_client import (
+    DEFAULT_GEMINI_MODEL,
+    FREE_TIER_MODELS,
+    GEMINI_API_KEY_ENV,
+    GEMINI_FREE_TIER_ENV,
+    FreeTierConfirmationError,
+    GeminiModelClient,
+    GeminiResponseError,
+    GeminiTransportError,
+    MissingGeminiApiKeyError,
+)
 from .interfaces import (
     AgentTool,
     ModelClient,
@@ -40,7 +51,16 @@ __all__ = [
     "CachingModelClient",
     "CostLedger",
     "DispatchToolSuite",
+    "DEFAULT_GEMINI_MODEL",
+    "FREE_TIER_MODELS",
+    "FreeTierConfirmationError",
+    "GEMINI_API_KEY_ENV",
+    "GEMINI_FREE_TIER_ENV",
+    "GeminiModelClient",
+    "GeminiResponseError",
+    "GeminiTransportError",
     "MissingApiKeyError",
+    "MissingGeminiApiKeyError",
     "ModelClient",
     "ModelResponse",
     "ProviderTransientError",

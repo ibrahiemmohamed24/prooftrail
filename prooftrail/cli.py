@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Sequence
@@ -10,6 +11,14 @@ from typing import Sequence
 from .agent.anthropic_client import AnthropicModelClient, MissingApiKeyError
 from .agent.budget import BudgetExceededError, BudgetGuard
 from .agent.cache import CachingModelClient, ReplayCache, ReplayCacheMiss
+from .agent.gemini_client import (
+    DEFAULT_GEMINI_MODEL,
+    FreeTierConfirmationError,
+    GeminiModelClient,
+    GeminiResponseError,
+    GeminiTransportError,
+    MissingGeminiApiKeyError,
+)
 from .agent.runner import MODE_LIVE, MODE_REPLAY, run_case, write_case_artifacts
 from .config import EVIDENCE_DIR, MODEL, REPLAY_DIR
 from .demo import run_killer_demo, write_demo_artifacts
@@ -22,6 +31,8 @@ from .scenarios import FAMILIES, FAMILY_IDS
 
 DEFAULT_DEMO_DIR = EVIDENCE_DIR / "demo-f02"
 DEFAULT_LIVE_DIR = EVIDENCE_DIR / "live"
+PROVIDERS = ("anthropic", "gemini")
+DEFAULT_PROVIDER = os.environ.get("PROOFTRAIL_PROVIDER", "anthropic")
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -50,11 +61,21 @@ def _parser() -> argparse.ArgumentParser:
         help="run one family x seed; --live calls the provider, --replay needs no key",
     )
     mode = run.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--live", action="store_true", help="call the Anthropic API and record the replay cache")
+    mode.add_argument("--live", action="store_true", help="call the selected real provider and record the replay cache")
     mode.add_argument("--replay", action="store_true", help="serve recorded responses; no network, no API key")
+    run.add_argument(
+        "--provider",
+        choices=PROVIDERS,
+        default=DEFAULT_PROVIDER if DEFAULT_PROVIDER in PROVIDERS else "anthropic",
+        help="live provider and replay namespace (gemini supports a no-billing free tier)",
+    )
     run.add_argument("--family", required=True, choices=FAMILY_IDS)
     run.add_argument("--seed", type=int, default=0)
-    run.add_argument("--model", default=None, help=f"override the model (default: {MODEL})")
+    run.add_argument(
+        "--model",
+        default=None,
+        help=f"override the provider model (Anthropic default: {MODEL}; Gemini default: {DEFAULT_GEMINI_MODEL})",
+    )
     run.add_argument("--budget-usd", type=float, default=None, help="override PROOFTRAIL_BUDGET_USD")
     run.add_argument("--cache-dir", type=Path, default=REPLAY_DIR, help="replay cache directory")
     run.add_argument("--output", type=Path, default=None, help="evidence directory (default evidence/runs/live/<case>)")
@@ -134,28 +155,52 @@ def build_live_client(*, model: str | None, budget: BudgetGuard, label: str) -> 
     return AnthropicModelClient(model=model, budget=budget, label=label)
 
 
+def build_gemini_client(*, model: str | None, label: str) -> GeminiModelClient:
+    """Factory for the real free-tier provider; tests replace its transport."""
+
+    return GeminiModelClient(model=model or DEFAULT_GEMINI_MODEL, label=label)
+
+
 def replay_cache_path(cache_dir: Path, case_id: str) -> Path:
     return Path(cache_dir) / f"{case_id}.json"
 
 
 def _agent_run(args: argparse.Namespace) -> int:
     case_id = make_case_id(args.family, args.seed)
-    cache = ReplayCache(replay_cache_path(args.cache_dir, case_id))
-    output_dir = args.output or (DEFAULT_LIVE_DIR / case_id)
+    cache_root = Path(args.cache_dir)
+    if cache_root.resolve() == REPLAY_DIR.resolve() and args.provider == "gemini":
+        cache_root = cache_root / "gemini"
+    cache = ReplayCache(replay_cache_path(cache_root, case_id))
+    output_dir = args.output or (
+        DEFAULT_LIVE_DIR / "gemini" / case_id
+        if args.provider == "gemini"
+        else DEFAULT_LIVE_DIR / case_id
+    )
+
+    if args.live and args.provider == "gemini" and args.budget_usd is not None:
+        print("error: --budget-usd is for paid providers; Gemini free tier bills $0", file=sys.stderr)
+        return 7
 
     try:
         if args.live:
             if args.fresh:
                 cache.clear()
-            budget = BudgetGuard.from_env(
-                limit_usd=args.budget_usd,
-                ledger_path=Path(args.cache_dir) / "cost_ledger.jsonl",
-            )
-            inner = build_live_client(model=args.model, budget=budget, label=case_id)
+            if args.provider == "gemini":
+                budget = None
+                inner = build_gemini_client(model=args.model, label=case_id)
+            else:
+                budget = BudgetGuard.from_env(
+                    limit_usd=args.budget_usd,
+                    ledger_path=cache_root / "cost_ledger.jsonl",
+                )
+                inner = build_live_client(model=args.model, budget=budget, label=case_id)
             client = CachingModelClient(cache, inner)
             mode = MODE_LIVE
         else:
-            client = CachingModelClient(cache, None, model_name=args.model)
+            replay_model = args.model
+            if replay_model is None and args.provider == "gemini" and not cache.path.exists():
+                replay_model = DEFAULT_GEMINI_MODEL
+            client = CachingModelClient(cache, None, model_name=replay_model)
             mode = MODE_REPLAY
         run = run_case(args.family, args.seed, model_client=client, mode=mode)
     except MissingApiKeyError as exc:
@@ -167,15 +212,25 @@ def _agent_run(args: argparse.Namespace) -> int:
     except ReplayCacheMiss as exc:
         print(f"error: replay cache miss: {exc}", file=sys.stderr)
         return 4
+    except (MissingGeminiApiKeyError, FreeTierConfirmationError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 5
+    except (GeminiTransportError, GeminiResponseError) as exc:
+        print(f"error: Gemini provider failed: {exc}", file=sys.stderr)
+        return 6
 
     paths = write_case_artifacts(run, output_dir)
     summary = run.summary()
     summary["replay_cache"] = str(cache.path)
     summary["cache_hits"] = client.hits
     summary["cache_misses"] = client.misses
-    if args.live:
+    summary["provider"] = args.provider
+    if args.live and budget is not None:
         summary["budget_spent_usd"] = budget.spent_usd
         summary["budget_limit_usd"] = budget.limit_usd
+    if args.live and args.provider == "gemini":
+        summary["pricing_tier"] = "free"
+        summary["billed_cost_usd"] = 0.0
     if args.json:
         print(json.dumps(summary, sort_keys=True))
         return 0
@@ -198,8 +253,10 @@ def _agent_run(args: argparse.Namespace) -> int:
         f"{usage['output_tokens']} out tokens, ${usage['cost_usd']:.4f}"
     )
     print(f"Replay cache  : {cache.path} ({client.hits} hits, {client.misses} misses)")
-    if args.live:
+    if args.live and budget is not None:
         print(f"Budget        : ${budget.spent_usd:.4f} of ${budget.limit_usd:.2f} spent (all runs)")
+    if args.live and args.provider == "gemini":
+        print("Billing       : Gemini Free Tier confirmed; billed cost $0.00")
     print(f"Certificate   : {paths['certificate_markdown'].resolve()}")
     print(f"Labels        : provisional, verified_by_human={summary['labels_human_verified']}")
     return 0

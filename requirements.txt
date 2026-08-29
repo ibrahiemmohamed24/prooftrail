@@ -1,2 +1,2 @@
 # Runtime for --live mode only. Replay mode (default) needs nothing beyond the stdlib.
-anthropic==1.4.0
+anthropic==1.2.0

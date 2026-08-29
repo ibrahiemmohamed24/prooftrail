@@ -16,7 +16,7 @@ authors = [{ name = "Fatma Ramadan", email = "fatmaramadan156@gmail.com" }]
 dependencies = []
 
 [project.optional-dependencies]
-live = ["anthropic>=1.2.0,<2"]
+live = ["anthropic==1.2.0"]
 dev = ["pytest==8.4.1", "pytest-cov==6.2.1"]
 
 [project.scripts]
