@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from .interfaces import ModelClient, ModelResponse, ToolSpec, prompt_sha256
 
@@ -118,9 +118,22 @@ class CachingModelClient:
         inner: ModelClient | None = None,
         *,
         model_name: str | None = None,
+        inner_factory: Callable[[], ModelClient] | None = None,
     ):
+        """``inner`` serves misses immediately; ``inner_factory`` builds it lazily.
+
+        The lazy form exists for resumable recordings: a case whose every
+        prompt is already cached is completed without constructing the live
+        client at all, so no API key, quota or budget is touched. The factory
+        runs on the first miss only, and the cache's recorded model is the
+        contract it must honour.
+        """
+
+        if inner is not None and inner_factory is not None:
+            raise ValueError("pass either inner or inner_factory, not both")
         self.cache = cache
-        self.inner = inner
+        self._inner = inner
+        self._inner_factory = inner_factory
         if inner is not None:
             self.model_name = inner.model_name
         else:
@@ -132,9 +145,28 @@ class CachingModelClient:
                 f"replay cache {cache.path} was recorded with {cache.model!r} but "
                 f"{self.model_name!r} was requested; pass --fresh to re-record or use --model {cache.model}"
             )
-        self.is_live_model = bool(inner is not None and inner.is_live_model)
+        self.is_live_model = bool(inner is not None and inner.is_live_model) or inner_factory is not None
         self.hits = 0
         self.misses = 0
+
+    @property
+    def inner(self) -> ModelClient | None:
+        return self._inner
+
+    @property
+    def live_client_built(self) -> bool:
+        return self._inner is not None
+
+    def _resolve_inner(self) -> ModelClient | None:
+        if self._inner is None and self._inner_factory is not None:
+            built = self._inner_factory()
+            if built.model_name != self.model_name:
+                raise ReplayCacheModelMismatch(
+                    f"replay cache {self.cache.path} was recorded with {self.model_name!r} but the live "
+                    f"client was built for {built.model_name!r}"
+                )
+            self._inner = built
+        return self._inner
 
     def complete(
         self,
@@ -155,12 +187,13 @@ class CachingModelClient:
         if cached is not None:
             self.hits += 1
             return cached
-        if self.inner is None:
+        inner = self._resolve_inner()
+        if inner is None:
             raise ReplayCacheMiss(
                 f"no cached response for prompt {key[:12]} in {self.cache.path}; "
                 "the replayed inputs diverged from the recorded run or the case was never recorded"
             )
-        response = self.inner.complete(
+        response = inner.complete(
             messages=messages, tools=tools, max_output_tokens=max_output_tokens, effort=effort
         )
         self.misses += 1

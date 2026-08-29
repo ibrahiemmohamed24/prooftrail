@@ -83,19 +83,28 @@ separately in provider metadata. The default four-second request spacing and
 bounded 429 retry protect the free quota. If a daily quota is reached, rerun the
 same command later without `--fresh` to resume from cached provider responses.
 
-## Freeze the 40-case dataset (spends money) and replay it (free)
+## Freeze the 40-case dataset (Gemini Free Tier, billed $0) and replay it (no key)
 
 ```powershell
-# 1. smoke: three cases first, check the printed [ok ] flags
-python -m prooftrail freeze --live --case F02-s00,F03-s00,F10-s00
+$env:PROOFTRAIL_GEMINI_FREE_TIER = "1"      # after checking the key's Plan column says Free
+# GEMINI_API_KEY must be set in this shell; never in a file
 
-# 2. everything: 10 families x 4 seeds; already-frozen cases are skipped
-python -m prooftrail freeze --live --all --skip-frozen
+# 1. smoke: three cases first, check the printed [ok ] flags
+python -m prooftrail freeze --live --provider gemini --case F02-s00,F03-s00,F10-s00
+
+# 2. everything: 10 families x 4 seeds; frozen cases are skipped, cached turns
+#    are served before any live call, so the command is safe to rerun after a
+#    quota pause
+python -m prooftrail freeze --live --provider gemini --all --skip-frozen
 
 # 3. judges: no key, no network
-python -m prooftrail replay --all
-python -m prooftrail manifest
+python -m prooftrail replay --provider gemini --all
+python -m prooftrail manifest --provider gemini
 ```
+
+The paid Anthropic route uses the same commands without `--provider gemini`
+and adds the `PROOFTRAIL_BUDGET_USD` guard; a dataset must never mix
+providers or models, and the manifest fails if it does.
 
 `freeze` writes `data/frozen/<case>/{case.json,labels.provisional.json,summary.json,
 certificate.md,...}` and `data/replay/<case>.json`, then rebuilds

@@ -99,8 +99,14 @@ def _parser() -> argparse.ArgumentParser:
     which = freeze.add_mutually_exclusive_group(required=True)
     which.add_argument("--all", action="store_true", help="all 10 families x 4 seeds (40 cases)")
     which.add_argument("--case", action="append", metavar="CASE_ID", help="one case id, repeatable (e.g. F02-s00)")
-    freeze.add_argument("--model", default=None, help=f"override the model (default: {MODEL})")
-    freeze.add_argument("--budget-usd", type=float, default=None, help="override PROOFTRAIL_BUDGET_USD")
+    freeze.add_argument(
+        "--provider",
+        choices=PROVIDERS,
+        default=DEFAULT_PROVIDER if DEFAULT_PROVIDER in PROVIDERS else "anthropic",
+        help="live provider and replay cache namespace (gemini = zero-billed free tier)",
+    )
+    freeze.add_argument("--model", default=None, help=f"override the model (Anthropic default: {MODEL}; Gemini default: {DEFAULT_GEMINI_MODEL})")
+    freeze.add_argument("--budget-usd", type=float, default=None, help="override PROOFTRAIL_BUDGET_USD (paid providers only)")
     freeze.add_argument("--cache-dir", type=Path, default=REPLAY_DIR)
     freeze.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
     freeze.add_argument("--fresh", action="store_true", help="discard existing replay caches before recording")
@@ -111,11 +117,23 @@ def _parser() -> argparse.ArgumentParser:
     which = replay.add_mutually_exclusive_group(required=True)
     which.add_argument("--all", action="store_true")
     which.add_argument("--case", action="append", metavar="CASE_ID")
+    replay.add_argument(
+        "--provider",
+        choices=PROVIDERS,
+        default=DEFAULT_PROVIDER if DEFAULT_PROVIDER in PROVIDERS else "anthropic",
+        help="live provider and replay cache namespace (gemini = zero-billed free tier)",
+    )
     replay.add_argument("--cache-dir", type=Path, default=REPLAY_DIR)
     replay.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
     replay.add_argument("--json", action="store_true")
 
     manifest = commands.add_parser("manifest", help="rebuild data/frozen/manifest.json and check the 40/40 invariants")
+    manifest.add_argument(
+        "--provider",
+        choices=PROVIDERS,
+        default=DEFAULT_PROVIDER if DEFAULT_PROVIDER in PROVIDERS else "anthropic",
+        help="live provider and replay cache namespace (gemini = zero-billed free tier)",
+    )
     manifest.add_argument("--cache-dir", type=Path, default=REPLAY_DIR)
     manifest.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
     manifest.add_argument("--json", action="store_true")
@@ -203,11 +221,26 @@ def replay_cache_path(cache_dir: Path, case_id: str) -> Path:
     return Path(cache_dir) / f"{case_id}.json"
 
 
+def provider_cache_root(cache_dir: Path, provider: str) -> Path:
+    """Gemini caches live under ``data/replay/gemini/`` so providers never mix."""
+
+    root = Path(cache_dir)
+    if provider == "gemini" and root.resolve() == REPLAY_DIR.resolve():
+        root = root / "gemini"
+    return root
+
+
+def live_factory_for(provider: str):
+    """Return a ``(model, budget, label) -> ModelClient`` factory for ``provider``."""
+
+    if provider == "gemini":
+        return lambda *, model, budget, label: build_gemini_client(model=model, label=label)
+    return build_live_client
+
+
 def _agent_run(args: argparse.Namespace) -> int:
     case_id = make_case_id(args.family, args.seed)
-    cache_root = Path(args.cache_dir)
-    if cache_root.resolve() == REPLAY_DIR.resolve() and args.provider == "gemini":
-        cache_root = cache_root / "gemini"
+    cache_root = provider_cache_root(args.cache_dir, args.provider)
     cache = ReplayCache(replay_cache_path(cache_root, case_id))
     output_dir = args.output or (
         DEFAULT_LIVE_DIR / "gemini" / case_id
@@ -318,11 +351,18 @@ def _selected_case_ids(args: argparse.Namespace) -> list[str]:
 
 def _freeze(args: argparse.Namespace) -> int:
     case_ids = _selected_case_ids(args)
-    budget = BudgetGuard.from_env(
-        limit_usd=args.budget_usd, ledger_path=Path(args.cache_dir) / "cost_ledger.jsonl"
-    )
+    cache_root = provider_cache_root(args.cache_dir, args.provider)
+    if args.provider == "gemini":
+        if args.budget_usd is not None:
+            print("error: --budget-usd is for paid providers; Gemini free tier bills $0", file=sys.stderr)
+            return 7
+        budget = None
+    else:
+        budget = BudgetGuard.from_env(limit_usd=args.budget_usd, ledger_path=cache_root / "cost_ledger.jsonl")
+    factory = live_factory_for(args.provider)
     results: list[dict] = []
     failures: list[str] = []
+    stopped_early: str | None = None
     for case_id in case_ids:
         if args.skip_frozen and (Path(args.frozen_dir) / case_id / "case.json").exists():
             if not args.json:
@@ -331,59 +371,82 @@ def _freeze(args: argparse.Namespace) -> int:
         try:
             result = freeze_case(
                 case_id,
-                live_factory=build_live_client,
+                live_factory=factory,
                 budget=budget,
                 model=args.model,
-                cache_dir=args.cache_dir,
+                cache_dir=cache_root,
                 frozen_dir=args.frozen_dir,
                 fresh=args.fresh,
             )
-        except MissingApiKeyError as exc:
+        except (MissingApiKeyError, MissingGeminiApiKeyError, FreeTierConfirmationError) as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
+        except (ReplayCacheModelMismatch, UnknownModelPricingError) as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 5
         except BudgetExceededError as exc:
             print(f"error: budget guard stopped the run at {case_id}: {exc}", file=sys.stderr)
             failures.append(f"{case_id}: budget")
+            stopped_early = case_id
+            break
+        except (GeminiTransportError, GeminiResponseError) as exc:
+            # Quota or network trouble: stop here so the run can be resumed later
+            # with the same command; cached turns are then served without a call.
+            print(f"error: Gemini provider failed at {case_id}: {exc}", file=sys.stderr)
+            failures.append(f"{case_id}: provider failure ({exc})")
+            stopped_early = case_id
             break
         summary = result.summary()
+        summary["provider"] = args.provider
         results.append(summary)
         if not result.ok:
             failures.append(f"{case_id}: checks failed {[k for k, v in result.checks.items() if not v]}")
         if not args.json:
             usage = summary["usage"]
             flag = "ok " if result.ok else "FAIL"
+            if budget is not None:
+                billing = f"budget ${budget.spent_usd:.4f}/${budget.limit_usd:.2f}"
+            else:
+                billing = "billed $0.00 (free tier)"
             print(
                 f"[{flag}] {case_id}: {summary['tool_call_count']} tool calls, verdict {summary['verdict']}, "
                 f"first bad {summary['first_bad_event_seq']}, chain {'valid' if summary['ledger_chain_valid'] else 'INVALID'}, "
-                f"{usage['llm_calls']} calls / ${usage['cost_usd']:.4f}, budget ${budget.spent_usd:.4f}/${budget.limit_usd:.2f}"
+                f"{usage['llm_calls']} calls ({result.cache_hits} cached / {result.cache_misses} live), "
+                f"{usage['input_tokens']} in / {usage['output_tokens']} out tokens, {billing}"
             )
             if not result.ok:
                 print(f"       failed checks: {[k for k, v in result.checks.items() if not v]}")
 
-    manifest = build_manifest(frozen_dir=args.frozen_dir, cache_dir=args.cache_dir)
+    manifest = build_manifest(frozen_dir=args.frozen_dir, cache_dir=cache_root)
     manifest_path = write_manifest(manifest, args.frozen_dir)
     if args.json:
-        print(json.dumps({"results": results, "failures": failures, "manifest": manifest}, sort_keys=True))
+        print(json.dumps({"results": results, "failures": failures, "stopped_at": stopped_early, "manifest": manifest}, sort_keys=True))
     else:
         totals = manifest["totals"]
         print(
             f"Manifest      : {manifest_path} -> {manifest['status']}, "
             f"{totals['llm_calls']} calls, {totals['input_tokens']} in / {totals['output_tokens']} out tokens, "
-            f"${totals['cost_usd']:.4f}"
+            f"billed ${totals['cost_usd']:.4f} (list-price equivalent ${totals['list_price_equivalent_usd']:.4f})"
         )
-        print(f"Budget        : ${budget.spent_usd:.4f} of ${budget.limit_usd:.2f} spent (cumulative)")
+        if budget is not None:
+            print(f"Budget        : ${budget.spent_usd:.4f} of ${budget.limit_usd:.2f} spent (cumulative)")
+        if stopped_early is not None:
+            print(f"Stopped at    : {stopped_early}; rerun the same command with --skip-frozen to resume")
         for problem in manifest_problems(manifest):
             print(f"  - {problem}")
+    if any("provider failure" in failure for failure in failures):
+        return 6
     return 1 if failures else 0
 
 
 def _replay(args: argparse.Namespace) -> int:
     case_ids = _selected_case_ids(args)
+    cache_root = provider_cache_root(args.cache_dir, args.provider)
     rows: list[dict] = []
     failures: list[str] = []
     for case_id in case_ids:
         try:
-            result = replay_case(case_id, cache_dir=args.cache_dir, frozen_dir=args.frozen_dir)
+            result = replay_case(case_id, cache_dir=cache_root, frozen_dir=args.frozen_dir)
         except FileNotFoundError as exc:
             failures.append(f"{case_id}: {exc}")
             if not args.json:
@@ -413,7 +476,7 @@ def _replay(args: argparse.Namespace) -> int:
 
 
 def _manifest(args: argparse.Namespace) -> int:
-    manifest = build_manifest(frozen_dir=args.frozen_dir, cache_dir=args.cache_dir)
+    manifest = build_manifest(frozen_dir=args.frozen_dir, cache_dir=provider_cache_root(args.cache_dir, args.provider))
     path = write_manifest(manifest, args.frozen_dir)
     problems = manifest_problems(manifest)
     if args.json:
@@ -422,10 +485,11 @@ def _manifest(args: argparse.Namespace) -> int:
         totals = manifest["totals"]
         print(f"Manifest   : {path}")
         print(f"Status     : {manifest['status']} ({'complete' if manifest['complete'] else 'INCOMPLETE'})")
-        print(f"Models     : {', '.join(manifest['models']) or '-'}")
+        print(f"Models     : {', '.join(manifest['models']) or '-'}   providers: {', '.join(manifest['providers']) or '-'}")
         print(
             f"Totals     : {totals['llm_calls']} LLM calls, {totals['input_tokens']} in / "
-            f"{totals['output_tokens']} out tokens, ${totals['cost_usd']:.4f}"
+            f"{totals['output_tokens']} out tokens, billed ${totals['cost_usd']:.4f} "
+            f"(list-price equivalent ${totals['list_price_equivalent_usd']:.4f})"
         )
         for name, value in manifest["invariants"].items():
             print(f"  {name:<28} {'yes' if value else 'NO'}")

@@ -115,7 +115,12 @@ def test_manifest_counts_totals_and_flags_missing_cases(tmp_path):
         "auditor_view_family_blind": True,
         "all_usage_recorded": True,
         "all_replay_caches_present": True,
+        "single_model": True,
+        "single_provider": True,
     }
+    assert manifest["providers"] == ["anthropic"]
+    assert manifest["totals"]["list_price_equivalent_usd"] == manifest["totals"]["cost_usd"]
+    assert all(c["provider"] == "anthropic" for c in manifest["cases"])
     assert manifest["problems"] == []
     assert any("38 case(s) not frozen" in p for p in manifest_problems(manifest))
     path = write_manifest(manifest, frozen)
@@ -164,9 +169,85 @@ def test_smoke_checks_flag_a_run_with_no_tool_calls_or_cost(tmp_path):
     )
     assert result.ok is False
     assert result.checks["model_called_tools"] is False
-    assert result.checks["usage_and_cost_recorded"] is False
+    assert result.checks["usage_recorded"] is False
+    assert result.checks["cost_recorded"] is True, "a $0 figure is still a recorded figure"
     assert result.checks["ledger_chain_valid"] is True
     assert smoke_checks(result.run) == result.checks
+
+
+def test_gemini_free_tier_freeze_replay_and_manifest_bill_zero(tmp_path, monkeypatch, capsys):
+    from test_gemini_provider import _blind_retry_script as gemini_blind_retry
+    from test_gemini_provider import _fake_gemini_factory
+
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.setattr(cli, "build_gemini_client", _fake_gemini_factory(gemini_blind_retry))
+    monkeypatch.setattr(cli, "build_live_client", lambda **_: pytest.fail("gemini freeze must not build the paid client"))
+    frozen = str(tmp_path / "frozen")
+    cache = str(tmp_path / "replay")
+
+    code = cli.main(["freeze", "--live", "--provider", "gemini", "--case", "F02-s00,F03-s01",
+                     "--cache-dir", cache, "--frozen-dir", frozen])
+    out = capsys.readouterr().out
+    assert code == 0, out
+    assert "[ok ] F02-s00" in out and "billed $0.00 (free tier)" in out
+    assert "Budget" not in out
+    assert not (Path(cache) / "cost_ledger.jsonl").exists()
+
+    manifest = json.loads((Path(frozen) / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["frozen_cases"] == 2
+    assert manifest["providers"] == ["google-gemini"]
+    assert len(manifest["models"]) == 1
+    assert manifest["invariants"]["single_model"] is True
+    assert manifest["invariants"]["all_usage_recorded"] is True
+    assert manifest["totals"]["cost_usd"] == 0.0
+    assert manifest["totals"]["list_price_equivalent_usd"] > 0
+    assert manifest["problems"] == []
+    labels = json.loads((Path(frozen) / "F02-s00" / "labels.provisional.json").read_text(encoding="utf-8"))
+    assert labels["verified_by_human"] is False
+
+    # Resume semantics: a second run skips frozen cases and spends nothing.
+    monkeypatch.setattr(cli, "build_gemini_client", lambda **_: pytest.fail("skipped cases must not build a client"))
+    code = cli.main(["freeze", "--live", "--provider", "gemini", "--case", "F02-s00", "--skip-frozen",
+                     "--cache-dir", cache, "--frozen-dir", frozen])
+    assert code == 0 and "already frozen, skipped" in capsys.readouterr().out
+
+    code = cli.main(["replay", "--provider", "gemini", "--case", "F02-s00,F03-s01", "--cache-dir", cache, "--frozen-dir", frozen, "--json"])
+    payload = json.loads(capsys.readouterr().out)
+    assert code == 0 and payload["failures"] == []
+    assert all(row["matches_frozen"] for row in payload["replayed"])
+
+    code = cli.main(["freeze", "--live", "--provider", "gemini", "--case", "F04-s00", "--budget-usd", "1",
+                     "--cache-dir", cache, "--frozen-dir", frozen])
+    assert code == 7
+
+
+def test_fully_cached_case_is_frozen_without_building_a_live_client(tmp_path):
+    frozen, cache, budget = _freeze_two(tmp_path)
+    before = (frozen / "F02-s00" / "case.json").read_text(encoding="utf-8")
+
+    def no_client(**_kwargs):
+        pytest.fail("a fully cached case must never construct the live client")
+
+    result = freeze_case("F02-s00", live_factory=no_client, budget=None, cache_dir=cache, frozen_dir=frozen)
+    assert result.ok and result.cache_hits == 3 and result.cache_misses == 0
+    assert (frozen / "F02-s00" / "case.json").read_text(encoding="utf-8") == before
+
+    from prooftrail.agent import ReplayCacheModelMismatch
+
+    with pytest.raises(ReplayCacheModelMismatch):
+        freeze_case("F02-s00", live_factory=no_client, budget=None, model="claude-sonnet-5", cache_dir=cache, frozen_dir=frozen)
+
+
+def test_manifest_flags_a_dataset_that_mixes_models(tmp_path):
+    frozen, cache, _budget = _freeze_two(tmp_path)
+    case_path = frozen / "F03-s01" / "case.json"
+    raw = json.loads(case_path.read_text(encoding="utf-8"))
+    raw["trace"]["model"] = "claude-sonnet-5"
+    case_path.write_text(json.dumps(raw), encoding="utf-8")
+    manifest = build_manifest(frozen_dir=frozen, cache_dir=cache, expected=["F02-s00", "F03-s01"])
+    assert manifest["invariants"]["single_model"] is False
+    assert any("mixes models" in p for p in manifest["problems"])
+    assert manifest["complete"] is False
 
 
 def test_freeze_replay_and_manifest_cli_round_trip(tmp_path, monkeypatch, capsys):
@@ -231,21 +312,46 @@ def test_every_committed_frozen_case_loads_verifies_and_is_family_blind(case_id)
     assert case.case_id == case_id and labels.case_id == case_id
     assert verify_chain(case.ledger) == (True, None)
     assert labels.verified_by_human is False
-    assert case.trace.usage.llm_calls > 0 and case.trace.usage.cost_usd > 0
-    assert all(m.get("provider", {}).get("prompt_sha256") for m in case.trace.messages if m["role"] == "assistant")
+    assert case.trace.usage.llm_calls > 0 and case.trace.usage.input_tokens > 0
+    assistant_turns = [m for m in case.trace.messages if m["role"] == "assistant"]
+    assert all(m.get("provider", {}).get("prompt_sha256") for m in assistant_turns)
+    assert all("cost_usd" in m["provider"]["usage"] for m in assistant_turns)
     view = case.auditor_view()
     assert "family_id" not in view["trace"] and "seed" not in view["trace"]
     text = json.dumps(view)
     assert case.family_id not in text and case_id not in text
-    assert replay_cache_path(REPLAY_DIR, case_id).exists()
+    assert replay_cache_path(_committed_cache_dir(), case_id).exists()
+
+
+def _committed_cache_dir() -> Path:
+    """Replay caches are namespaced per provider; the manifest says which one."""
+
+    if _MANIFEST.exists():
+        providers = json.loads(_MANIFEST.read_text(encoding="utf-8")).get("providers", [])
+        if providers == ["google-gemini"]:
+            return REPLAY_DIR / "gemini"
+    return REPLAY_DIR
 
 
 @pytest.mark.skipif(not _MANIFEST.exists(), reason="no frozen manifest committed yet")
 def test_committed_manifest_matches_the_files_on_disk():
     manifest = json.loads(_MANIFEST.read_text(encoding="utf-8"))
-    rebuilt = build_manifest()
+    rebuilt = build_manifest(cache_dir=_committed_cache_dir())
     assert rebuilt["frozen_cases"] == manifest["frozen_cases"]
     assert rebuilt["totals"] == manifest["totals"]
+    assert rebuilt["problems"] == manifest["problems"] == []
     assert [c["case_sha256"] for c in rebuilt["cases"]] == [c["case_sha256"] for c in manifest["cases"]]
+    assert manifest["invariants"]["single_model"] is True
+    assert manifest["invariants"]["single_provider"] is True
+    assert manifest["invariants"]["all_labels_provisional"] is True
+    assert manifest["totals"]["cost_usd"] == 0.0, "the free plan allows no billed spend"
+
+
+@pytest.mark.skipif(not _MANIFEST.exists(), reason="no frozen manifest committed yet")
+def test_committed_dataset_is_complete():
+    manifest = json.loads(_MANIFEST.read_text(encoding="utf-8"))
+    if manifest["frozen_cases"] < manifest["expected_cases"]:
+        pytest.skip(f"dataset still in progress: {manifest['status']} (see PROJECT_STATUS.md)")
     assert manifest["complete"] is True, manifest_problems(manifest)
     assert manifest["frozen_cases"] == 40
+    assert len(_committed_cases) == 40

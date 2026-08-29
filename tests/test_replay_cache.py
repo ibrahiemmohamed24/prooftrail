@@ -94,6 +94,37 @@ def test_model_mismatch_is_rejected_before_any_live_call(tmp_path):
     assert CachingModelClient(ReplayCache(path), None).model_name == "claude-opus-5"
 
 
+def test_lazy_inner_factory_is_only_built_on_the_first_miss(tmp_path):
+    path = tmp_path / "F01-s00.json"
+    RefundAgent(CachingModelClient(ReplayCache(path), _script()), [EchoTool()]).run_request(case_id="F01-s00", text="Echo hello")
+
+    built: list[str] = []
+
+    def factory():
+        built.append("built")
+        return _script()
+
+    # Fully cached: the factory never runs, yet the client counts as live-backed.
+    client = CachingModelClient(ReplayCache(path), inner_factory=factory, model_name="claude-opus-5")
+    assert client.is_live_model is True and client.live_client_built is False
+    trace = RefundAgent(client, [EchoTool()]).run_request(case_id="F01-s00", text="Echo hello")
+    assert built == [] and client.hits == 2 and client.misses == 0
+    assert trace.final_report == "Done."
+
+    # A new prompt triggers exactly one construction, then records normally.
+    client = CachingModelClient(ReplayCache(path), inner_factory=factory, model_name="claude-opus-5")
+    RefundAgent(client, [EchoTool()]).run_request(case_id="F01-s00", text="Echo something else")
+    assert built == ["built"] and client.misses == 2 and client.live_client_built is True
+
+    # The factory must honour the cache's model.
+    wrong = lambda: ScriptedModelClient([ModelResponse(text="x")], model_name="claude-sonnet-5")  # noqa: E731
+    client = CachingModelClient(ReplayCache(path), inner_factory=wrong, model_name="claude-opus-5")
+    with pytest.raises(ReplayCacheModelMismatch):
+        RefundAgent(client, [EchoTool()]).run_request(case_id="F01-s00", text="Echo a third thing")
+    with pytest.raises(ValueError):
+        CachingModelClient(ReplayCache(path), _script(), inner_factory=factory)
+
+
 def test_run_case_records_every_user_intent_in_order_and_is_family_agnostic():
     client = ScriptedModelClient(
         [

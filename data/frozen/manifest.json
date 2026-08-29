@@ -1,0 +1,157 @@
+{
+  "cases": [
+    {
+      "case_id": "F02-s00",
+      "case_sha256": "3dac607a87b4638826f179dc0e234019e7a2b85438fd89cf9abe8840f84cc778",
+      "family_id": "F02",
+      "labels_sha256": "230e8a4ed331441cdf78ffeee00dd0a344fbf42fc839338cec223546b2678d53",
+      "labels_verified_by_human": false,
+      "ledger_chain_valid": true,
+      "ledger_events": 8,
+      "list_price_equivalent_usd": 0.001403,
+      "mode": "live-llm-run",
+      "model": "gemini-3.1-flash-lite",
+      "prooftrail_first_bad_event_seq": null,
+      "prooftrail_verdict": "SUPPORTED",
+      "provider": "google-gemini",
+      "provisional_label_verdict": "SUPPORTED",
+      "replay_cache_entries": 4,
+      "seed": 0,
+      "stop_reason": "end_turn",
+      "tool_calls": 3,
+      "usage": {
+        "cost_usd": 0.0,
+        "input_tokens": 3084,
+        "llm_calls": 4,
+        "output_tokens": 422
+      }
+    }
+  ],
+  "complete": false,
+  "dataset": "prooftrail-frozen-v1",
+  "expected_cases": 40,
+  "families": {
+    "F01": {
+      "case_ids": [],
+      "expected": 4,
+      "frozen": 0
+    },
+    "F02": {
+      "case_ids": [
+        "F02-s00"
+      ],
+      "expected": 4,
+      "frozen": 1
+    },
+    "F03": {
+      "case_ids": [],
+      "expected": 4,
+      "frozen": 0
+    },
+    "F04": {
+      "case_ids": [],
+      "expected": 4,
+      "frozen": 0
+    },
+    "F05": {
+      "case_ids": [],
+      "expected": 4,
+      "frozen": 0
+    },
+    "F06": {
+      "case_ids": [],
+      "expected": 4,
+      "frozen": 0
+    },
+    "F07": {
+      "case_ids": [],
+      "expected": 4,
+      "frozen": 0
+    },
+    "F08": {
+      "case_ids": [],
+      "expected": 4,
+      "frozen": 0
+    },
+    "F09": {
+      "case_ids": [],
+      "expected": 4,
+      "frozen": 0
+    },
+    "F10": {
+      "case_ids": [],
+      "expected": 4,
+      "frozen": 0
+    }
+  },
+  "frozen_cases": 1,
+  "human_verification": "none yet; every label is provisional and no B1-vs-ProofTrail number may be published from this manifest",
+  "invariants": {
+    "all_chains_valid": true,
+    "all_labels_provisional": true,
+    "all_replay_caches_present": true,
+    "all_usage_recorded": true,
+    "auditor_view_family_blind": true,
+    "single_model": true,
+    "single_provider": true
+  },
+  "missing": [
+    "F01-s00",
+    "F01-s01",
+    "F01-s02",
+    "F01-s03",
+    "F02-s01",
+    "F02-s02",
+    "F02-s03",
+    "F03-s00",
+    "F03-s01",
+    "F03-s02",
+    "F03-s03",
+    "F04-s00",
+    "F04-s01",
+    "F04-s02",
+    "F04-s03",
+    "F05-s00",
+    "F05-s01",
+    "F05-s02",
+    "F05-s03",
+    "F06-s00",
+    "F06-s01",
+    "F06-s02",
+    "F06-s03",
+    "F07-s00",
+    "F07-s01",
+    "F07-s02",
+    "F07-s03",
+    "F08-s00",
+    "F08-s01",
+    "F08-s02",
+    "F08-s03",
+    "F09-s00",
+    "F09-s01",
+    "F09-s02",
+    "F09-s03",
+    "F10-s00",
+    "F10-s01",
+    "F10-s02",
+    "F10-s03"
+  ],
+  "models": [
+    "gemini-3.1-flash-lite"
+  ],
+  "problems": [],
+  "providers": [
+    "google-gemini"
+  ],
+  "schema_version": 1,
+  "status": "1/40 cases frozen",
+  "totals": {
+    "cost_usd": 0.0,
+    "input_tokens": 3084,
+    "ledger_events": 8,
+    "list_price_equivalent_usd": 0.001403,
+    "llm_calls": 4,
+    "output_tokens": 422,
+    "tool_calls": 3
+  }
+}

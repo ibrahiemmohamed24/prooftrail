@@ -20,10 +20,10 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from .agent.budget import BudgetGuard
-from .agent.cache import CachingModelClient, ReplayCache
+from .agent.cache import CachingModelClient, ReplayCache, ReplayCacheModelMismatch
 from .agent.interfaces import ModelClient
 from .agent.runner import MODE_LIVE, MODE_REPLAY, CaseRun, run_case, write_case_artifacts
 from .config import FROZEN_DIR, REPLAY_DIR, SCENARIO_CONFIG
@@ -109,9 +109,11 @@ def smoke_checks(run: CaseRun) -> dict[str, bool]:
         "every_tool_call_has_a_tool_message": len(tool_messages) == len(trace.tool_calls),
         "timeout_hides_commit_status": timeouts_hidden,
         "ledger_chain_valid": run.ledger_chain_valid,
-        "usage_and_cost_recorded": trace.usage.llm_calls > 0
-        and trace.usage.input_tokens > 0
-        and trace.usage.cost_usd > 0,
+        "usage_recorded": trace.usage.llm_calls > 0 and trace.usage.input_tokens > 0,
+        # A recorded cost may legitimately be $0.00 (free tier); what must hold
+        # is that every turn carries an explicit provider cost figure.
+        "cost_recorded": bool(assistant_turns)
+        and all("cost_usd" in (m.get("provider", {}).get("usage") or {}) for m in assistant_turns),
         "labels_not_human_verified": run.ground_truth.verified_by_human is False,
         "final_report_present": bool(trace.final_report.strip()),
     }
@@ -147,20 +149,37 @@ def freeze_case(
     case_id: str,
     *,
     live_factory: LiveClientFactory,
-    budget: BudgetGuard,
+    budget: BudgetGuard | None,
     model: str | None = None,
     cache_dir: str | Path = REPLAY_DIR,
     frozen_dir: str | Path = FROZEN_DIR,
     fresh: bool = False,
 ) -> FreezeResult:
-    """Run one case against the real model and write its frozen bundle."""
+    """Run one case against the real model and write its frozen bundle.
+
+    ``budget`` is ``None`` for zero-billed providers; paid providers must pass
+    a ``BudgetGuard``. ``live_factory`` receives ``model``, ``budget``, ``label``.
+    """
 
     family, seed = parse_case_id(case_id)
     cache = ReplayCache(replay_cache_path(cache_dir, case_id))
     if fresh:
         cache.clear()
-    inner = live_factory(model=model, budget=budget, label=case_id)
-    client = CachingModelClient(cache, inner)
+
+    def build_live() -> ModelClient:
+        return live_factory(model=model, budget=budget, label=case_id)
+
+    if cache.model is not None:
+        # Resume: serve every recorded turn first; the live client (and its
+        # key / quota / budget) is only touched if a prompt is missing.
+        if model is not None and model != cache.model:
+            raise ReplayCacheModelMismatch(
+                f"replay cache {cache.path} was recorded with {cache.model!r}; refusing to continue "
+                f"{case_id} with {model!r} (use --fresh to re-record)"
+            )
+        client = CachingModelClient(cache, inner_factory=build_live, model_name=cache.model)
+    else:
+        client = CachingModelClient(cache, build_live())
     run = run_case(family, seed, model_client=client, mode=MODE_LIVE)
     paths = write_case_artifacts(run, case_dir(frozen_dir, case_id))
     return FreezeResult(case_id, run, paths, smoke_checks(run), client.hits, client.misses)
@@ -231,6 +250,19 @@ def replay_case(
 # --------------------------------------------------------------------------- #
 # Manifest
 # --------------------------------------------------------------------------- #
+def turn_list_price(message: Mapping[str, Any]) -> float:
+    """Paid-tier price of one assistant turn.
+
+    Free-tier providers record ``list_price_equivalent_usd`` next to a billed
+    ``cost_usd`` of 0; paid providers record the real charge as ``cost_usd``.
+    """
+
+    usage = message.get("provider", {}).get("usage") or {}
+    if "list_price_equivalent_usd" in usage:
+        return float(usage["list_price_equivalent_usd"])
+    return float(usage.get("cost_usd", 0.0))
+
+
 def _auditor_view_is_blind(case: FrozenCase) -> bool:
     view = case.auditor_view()
     text = json.dumps(view, sort_keys=True, ensure_ascii=False)
@@ -249,9 +281,18 @@ def build_manifest(
     expected_ids = tuple(expected) if expected is not None else all_case_ids()
     cases: list[dict[str, Any]] = []
     missing: list[str] = []
-    totals = {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0, "llm_calls": 0, "tool_calls": 0, "ledger_events": 0}
+    totals = {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "list_price_equivalent_usd": 0.0,
+        "llm_calls": 0,
+        "tool_calls": 0,
+        "ledger_events": 0,
+    }
     families: dict[str, dict[str, Any]] = {}
     models: set[str] = set()
+    providers: set[str] = set()
     problems: list[str] = []
 
     for case_id in expected_ids:
@@ -284,8 +325,17 @@ def build_manifest(
         if not _auditor_view_is_blind(case):
             problems.append(f"{case_id}: auditor view leaks family or case identity")
         usage = case.trace.usage
-        if usage.llm_calls <= 0 or usage.input_tokens <= 0 or usage.cost_usd <= 0:
-            problems.append(f"{case_id}: trace has no recorded usage/cost")
+        assistant_turns = [m for m in case.trace.messages if m["role"] == "assistant"]
+        if usage.llm_calls <= 0 or usage.input_tokens <= 0:
+            problems.append(f"{case_id}: trace has no recorded usage")
+        if not all("cost_usd" in (m.get("provider", {}).get("usage") or {}) for m in assistant_turns):
+            problems.append(f"{case_id}: a model turn has no recorded cost figure")
+        case_providers = {m.get("provider", {}).get("provider") for m in assistant_turns}
+        case_providers.discard(None)
+        provider = sorted(case_providers)[0] if len(case_providers) == 1 else None
+        if len(case_providers) != 1:
+            problems.append(f"{case_id}: expected exactly one provider per trace, found {sorted(case_providers)}")
+        list_price = round(sum(turn_list_price(m) for m in assistant_turns), 6)
         cache_path = replay_cache_path(cache_dir, case_id)
         cache_entries = len(ReplayCache(cache_path)) if cache_path.exists() else 0
         if cache_entries == 0:
@@ -294,9 +344,12 @@ def build_manifest(
         summary = json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.exists() else {}
 
         models.add(case.trace.model)
+        if provider is not None:
+            providers.add(provider)
         totals["input_tokens"] += usage.input_tokens
         totals["output_tokens"] += usage.output_tokens
         totals["cost_usd"] = round(totals["cost_usd"] + usage.cost_usd, 6)
+        totals["list_price_equivalent_usd"] = round(totals["list_price_equivalent_usd"] + list_price, 6)
         totals["llm_calls"] += usage.llm_calls
         totals["tool_calls"] += len(case.trace.tool_calls)
         totals["ledger_events"] += len(case.ledger)
@@ -308,12 +361,14 @@ def build_manifest(
                 "family_id": case.family_id,
                 "seed": case.seed,
                 "model": case.trace.model,
+                "provider": provider,
                 "mode": summary.get("mode"),
                 "stop_reason": case.trace.stop_reason,
                 "tool_calls": len(case.trace.tool_calls),
                 "ledger_events": len(case.ledger),
                 "ledger_chain_valid": chain_valid,
                 "usage": usage.to_dict(),
+                "list_price_equivalent_usd": list_price,
                 "prooftrail_verdict": summary.get("verdict"),
                 "prooftrail_first_bad_event_seq": summary.get("first_bad_event_seq"),
                 "provisional_label_verdict": labels.verdict,
@@ -325,6 +380,10 @@ def build_manifest(
         )
 
     frozen_count = len(cases)
+    if len(models) > 1:
+        problems.append(f"dataset mixes models: {sorted(models)}; every case must use the same model")
+    if len(providers) > 1:
+        problems.append(f"dataset mixes providers: {sorted(providers)}")
     manifest = {
         "schema_version": MANIFEST_SCHEMA_VERSION,
         "dataset": "prooftrail-frozen-v1",
@@ -333,6 +392,7 @@ def build_manifest(
         "complete": frozen_count == len(expected_ids) and not problems,
         "status": f"{frozen_count}/{len(expected_ids)} cases frozen",
         "models": sorted(models),
+        "providers": sorted(providers),
         "totals": totals,
         "families": families,
         "missing": missing,
@@ -341,8 +401,10 @@ def build_manifest(
             "all_chains_valid": all(c["ledger_chain_valid"] for c in cases) if cases else False,
             "all_labels_provisional": all(c["labels_verified_by_human"] is False for c in cases) if cases else False,
             "auditor_view_family_blind": not any("leaks" in p for p in problems) and bool(cases),
-            "all_usage_recorded": all(c["usage"]["llm_calls"] > 0 and c["usage"]["cost_usd"] > 0 for c in cases) if cases else False,
+            "all_usage_recorded": all(c["usage"]["llm_calls"] > 0 and c["usage"]["input_tokens"] > 0 for c in cases) if cases else False,
             "all_replay_caches_present": all(c["replay_cache_entries"] > 0 for c in cases) if cases else False,
+            "single_model": len(models) == 1,
+            "single_provider": len(providers) == 1,
         },
         "human_verification": "none yet; every label is provisional and no B1-vs-ProofTrail number may be published from this manifest",
         "cases": cases,

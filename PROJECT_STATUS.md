@@ -40,9 +40,14 @@ Owner(s) should complete both items on feature branches:
    replay cache, CLI, fake-provider tests. Points for the "Live agent + frozen
    dataset" row stay at 0 until item 2 lands, because its definition of done
    covers both.
-2. Forty frozen traces: 10 families × 4 fixed seeds, replayable without an API key. **Pending**
-   (use the validated `gemini-3.1-flash-lite` Free Tier route at billed cost $0;
-   `F02-s00` is the first successful live + replay smoke trace, leaving 39).
+2. Forty frozen traces: 10 families × 4 fixed seeds, replayable without an API key. **In progress: 1/40**
+   (`gemini-3.1-flash-lite` Free Tier route at billed cost $0; `F02-s00` is frozen
+   in `data/frozen/` from its real replay cache and verified by `prooftrail replay`).
+   Tooling is complete and resumable: `python -m prooftrail freeze --live --provider gemini --all --skip-frozen`
+   serves every cached turn first and only builds the live client on a cache miss, so
+   an interrupted run continues without re-recording finished cases. The remaining 39
+   cases need `GEMINI_API_KEY` + `PROOFTRAIL_GEMINI_FREE_TIER=1` in the shell that runs
+   the command; the manifest enforces one model and one provider across the dataset.
 
 The milestone is complete only when:
 
