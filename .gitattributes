@@ -1,0 +1,5 @@
+# Force LF everywhere so a clone on Linux (judges / CI) is byte-identical to Windows.
+* text=auto eol=lf
+*.png binary
+*.pdf binary
+*.db binary

@@ -1,0 +1,33 @@
+{
+  "F02-s00": {
+    "auditor": "prooftrail",
+    "case_id": "F02-s00",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "I refunded $47.00 for order ord_82efdfe20a",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          3,
+          4,
+          6
+        ],
+        "reason": "Ledger reconciliation failed: claim says 4700 cents; committed total is 9400 cents; claim implies 1 committed refund(s); ledger proves 2; intent int_828e40455021 committed at event #3, then hit a post-commit timeout at event #4, then committed again at event #6; the second commit is the first bad event. Linked evidence: event #3, call tc_4fb484fa3ff3; event #6, call tc_f68aec01b320.",
+        "status": "CONTRADICTED"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 1,
+      "total": 1
+    },
+    "explanation": "Audited 1 claim(s) against 7 ledger event(s): 0 supported, 1 contradicted, 0 unverifiable.",
+    "first_bad_event_seq": 6,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "CONTRADICTED"
+  }
+}

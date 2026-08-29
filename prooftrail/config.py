@@ -1,0 +1,97 @@
+"""Single source of truth for models, budgets, paths and fairness constants.
+
+Everything that must be *identical* between the baselines and ProofTrail lives
+here so that the fairness of the comparison is enforced by code, not by
+discipline. Do not add per-auditor model or token overrides.
+"""
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass, field
+from pathlib import Path
+
+# --------------------------------------------------------------------------- #
+# Paths
+# --------------------------------------------------------------------------- #
+PACKAGE_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = PACKAGE_ROOT.parent
+DATA_DIR = PROJECT_ROOT / "data"
+FROZEN_DIR = DATA_DIR / "frozen"          # committed: one folder per case
+REPLAY_DIR = DATA_DIR / "replay"          # committed: cached LLM responses
+STATE_DIR = DATA_DIR / "state"            # ignored: live SQLite files
+EVIDENCE_DIR = PROJECT_ROOT / "evidence" / "runs"
+
+# --------------------------------------------------------------------------- #
+# Model — ONE model for every role (agent, B0, B1, claim extractor).
+# Overridable only globally via PROOFTRAIL_MODEL to keep the comparison fair.
+# --------------------------------------------------------------------------- #
+DEFAULT_MODEL = "claude-opus-5"
+MODEL = os.environ.get("PROOFTRAIL_MODEL", DEFAULT_MODEL)
+
+# USD per 1M tokens (Anthropic first-party API, checked 2026-08-28).
+PRICING_PER_MTOK: dict[str, tuple[float, float]] = {
+    "claude-opus-5": (5.00, 25.00),
+    "claude-sonnet-5": (2.00, 10.00),
+    "claude-haiku-4-5": (1.00, 5.00),
+}
+
+
+def cost_usd(model: str, input_tokens: int, output_tokens: int) -> float:
+    """Cost of one call. Unknown model -> priced as Opus 5 (conservative)."""
+    inp, out = PRICING_PER_MTOK.get(model, PRICING_PER_MTOK["claude-opus-5"])
+    return (input_tokens * inp + output_tokens * out) / 1_000_000
+
+
+# --------------------------------------------------------------------------- #
+# Budget guard (live mode only)
+# --------------------------------------------------------------------------- #
+BUDGET_USD = float(os.environ.get("PROOFTRAIL_BUDGET_USD", "30"))
+COST_LEDGER_PATH = REPLAY_DIR / "cost_ledger.jsonl"
+
+
+# --------------------------------------------------------------------------- #
+# Fairness constants — shared by B0, B1 and ProofTrail's LLM stage.
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class AuditorLimits:
+    """Identical caps for every auditor. Changing one changes all."""
+
+    max_output_tokens: int = 4096
+    effort: str = "high"
+    # Max LLM calls an auditor may make per case. B0/B1 are one-shot (1).
+    # ProofTrail uses exactly 1 as well: the claim extractor. The reconciler
+    # and temporal verifier are deterministic code and cost zero tokens.
+    max_llm_calls_per_case: int = 1
+
+
+AUDITOR_LIMITS = AuditorLimits()
+
+
+@dataclass(frozen=True)
+class AgentLimits:
+    """Caps for the *refund agent* whose behaviour we audit (data creation)."""
+
+    max_output_tokens: int = 4096
+    max_turns: int = 12
+    effort: str = "medium"
+
+
+AGENT_LIMITS = AgentLimits()
+
+
+# --------------------------------------------------------------------------- #
+# Scenario generation
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class ScenarioConfig:
+    instances_per_family: int = 4
+    # Seeds are fixed so `prooftrail cases generate` is byte-reproducible.
+    seeds: tuple[int, ...] = field(default_factory=lambda: (0, 1, 2, 3))
+
+
+SCENARIO_CONFIG = ScenarioConfig()
+
+# Simulated clock start for every case (ISO 8601, UTC). Deterministic timestamps
+# make ledger hashes reproducible across machines.
+SIM_CLOCK_START = "2026-08-28T09:00:00+00:00"
+SIM_CLOCK_STEP_SECONDS = 7

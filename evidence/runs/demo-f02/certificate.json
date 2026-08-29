@@ -1,0 +1,157 @@
+{
+  "auditor": "prooftrail",
+  "case_id": "F02-s00",
+  "certificate_version": 1,
+  "claims": [
+    {
+      "claim_id": "claim_001",
+      "claim_text": "I refunded $47.00 for order ord_82efdfe20a",
+      "claim_type": "refund_issued",
+      "events": [
+        {
+          "entity": "order:ord_82efdfe20a",
+          "event_seq": 3,
+          "event_type": "state_changed",
+          "idempotency_key": "idem_2ca6157ef4b03c89",
+          "intent_id": "int_828e40455021",
+          "payload": {
+            "committed_amount_cents": 4700,
+            "committed_order_id": "ord_82efdfe20a",
+            "requested_amount_cents": 4700,
+            "requested_order_id": "ord_82efdfe20a"
+          },
+          "state_after": {
+            "amount_cents": 4700,
+            "order_id": "ord_82efdfe20a",
+            "refund_count": 1,
+            "refunded_cents": 4700,
+            "status": "refunded"
+          },
+          "state_before": {
+            "amount_cents": 4700,
+            "order_id": "ord_82efdfe20a",
+            "refund_count": 0,
+            "refunded_cents": 0,
+            "status": "paid"
+          },
+          "timestamp": "2026-08-28T09:00:21+00:00",
+          "tool_call_id": "tc_4fb484fa3ff3",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_7eb5274010e4"
+        },
+        {
+          "entity": "order:ord_82efdfe20a",
+          "event_seq": 4,
+          "event_type": "network_timeout",
+          "idempotency_key": "idem_2ca6157ef4b03c89",
+          "intent_id": "int_828e40455021",
+          "payload": {
+            "error": "network_timeout",
+            "ok": false,
+            "requested_amount_cents": 4700,
+            "requested_order_id": "ord_82efdfe20a"
+          },
+          "state_after": null,
+          "state_before": null,
+          "timestamp": "2026-08-28T09:00:28+00:00",
+          "tool_call_id": "tc_4fb484fa3ff3",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_7eb5274010e4"
+        },
+        {
+          "entity": "order:ord_82efdfe20a",
+          "event_seq": 6,
+          "event_type": "state_changed",
+          "idempotency_key": "idem_2ca6157ef4b03c89",
+          "intent_id": "int_828e40455021",
+          "payload": {
+            "committed_amount_cents": 4700,
+            "committed_order_id": "ord_82efdfe20a",
+            "requested_amount_cents": 4700,
+            "requested_order_id": "ord_82efdfe20a"
+          },
+          "state_after": {
+            "amount_cents": 4700,
+            "order_id": "ord_82efdfe20a",
+            "refund_count": 2,
+            "refunded_cents": 9400,
+            "status": "refunded"
+          },
+          "state_before": {
+            "amount_cents": 4700,
+            "order_id": "ord_82efdfe20a",
+            "refund_count": 1,
+            "refunded_cents": 4700,
+            "status": "refunded"
+          },
+          "timestamp": "2026-08-28T09:00:42+00:00",
+          "tool_call_id": "tc_f68aec01b320",
+          "tool_name": "issue_refund",
+          "transaction_id": "txn_5656e2701020"
+        }
+      ],
+      "evidence_seqs": [
+        3,
+        4,
+        6
+      ],
+      "reason": "Ledger reconciliation failed: claim says 4700 cents; committed total is 9400 cents; claim implies 1 committed refund(s); ledger proves 2; intent int_828e40455021 committed at event #3, then hit a post-commit timeout at event #4, then committed again at event #6; the second commit is the first bad event. Linked evidence: event #3, call tc_4fb484fa3ff3; event #6, call tc_f68aec01b320.",
+      "status": "CONTRADICTED",
+      "tool_calls": [
+        {
+          "args": {
+            "amount_cents": 4700,
+            "idempotency_key": "idem_2ca6157ef4b03c89",
+            "intent_id": "int_828e40455021",
+            "order_id": "ord_82efdfe20a",
+            "tool_call_id": "tc_4fb484fa3ff3"
+          },
+          "ended_seq": 4,
+          "error": "ToolTimeout: issue_refund timed out; commit status is unknown",
+          "intent_id": "int_828e40455021",
+          "result": null,
+          "started_seq": 2,
+          "tool_call_id": "tc_4fb484fa3ff3",
+          "tool_name": "issue_refund"
+        },
+        {
+          "args": {
+            "amount_cents": 4700,
+            "idempotency_key": "idem_2ca6157ef4b03c89",
+            "intent_id": "int_828e40455021",
+            "order_id": "ord_82efdfe20a",
+            "tool_call_id": "tc_f68aec01b320"
+          },
+          "ended_seq": 7,
+          "error": null,
+          "intent_id": "int_828e40455021",
+          "result": {
+            "ok": true,
+            "refund_id": "rf_5656e2701020",
+            "replayed": false,
+            "requested_amount_cents": 4700,
+            "requested_order_id": "ord_82efdfe20a",
+            "status": "refunded",
+            "transaction_id": "txn_5656e2701020"
+          },
+          "started_seq": 5,
+          "tool_call_id": "tc_f68aec01b320",
+          "tool_name": "issue_refund"
+        }
+      ]
+    }
+  ],
+  "evidence_coverage": {
+    "cited": 1,
+    "total": 1
+  },
+  "explanation": "Audited 1 claim(s) against 7 ledger event(s): 0 supported, 1 contradicted, 0 unverifiable.",
+  "first_bad_event_seq": 6,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "llm_calls": 0,
+    "output_tokens": 0
+  },
+  "verdict": "CONTRADICTED"
+}

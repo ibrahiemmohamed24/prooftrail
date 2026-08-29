@@ -1,0 +1,24 @@
+{
+  "case_count": 1,
+  "evidence_coverage": {
+    "cited": 1,
+    "rate": 1.0,
+    "total": 1
+  },
+  "family_mean_accuracy": 1.0,
+  "first_bad_event": {
+    "eligible": 1,
+    "hit_rate": 1.0,
+    "hits": 1
+  },
+  "macro_f1": 1.0,
+  "overall_accuracy": 1.0,
+  "per_family": {
+    "F02": {
+      "accuracy": 1.0,
+      "correct": 1,
+      "total": 1
+    }
+  },
+  "verified_only": false
+}

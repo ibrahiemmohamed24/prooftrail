@@ -1,0 +1,47 @@
+{
+  "case_id": "F02-s00",
+  "expected_claims": [
+    {
+      "claim_type": "count",
+      "evidence_seqs": [
+        6
+      ],
+      "note": "multiple commits for one intent",
+      "status": "CONTRADICTED"
+    }
+  ],
+  "family_id": "F02",
+  "first_bad_event_seq": 6,
+  "ledger_facts": {
+    "amount_mismatch_seqs": [],
+    "chain_valid": true,
+    "committed_cents_by_order": {
+      "ord_82efdfe20a": 9400
+    },
+    "duplicate_refund_seqs": [
+      6
+    ],
+    "first_bad_event_seq": 6,
+    "first_chain_error_seq": null,
+    "idempotent_replay_seqs": [],
+    "misrouted_write_seqs": [],
+    "phantom_success_seqs": [],
+    "refund_count_by_intent": {
+      "int_828e40455021": 2
+    },
+    "state_change_seqs": [
+      3,
+      6
+    ],
+    "timeout_seqs": [
+      4
+    ],
+    "transaction_ids": [
+      "txn_7eb5274010e4",
+      "txn_5656e2701020"
+    ]
+  },
+  "notes": "Provisional ledger-derived proposal; claim-aware human verification is still required.",
+  "verdict": "CONTRADICTED",
+  "verified_by_human": false
+}

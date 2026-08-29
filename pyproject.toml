@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prooftrail"
+version = "0.1.0"
+description = "Evidence-linked auditing of agent action claims against an append-only ledger (same evidence, independent truth, frozen traces)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Fatma Ramadan", email = "fatmaramadan156@gmail.com" }]
+# Core (env, ledger, reconciler, eval, replay mode) is stdlib-only on purpose:
+# a judge can reproduce the headline comparison with zero third-party packages
+# and zero API calls. The Anthropic SDK is only needed for --live.
+dependencies = []
+
+[project.optional-dependencies]
+live = ["anthropic==1.4.0"]
+dev = ["pytest==8.4.1", "pytest-cov==6.2.1"]
+
+[project.scripts]
+prooftrail = "prooftrail.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["prooftrail*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
