@@ -7,10 +7,11 @@
 - **Overall completion:** 55 / 100
 - **Last verified:** 2026-08-29
 - **Default branch:** `main`
-- **Offline tests:** 98 passed
-- **Statement coverage:** 93%
+- **Offline tests:** 121 passed (no test uses the network or an API key)
+- **Statement coverage:** 94%
 - **Working demo:** F02 claims one $47 refund; the ledger proves two commits and $94; ProofTrail returns `CONTRADICTED` with first bad event `#6`.
-- **Honesty boundary:** the current demo uses `ScriptedModelClient`; it is not a real-LLM benchmark result.
+- **Live provider:** `AnthropicModelClient` behind `ModelClient`, budget guard over `data/replay/cost_ledger.jsonl`, prompt-hash replay cache, `python -m prooftrail agent run --live|--replay --family F02 --seed 0`.
+- **Honesty boundary:** the demo still uses `ScriptedModelClient`; no real-model trace has been frozen yet, so no benchmark number exists.
 
 ## Scoring model
 
@@ -32,8 +33,14 @@ definition of done is satisfied and linked evidence exists in the PR.
 
 Owner(s) should complete both items on feature branches:
 
-1. Real LLM provider adapter behind the existing `ModelClient` protocol.
-2. Forty frozen traces: 10 families × 4 fixed seeds, replayable without an API key.
+1. Real LLM provider adapter behind the existing `ModelClient` protocol. **Done**
+   (`feat/live-llm-provider`): adapter, budget guard, bounded retry that never
+   re-runs a tool, prompt hash + usage + cost + stop reason recorded per turn,
+   replay cache, CLI, fake-provider tests. Points for the "Live agent + frozen
+   dataset" row stay at 0 until item 2 lands, because its definition of done
+   covers both.
+2. Forty frozen traces: 10 families × 4 fixed seeds, replayable without an API key. **Pending**
+   (needs `ANTHROPIC_API_KEY` in the environment and a 2–3 case smoke run first).
 
 The milestone is complete only when:
 

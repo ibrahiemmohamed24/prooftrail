@@ -2,11 +2,13 @@
 
 **Evidence-linked auditing of what an AI agent *says* it did versus what the ledger *proves* it did.**
 
-> Status: working offline milestone (≈55% of the submission plan). The $47 → $94 path now runs
-> end to end: stateful tools, trace recording, ledger reconciliation, first-bad-event detection,
-> certificates, fair-baseline contract, metrics and CLI. **98 tests pass.** The real-LLM adapter,
-> frozen 40-case benchmark, human label verification and final competition assets are still pending.
-> See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and current handoff target.
+> Status: offline milestone plus a live provider (≈55% of the submission plan; the 40 frozen
+> cases complete the 55 → 75 step). The $47 → $94 path runs end to end: stateful tools, trace
+> recording, ledger reconciliation, first-bad-event detection, certificates, fair-baseline
+> contract, metrics and CLI. A real Anthropic adapter with a budget guard, prompt hashing and a
+> no-key replay cache is in place. **121 tests pass (94% coverage), none of them touch the network.**
+> The frozen 40-case benchmark, human label verification and final competition assets are still
+> pending. See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and handoff target.
 
 ---
 
@@ -85,8 +87,38 @@ Hash chain    : valid
 
 This command deliberately uses `ScriptedModelClient`, a deterministic offline
 fixture. It proves the integration and replay path; it is **not** reported as
-evidence of real-model behaviour. Live LLM traces will be generated and frozen
-once in the next milestone, after which judges will replay them with no key.
+evidence of real-model behaviour. Live LLM traces are generated with the
+command below and frozen once, after which judges replay them with no key.
+
+---
+
+## Live run — one real-model case, then replay it for free
+
+```powershell
+python -m pip install -e ".[dev,live]"     # adds the anthropic SDK
+$env:ANTHROPIC_API_KEY = "<your key>"      # never committed; read from the environment only
+$env:PROOFTRAIL_BUDGET_USD = "30"          # hard spend ceiling across ALL live runs
+
+python -m prooftrail agent run --live --family F02 --seed 0
+python -m prooftrail agent run --replay --family F02 --seed 0   # no key, no network
+```
+
+What a live run records, per assistant turn, inside `evidence/runs/live/<case>/case.json`:
+
+| Field | Where |
+|---|---|
+| model name | `trace.model`, `messages[].provider.model` |
+| prompt hash (sha256 of model + transcript + tools + caps) | `messages[].provider.prompt_sha256` |
+| input / output / cache tokens and USD cost | `messages[].provider.usage`, summed in `trace.usage` |
+| stop reason (`tool_use`, `end_turn`, `max_tokens`, `refusal`) | `messages[].provider.stop_reason` |
+| provider tool-call ids and verbatim content blocks (thinking included) | `messages[].tool_calls[].provider_call_id`, `messages[].provider_content` |
+
+Guard rails: the `BudgetGuard` refuses any call whose worst-case cost would push
+the cumulative spend in `data/replay/cost_ledger.jsonl` past `PROOFTRAIL_BUDGET_USD`;
+transient network / 429 / 5xx failures are retried at most three times, and a retry
+only re-sends the model request — tool actions are never re-executed. Every live
+response is written to `data/replay/<case>.json` keyed by prompt hash, so `--replay`
+reproduces the identical trace with zero API calls and fails loudly on any divergence.
 
 ---
 
@@ -103,7 +135,8 @@ once in the next milestone, after which judges will replay them with no key.
 | Fair baseline | B1 one-call contract sees the same trace + ledger and fails closed | ✅ contract; data pending |
 | Evaluation | Family weighting, Macro-F1, first-bad hit rate, coverage, reports | ✅ |
 | Reproduction | CLI demo + JSON/Markdown evidence + secret scan | ✅ offline milestone |
-| Live benchmark | Real model adapter, 40 frozen traces, human-approved labels, repeats | ⏳ |
+| Live provider | `agent/anthropic_client.py` + budget guard + prompt-hash replay cache + `agent run --live/--replay` | ✅ offline tests with a fake provider |
+| Live benchmark | 40 frozen traces, human-approved labels, repeats | ⏳ |
 
 Run `pytest` from this folder.
 

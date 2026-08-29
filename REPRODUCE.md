@@ -43,6 +43,23 @@ Generated files live in `evidence/runs/demo-f02/`:
 - `certificate.md` and `certificate.json` — claim-linked review evidence.
 - `metrics.json` and `report.md` — a one-case integration smoke metric.
 
+## Live run and no-key replay
+
+```powershell
+python -m pip install -e ".[dev,live]"
+$env:ANTHROPIC_API_KEY = "<your key>"      # environment only; never in files
+$env:PROOFTRAIL_BUDGET_USD = "30"
+python -m prooftrail agent run --live --family F02 --seed 0      # records data/replay/F02-s00.json
+python -m prooftrail agent run --replay --family F02 --seed 0    # zero network, zero key
+```
+
+The live run writes `evidence/runs/live/F02-s00/` with the same bundle as the
+demo plus provider metadata (model, prompt hash, tokens, cost, stop reason).
+Spend is appended to `data/replay/cost_ledger.jsonl`; the budget guard refuses
+any call that could exceed `PROOFTRAIL_BUDGET_USD`. Replay serves the recorded
+responses by prompt hash and exits with code 4 on a cache miss instead of
+silently calling the API.
+
 ## Honesty boundary
 
 `prooftrail demo` uses a class named `ScriptedModelClient` and records the mode
