@@ -345,7 +345,7 @@ def test_gemini_retry_bounds_nontransient_errors_and_paces_calls(monkeypatch):
         transport=FakeGeminiTransport([gemini_text_turn("ok")]),
         min_interval_seconds=0,
     )
-    assert env_confirmed.model_name == "gemini-3.7-flash"
+    assert env_confirmed.model_name == "gemini-3.1-flash-lite"
     assert list_price_equivalent_usd("unknown", 10, 10) == 0.0
 
 

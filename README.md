@@ -137,7 +137,7 @@ key into this repository or a chat. In PowerShell:
 $geminiSecret = Read-Host "Gemini API key" -AsSecureString
 $env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new("", $geminiSecret).Password
 $env:PROOFTRAIL_GEMINI_FREE_TIER = "1"
-$env:PROOFTRAIL_MODEL = "gemini-3.7-flash"
+$env:PROOFTRAIL_MODEL = "gemini-3.1-flash-lite"
 
 python -m prooftrail agent run --live --provider gemini --family F02 --seed 0 --fresh
 Remove-Item Env:GEMINI_API_KEY

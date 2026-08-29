@@ -10,8 +10,8 @@
 - **Offline tests:** 130 passed (no test uses the network or an API key)
 - **Statement coverage:** 94%
 - **Working demo:** F02 claims one $47 refund; the ledger proves two commits and $94; ProofTrail returns `CONTRADICTED` with first bad event `#6`.
-- **Live providers:** paid `AnthropicModelClient` plus zero-billed `GeminiModelClient` Free Tier route behind the same `ModelClient`; both use the prompt-hash replay cache.
-- **Honesty boundary:** the demo still uses `ScriptedModelClient`; no real-model trace has been frozen yet, so no benchmark number exists.
+- **Live providers:** paid `AnthropicModelClient` plus a tested zero-billed `GeminiModelClient` Free Tier route behind the same `ModelClient`; both use the prompt-hash replay cache. The validated Gemini default is `gemini-3.1-flash-lite`.
+- **Honesty boundary:** the demo still uses `ScriptedModelClient`; one real-model smoke trace (`F02-s00`) has been frozen and replayed, but the 40-case dataset and benchmark do not exist yet.
 
 ## Scoring model
 
@@ -40,8 +40,8 @@ Owner(s) should complete both items on feature branches:
    dataset" row stay at 0 until item 2 lands, because its definition of done
    covers both.
 2. Forty frozen traces: 10 families × 4 fixed seeds, replayable without an API key. **Pending**
-   (use Gemini Free Tier for real calls at billed cost $0; a key whose AI Studio
-   Plan says Free and a 2–3 case smoke run are still required).
+   (use the validated `gemini-3.1-flash-lite` Free Tier route at billed cost $0;
+   `F02-s00` is the first successful live + replay smoke trace, leaving 39).
 
 The milestone is complete only when:
 

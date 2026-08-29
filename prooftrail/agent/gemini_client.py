@@ -36,7 +36,7 @@ from .interfaces import ModelResponse, ToolCall, ToolSpec, prompt_sha256
 
 GEMINI_API_KEY_ENV = "GEMINI_API_KEY"
 GEMINI_FREE_TIER_ENV = "PROOFTRAIL_GEMINI_FREE_TIER"
-DEFAULT_GEMINI_MODEL = "gemini-3.7-flash"
+DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-lite"
 GEMINI_PROVIDER_NAME = "google-gemini"
 DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 
