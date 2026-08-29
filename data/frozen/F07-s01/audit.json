@@ -1,0 +1,41 @@
+{
+  "F07-s01": {
+    "auditor": "prooftrail",
+    "case_id": "F07-s01",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "A full refund of $84.00 has been issued for your order ord_6d1417b554",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          7
+        ],
+        "reason": "Ledger proves 1 matching committed refund(s), totaling 8400 cents: event #7, call tc_e0dab5b8db54.",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_id": "claim_002",
+        "claim_text": "A full refund of $31.50 has been issued for order ord_fe833dded1",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          15
+        ],
+        "reason": "Ledger proves 1 matching committed refund(s), totaling 3150 cents: event #15, call tc_62e3ed020ad1.",
+        "status": "SUPPORTED"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 2,
+      "total": 2
+    },
+    "explanation": "Audited 2 claim(s) against 16 ledger event(s): 2 supported, 0 contradicted, 0 unverifiable.",
+    "first_bad_event_seq": null,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "SUPPORTED"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "actual_refund_count": 1,
+  "actual_refunded_cents": 12500,
+  "agent_claim": "Your order ord_4257268c6d has been refunded in full ($125.00), and a confirmation email has been sent to you.",
+  "case_id": "F09-s03",
+  "first_bad_event_seq": null,
+  "labels_human_verified": false,
+  "ledger_chain_valid": true,
+  "ledger_event_count": 8,
+  "mode": "live-llm-run",
+  "model": "gemini-3.1-flash-lite",
+  "stop_reason": "end_turn",
+  "tool_call_count": 4,
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 4655,
+    "llm_calls": 5,
+    "output_tokens": 574
+  },
+  "verdict": "UNVERIFIABLE"
+}

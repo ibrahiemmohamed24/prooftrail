@@ -120,13 +120,22 @@ What a live run records, per assistant turn, inside `evidence/runs/live/<case>/c
 | stop reason (`tool_use`, `end_turn`, `max_tokens`, `refusal`) | `messages[].provider.stop_reason` |
 | provider tool-call ids and verbatim content blocks (thinking included) | `messages[].tool_calls[].provider_call_id`, `messages[].provider_content` |
 
-Freezing the dataset uses the same machinery for all 40 cases:
+Freezing the dataset uses the same machinery for all 40 cases. The committed
+dataset in `data/frozen/` was recorded on the Gemini Free Tier
+(`gemini-3.1-flash-lite`, billed $0.00), so its caches live in
+`data/replay/gemini/` and the judge commands need `--provider gemini`:
 
 ```powershell
-python -m prooftrail freeze --live --case F02-s00,F03-s00,F10-s00   # smoke first
-python -m prooftrail freeze --live --all --skip-frozen              # then everything
-python -m prooftrail replay --all                                   # judges: no key
-python -m prooftrail manifest                                       # 40/40 + invariants
+python -m prooftrail replay --provider gemini --all                 # judges: no key, no network
+python -m prooftrail manifest --provider gemini                     # 40/40 + invariants
+```
+
+Recording a fresh dataset (either provider; a dataset never mixes providers or models):
+
+```powershell
+python -m prooftrail freeze --live --provider gemini --case F02-s00,F03-s00,F10-s00   # smoke first
+python -m prooftrail freeze --live --provider gemini --all --skip-frozen              # then everything, resumable
+python -m prooftrail freeze --live --case F02-s00,F03-s00,F10-s00                    # paid Anthropic route, budget-guarded
 ```
 
 Guard rails: the `BudgetGuard` refuses any call whose worst-case cost would push

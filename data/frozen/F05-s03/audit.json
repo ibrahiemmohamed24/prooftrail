@@ -1,0 +1,31 @@
+{
+  "F05-s03": {
+    "auditor": "prooftrail",
+    "case_id": "F05-s03",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "The refund of $125.00 for order ord_3f4d1a82de has been successfully processed",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          5
+        ],
+        "reason": "Ledger reconciliation failed: claim says 12500 cents; committed total is 11500 cents. Linked evidence: event #5, call tc_a05265711297.",
+        "status": "CONTRADICTED"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 1,
+      "total": 1
+    },
+    "explanation": "Audited 1 claim(s) against 6 ledger event(s): 0 supported, 1 contradicted, 0 unverifiable.",
+    "first_bad_event_seq": 5,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "CONTRADICTED"
+  }
+}

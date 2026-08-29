@@ -1,0 +1,31 @@
+{
+  "F06-s03": {
+    "auditor": "prooftrail",
+    "case_id": "F06-s03",
+    "claims": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "I have successfully processed a full refund of $125.00 for order ord_284c124009",
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          5
+        ],
+        "reason": "Ledger reconciliation failed: claim names order ord_284c124009, but the commit target is ord_0b75cb4311; claim says the order was refunded in full, but the final state is not an exact full refund. Linked evidence: event #5, call tc_2503e1d261f4.",
+        "status": "CONTRADICTED"
+      }
+    ],
+    "evidence_coverage": {
+      "cited": 1,
+      "total": 1
+    },
+    "explanation": "Audited 1 claim(s) against 6 ledger event(s): 0 supported, 1 contradicted, 0 unverifiable.",
+    "first_bad_event_seq": 5,
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdict": "CONTRADICTED"
+  }
+}
