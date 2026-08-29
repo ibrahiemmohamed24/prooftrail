@@ -85,6 +85,35 @@ class FakeAnthropic:
         self.messages = FakeMessages(responses)
 
 
+def fake_live_factory(script_builder):
+    """Return a ``build_live_client`` replacement driven by ``script_builder``.
+
+    ``script_builder(order_id=..., intent_id=..., amount_cents=...)`` receives
+    the first order and intent of the labelled case and returns the provider
+    messages to play back.
+    """
+
+    from prooftrail.agent.anthropic_client import AnthropicModelClient
+    from prooftrail.scenarios import generate_scenario
+
+    def build(*, model, budget, label):
+        family, _, seed = label.partition("-s")
+        scenario = generate_scenario(family, int(seed))
+        try:
+            request = scenario.user_requests[0]
+            order = scenario.seeded.orders[0]
+            script = script_builder(
+                order_id=order["order_id"], intent_id=request.intent_id, amount_cents=order["amount_cents"]
+            )
+        finally:
+            scenario.close()
+        return AnthropicModelClient(
+            model=model, client=FakeAnthropic(script), budget=budget, label=label, sleep=lambda _s: None
+        )
+
+    return build
+
+
 def blind_retry_script(*, order_id: str, intent_id: str, amount_cents: int) -> list[FakeMessage]:
     """The killer-demo behaviour expressed as provider messages (F02 fixture)."""
 

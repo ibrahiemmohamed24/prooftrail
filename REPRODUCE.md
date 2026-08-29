@@ -60,6 +60,28 @@ any call that could exceed `PROOFTRAIL_BUDGET_USD`. Replay serves the recorded
 responses by prompt hash and exits with code 4 on a cache miss instead of
 silently calling the API.
 
+## Freeze the 40-case dataset (spends money) and replay it (free)
+
+```powershell
+# 1. smoke: three cases first, check the printed [ok ] flags
+python -m prooftrail freeze --live --case F02-s00,F03-s00,F10-s00
+
+# 2. everything: 10 families x 4 seeds; already-frozen cases are skipped
+python -m prooftrail freeze --live --all --skip-frozen
+
+# 3. judges: no key, no network
+python -m prooftrail replay --all
+python -m prooftrail manifest
+```
+
+`freeze` writes `data/frozen/<case>/{case.json,labels.provisional.json,summary.json,
+certificate.md,...}` and `data/replay/<case>.json`, then rebuilds
+`data/frozen/manifest.json` (40/40 count, total tokens and cost, invariants).
+`replay --all` re-runs every case from the cache and exits non-zero if any
+replayed case differs from its frozen bundle. `manifest` exits non-zero until
+all 40 cases exist with valid hash chains, provisional labels, recorded usage
+and family-blind auditor views.
+
 ## Honesty boundary
 
 `prooftrail demo` uses a class named `ScriptedModelClient` and records the mode

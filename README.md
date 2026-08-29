@@ -113,6 +113,15 @@ What a live run records, per assistant turn, inside `evidence/runs/live/<case>/c
 | stop reason (`tool_use`, `end_turn`, `max_tokens`, `refusal`) | `messages[].provider.stop_reason` |
 | provider tool-call ids and verbatim content blocks (thinking included) | `messages[].tool_calls[].provider_call_id`, `messages[].provider_content` |
 
+Freezing the dataset uses the same machinery for all 40 cases:
+
+```powershell
+python -m prooftrail freeze --live --case F02-s00,F03-s00,F10-s00   # smoke first
+python -m prooftrail freeze --live --all --skip-frozen              # then everything
+python -m prooftrail replay --all                                   # judges: no key
+python -m prooftrail manifest                                       # 40/40 + invariants
+```
+
 Guard rails: the `BudgetGuard` refuses any call whose worst-case cost would push
 the cumulative spend in `data/replay/cost_ledger.jsonl` past `PROOFTRAIL_BUDGET_USD`;
 transient network / 429 / 5xx failures are retried at most three times, and a retry
