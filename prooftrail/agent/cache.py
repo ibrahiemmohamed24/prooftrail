@@ -9,6 +9,7 @@ frozen run.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -19,6 +20,10 @@ CACHE_SCHEMA_VERSION = 1
 
 class ReplayCacheMiss(LookupError):
     """The prompt was never recorded; replay cannot continue without a network call."""
+
+
+class ReplayCacheModelMismatch(ValueError):
+    """The cache was recorded with a different model than the one requested."""
 
 
 class ReplayCache:
@@ -39,6 +44,7 @@ class ReplayCache:
         self._order = list(raw.get("order", []))
 
     def save(self) -> Path:
+        """Write atomically: a crash mid-write can never leave a truncated cache."""
         self.path.parent.mkdir(parents=True, exist_ok=True)
         payload = {
             "schema_version": CACHE_SCHEMA_VERSION,
@@ -46,11 +52,13 @@ class ReplayCache:
             "order": list(self._order),
             "entries": self._entries,
         }
-        self.path.write_text(
+        tmp = self.path.with_name(f"{self.path.name}.{os.getpid()}.tmp")
+        tmp.write_text(
             json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
             encoding="utf-8",
             newline="\n",
         )
+        os.replace(tmp, self.path)
         return self.path
 
     def clear(self) -> None:
@@ -80,7 +88,9 @@ class ReplayCache:
         if self.model is None:
             self.model = model
         elif self.model != model:
-            raise ValueError(f"replay cache {self.path} was recorded with {self.model!r}, not {model!r}")
+            raise ReplayCacheModelMismatch(
+                f"replay cache {self.path} was recorded with {self.model!r}, not {model!r}"
+            )
         if key not in self._entries:
             self._order.append(key)
         self._entries[key] = {"response": response.to_dict()}
@@ -115,6 +125,13 @@ class CachingModelClient:
             self.model_name = inner.model_name
         else:
             self.model_name = model_name or cache.model or "replay-cache-without-model"
+        # Check before any completion so a mismatch can never trigger a paid
+        # API call that would only fail when the response is saved.
+        if cache.model is not None and cache.model != self.model_name:
+            raise ReplayCacheModelMismatch(
+                f"replay cache {cache.path} was recorded with {cache.model!r} but "
+                f"{self.model_name!r} was requested; pass --fresh to re-record or use --model {cache.model}"
+            )
         self.is_live_model = bool(inner is not None and inner.is_live_model)
         self.hits = 0
         self.misses = 0
@@ -151,4 +168,10 @@ class CachingModelClient:
         return response
 
 
-__all__ = ["CACHE_SCHEMA_VERSION", "CachingModelClient", "ReplayCache", "ReplayCacheMiss"]
+__all__ = [
+    "CACHE_SCHEMA_VERSION",
+    "CachingModelClient",
+    "ReplayCache",
+    "ReplayCacheMiss",
+    "ReplayCacheModelMismatch",
+]

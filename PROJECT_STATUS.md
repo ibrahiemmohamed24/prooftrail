@@ -7,7 +7,8 @@
 - **Overall completion:** 55 / 100
 - **Last verified:** 2026-08-29
 - **Default branch:** `main`
-- **Offline tests:** 130 passed (no test uses the network or an API key)
+- **Offline tests:** 139 passed, 2 skipped until `data/frozen/` is populated (no test uses the network or an API key; the Anthropic SDK is exercised over an in-process mock transport, Gemini over a fake transport)
+- **Real spend to date:** $0.00 — the only live route in use is the Gemini Free Tier, billed at $0
 - **Statement coverage:** 94%
 - **Working demo:** F02 claims one $47 refund; the ledger proves two commits and $94; ProofTrail returns `CONTRADICTED` with first bad event `#6`.
 - **Live providers:** paid `AnthropicModelClient` plus a tested zero-billed `GeminiModelClient` Free Tier route behind the same `ModelClient`; both use the prompt-hash replay cache. The validated Gemini default is `gemini-3.1-flash-lite`.

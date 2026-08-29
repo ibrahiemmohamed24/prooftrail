@@ -23,7 +23,7 @@ import time
 from copy import deepcopy
 from typing import Any, Callable, Mapping, Sequence
 
-from ..config import MODEL, PRICING_PER_MTOK, cost_usd
+from ..config import MODEL, cost_usd, pricing_for
 from ..schemas import Usage
 from .budget import BudgetGuard
 from .interfaces import ModelResponse, ToolCall, ToolSpec, prompt_sha256
@@ -185,7 +185,7 @@ def compute_cost_usd(
     cache_creation_input_tokens: int = 0,
 ) -> float:
     base = cost_usd(model, input_tokens, output_tokens)
-    input_price = PRICING_PER_MTOK.get(model, PRICING_PER_MTOK["claude-opus-5"])[0]
+    input_price = pricing_for(model)[0]
     cache_cost = (
         cache_read_input_tokens * input_price * CACHE_READ_MULTIPLIER
         + cache_creation_input_tokens * input_price * CACHE_WRITE_MULTIPLIER
@@ -292,6 +292,9 @@ class AnthropicModelClient:
         if max_retries < 0:
             raise ValueError("max_retries must be >= 0")
         self.model_name = model or MODEL
+        # Fail here, before any key is read or any request is built: a model
+        # without a configured price can never be budgeted honestly.
+        pricing_for(self.model_name)
         self.budget = budget
         self.max_retries = max_retries
         self.label = label
@@ -355,8 +358,9 @@ class AnthropicModelClient:
         if self.budget is not None:
             estimate = self.budget.estimate_call_cost(
                 self.model_name,
-                prompt_chars=len(json.dumps(request, default=str, ensure_ascii=False)),
+                prompt_bytes=len(json.dumps(request, default=str, ensure_ascii=False).encode("utf-8")),
                 max_output_tokens=max_output_tokens,
+                attempts=self.max_retries + 1,
             )
             self.budget.authorize(estimate, description=f"{self.label} prompt {prompt_hash[:12]}")
 

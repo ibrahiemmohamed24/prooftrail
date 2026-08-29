@@ -49,8 +49,8 @@ Generated files live in `evidence/runs/demo-f02/`:
 python -m pip install -e ".[dev,live]"
 $env:ANTHROPIC_API_KEY = "<your key>"      # environment only; never in files
 $env:PROOFTRAIL_BUDGET_USD = "30"
-python -m prooftrail agent run --live --family F02 --seed 0      # records data/replay/F02-s00.json
-python -m prooftrail agent run --replay --family F02 --seed 0    # zero network, zero key
+python -m prooftrail agent run --live --fresh --family F02 --seed 0   # records data/replay/F02-s00.json
+python -m prooftrail agent run --replay --family F02 --seed 0          # zero network, zero key
 ```
 
 The live run writes `evidence/runs/live/F02-s00/` with the same bundle as the

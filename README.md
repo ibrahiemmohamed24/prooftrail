@@ -6,7 +6,7 @@
 > cases complete the 55 → 75 step). The $47 → $94 path runs end to end: stateful tools, trace
 > recording, ledger reconciliation, first-bad-event detection, certificates, fair-baseline
 > contract, metrics and CLI. A real Anthropic adapter with a budget guard, prompt hashing and a
-> no-key replay cache is in place. **130 tests pass (94% coverage), none of them touch the network.**
+> no-key replay cache is in place. **139 tests pass (94% coverage), none of them touch the network.**
 > The frozen 40-case benchmark, human label verification and final competition assets are still
 > pending. See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and handoff target.
 
@@ -99,9 +99,16 @@ python -m pip install -e ".[dev,live]"     # adds the anthropic SDK
 $env:ANTHROPIC_API_KEY = "<your key>"      # never committed; read from the environment only
 $env:PROOFTRAIL_BUDGET_USD = "30"          # hard spend ceiling across ALL live runs
 
-python -m prooftrail agent run --live --family F02 --seed 0
-python -m prooftrail agent run --replay --family F02 --seed 0   # no key, no network
+python -m prooftrail agent run --live --fresh --family F02 --seed 0   # record a NEW trace
+python -m prooftrail agent run --replay --family F02 --seed 0          # no key, no network
 ```
+
+`--fresh` discards `data/replay/F02-s00.json` before recording. Without it a live
+run first serves every prompt it already has in that cache and only calls the API
+for prompts it has not seen — useful to resume an interrupted recording cheaply,
+but it means the result is a continuation of the earlier trace, not a fresh
+sample of model behaviour. A cache recorded with a different model is refused
+before any request is sent.
 
 What a live run records, per assistant turn, inside `evidence/runs/live/<case>/case.json`:
 
@@ -123,7 +130,9 @@ python -m prooftrail manifest                                       # 40/40 + in
 ```
 
 Guard rails: the `BudgetGuard` refuses any call whose worst-case cost would push
-the cumulative spend in `data/replay/cost_ledger.jsonl` past `PROOFTRAIL_BUDGET_USD`;
+the cumulative spend in `data/replay/cost_ledger.jsonl` past `PROOFTRAIL_BUDGET_USD`
+(worst case = every UTF-8 byte of the request counted as an input token, the full
+output cap, and every retry attempt billed; models without a configured price are refused);
 transient network / 429 / 5xx failures are retried at most three times, and a retry
 only re-sends the model request — tool actions are never re-executed. Every live
 response is written to `data/replay/<case>.json` keyed by prompt hash, so `--replay`

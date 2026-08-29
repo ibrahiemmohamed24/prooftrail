@@ -10,7 +10,7 @@ from typing import Sequence
 
 from .agent.anthropic_client import AnthropicModelClient, MissingApiKeyError
 from .agent.budget import BudgetExceededError, BudgetGuard
-from .agent.cache import CachingModelClient, ReplayCache, ReplayCacheMiss
+from .agent.cache import CachingModelClient, ReplayCache, ReplayCacheMiss, ReplayCacheModelMismatch
 from .agent.gemini_client import (
     DEFAULT_GEMINI_MODEL,
     FreeTierConfirmationError,
@@ -20,7 +20,7 @@ from .agent.gemini_client import (
     MissingGeminiApiKeyError,
 )
 from .agent.runner import MODE_LIVE, MODE_REPLAY, run_case, write_case_artifacts
-from .config import EVIDENCE_DIR, FROZEN_DIR, MODEL, REPLAY_DIR
+from .config import EVIDENCE_DIR, FROZEN_DIR, MODEL, REPLAY_DIR, UnknownModelPricingError
 from .demo import run_killer_demo, write_demo_artifacts
 from .eval.metrics import evaluate_outputs
 from .eval.report import write_metrics_report
@@ -88,7 +88,7 @@ def _parser() -> argparse.ArgumentParser:
     run.add_argument("--budget-usd", type=float, default=None, help="override PROOFTRAIL_BUDGET_USD")
     run.add_argument("--cache-dir", type=Path, default=REPLAY_DIR, help="replay cache directory")
     run.add_argument("--output", type=Path, default=None, help="evidence directory (default evidence/runs/live/<case>)")
-    run.add_argument("--fresh", action="store_true", help="discard this case's replay cache before a live run")
+    run.add_argument("--fresh", action="store_true", help="discard this case's replay cache first; without it a live run resumes from cached turns")
     run.add_argument("--json", action="store_true", help="print only the JSON summary")
 
     freeze = commands.add_parser(
@@ -256,6 +256,9 @@ def _agent_run(args: argparse.Namespace) -> int:
     except (GeminiTransportError, GeminiResponseError) as exc:
         print(f"error: Gemini provider failed: {exc}", file=sys.stderr)
         return 6
+    except (ReplayCacheModelMismatch, UnknownModelPricingError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 5
 
     paths = write_case_artifacts(run, output_dir)
     summary = run.summary()
