@@ -7,7 +7,7 @@
 - **Overall completion:** 75 / 100
 - **Last verified:** 2026-08-29
 - **Default branch:** `main`
-- **Offline tests:** 192 passed, 0 skipped (no test uses the network or an API key; the Anthropic SDK is exercised over an in-process mock transport, Gemini over a fake transport; the 40 committed frozen cases are loaded, chain-verified and checked for family-blindness by the dataset tests)
+- **Offline tests:** 194 passed, 0 skipped (no test uses the network or an API key; the Anthropic SDK is exercised over an in-process mock transport, Gemini over a fake transport; the 40 committed frozen cases are loaded, chain-verified and checked for family-blindness by the dataset tests)
 - **Real spend to date:** $0.00 — all 175 recorded LLM calls went through the Gemini Free Tier (`gemini-3.1-flash-lite`), billed at $0; list-price equivalent $0.061
 - **Statement coverage:** 94%
 - **Working demo:** F02 claims one $47 refund; the ledger proves two commits and $94; ProofTrail returns `CONTRADICTED` with first bad event `#6`.
@@ -50,6 +50,8 @@ definition of done is satisfied and linked evidence exists in the PR.
      `providers: ["google-gemini"]`, all seven invariants `true`, `problems: []`;
    - `python -m prooftrail replay --provider gemini --all` with no key in the
      environment: `Replayed 40/40 cases with no API key; 0 failure(s).`
+   - manifest hashes are line-ending independent (`sha256_file` normalises CRLF to LF),
+     so the same checks pass from a `git archive`/Linux clone, not only a Windows working tree.
 
 Definition-of-done checklist:
 
@@ -58,7 +60,7 @@ Definition-of-done checklist:
 - `data/frozen/<case>/case.json` exists for all 40 cases. **Yes.**
 - Cached/replay mode reproduces the same trace inputs with no network. **Yes** (`replay --all` exits non-zero on any byte divergence from the frozen bundle; 0 failures).
 - No API key or personal data is committed. **Yes** (`scripts/check_no_secrets.py` passed; the dataset is fully synthetic).
-- `python -m pytest`, `python -m prooftrail demo`, and the secret scan pass. **Yes** (192 passed; demo unchanged: `CONTRADICTED`, event `#6`).
+- `python -m pytest`, `python -m prooftrail demo`, and the secret scan pass. **Yes** (194 passed; demo unchanged: `CONTRADICTED`, event `#6`).
 
 Known limits of this dataset (stated, not hidden):
 

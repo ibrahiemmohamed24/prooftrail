@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 
@@ -17,12 +18,37 @@ from prooftrail.freeze import (
     parse_case_id,
     replay_case,
     replay_cache_path,
+    sha256_file,
     smoke_checks,
     write_manifest,
 )
 from prooftrail.schemas.events import verify_chain
 
 from fakes import blind_retry_script, fake_live_factory
+
+
+def test_sha256_file_is_line_ending_independent(tmp_path: Path):
+    """Git checks the dataset out as LF; a Windows working tree may hold CRLF.
+    The manifest hashes must not depend on which one the reader has."""
+
+    payload = '{\n  "a": 1,\n  "b": "x"\n}\n'
+    lf = tmp_path / "lf.json"
+    crlf = tmp_path / "crlf.json"
+    lf.write_bytes(payload.encode("utf-8"))
+    crlf.write_bytes(payload.replace("\n", "\r\n").encode("utf-8"))
+    assert lf.read_bytes() != crlf.read_bytes()
+    assert sha256_file(lf) == sha256_file(crlf)
+    assert sha256_file(lf) == hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def test_write_case_artifacts_emits_lf_only(tmp_path: Path):
+    """Artifacts are hashed and committed, so writers must never emit CRLF."""
+
+    frozen, _cache, _budget = _freeze_two(tmp_path)
+    written = list((frozen / "F02-s00").iterdir())
+    assert written, "freeze wrote nothing"
+    for path in written:
+        assert b"\r\n" not in path.read_bytes(), path.name
 
 
 def test_case_inventory_is_ten_families_by_four_seeds():

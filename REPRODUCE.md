@@ -107,7 +107,8 @@ and adds the `PROOFTRAIL_BUDGET_USD` guard; a dataset must never mix
 providers or models, and the manifest fails if it does.
 
 `freeze` writes `data/frozen/<case>/{case.json,labels.provisional.json,summary.json,
-certificate.md,...}` and `data/replay/<case>.json`, then rebuilds
+certificate.md,...}` and the replay cache `data/replay/gemini/<case>.json`
+(`data/replay/<case>.json` for the paid Anthropic route), then rebuilds
 `data/frozen/manifest.json` (40/40 count, total tokens and cost, invariants).
 `replay --all` re-runs every case from the cache and exits non-zero if any
 replayed case differs from its frozen bundle. `manifest` exits non-zero until

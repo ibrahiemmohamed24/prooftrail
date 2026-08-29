@@ -68,7 +68,15 @@ def replay_cache_path(cache_dir: str | Path, case_id: str) -> Path:
 
 
 def sha256_file(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    """sha256 of a text artifact with CRLF normalised to LF.
+
+    Git stores every text file as LF (``.gitattributes``: ``eol=lf``), but a
+    Windows checkout, or an artifact written in text mode, may hold CRLF on
+    disk. Hashing the normalised bytes keeps ``case_sha256``/``labels_sha256``
+    identical in a working tree, in ``git archive`` and in a Linux clone.
+    """
+
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def load_frozen_case(case_id: str, frozen_dir: str | Path = FROZEN_DIR) -> FrozenCase:

@@ -56,6 +56,6 @@ def write_metrics_report(
     directory.mkdir(parents=True, exist_ok=True)
     json_path = directory / "metrics.json"
     markdown_path = directory / "report.md"
-    json_path.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    markdown_path.write_text(render_metrics_markdown(metrics, title=title), encoding="utf-8")
+    json_path.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    markdown_path.write_text(render_metrics_markdown(metrics, title=title), encoding="utf-8", newline="\n")
     return json_path, markdown_path

@@ -159,7 +159,10 @@ def _demo(args: argparse.Namespace) -> int:
     print(f"First bad     : ledger event #{summary['first_bad_event_seq']}")
     print(f"Hash chain    : {'valid' if summary['ledger_chain_valid'] else 'INVALID'}")
     print(f"Certificate   : {paths['certificate_markdown'].resolve()}")
-    print("Mode          : scripted offline fixture; real-LLM dataset is still pending")
+    print(
+        "Mode          : scripted offline fixture (not a real LLM run); the real-model "
+        "dataset is in data/frozen/ - replay it with `prooftrail replay --provider gemini --all`"
+    )
     return 0
 
 

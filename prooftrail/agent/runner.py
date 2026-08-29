@@ -126,19 +126,24 @@ def write_case_artifacts(run: CaseRun, output_dir: str | Path) -> dict[str, Path
     paths["certificate_json"].write_text(
         render_certificate_json(run.audit, run.case.trace, run.case.ledger) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     paths["certificate_markdown"].write_text(
         render_certificate_markdown(run.audit, run.case.trace, run.case.ledger),
         encoding="utf-8",
+        newline="\n",
     )
     _dump(paths["summary"], run.summary())
     return paths
 
 
 def _dump(path: Path, payload: Any) -> None:
+    # newline="\n": artifacts are hashed and committed, so the platform must
+    # never translate line endings (see freeze.sha256_file).
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
 

@@ -2,13 +2,15 @@
 
 **Evidence-linked auditing of what an AI agent *says* it did versus what the ledger *proves* it did.**
 
-> Status: offline milestone plus a live provider (≈55% of the submission plan; the 40 frozen
-> cases complete the 55 → 75 step). The $47 → $94 path runs end to end: stateful tools, trace
-> recording, ledger reconciliation, first-bad-event detection, certificates, fair-baseline
-> contract, metrics and CLI. A real Anthropic adapter with a budget guard, prompt hashing and a
-> no-key replay cache is in place. **139 tests pass (94% coverage), none of them touch the network.**
-> The frozen 40-case benchmark, human label verification and final competition assets are still
-> pending. See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and handoff target.
+> Status: live providers plus the frozen 40-case dataset (75 / 100 of the submission plan).
+> The $47 → $94 path runs end to end: stateful tools, trace recording, ledger reconciliation,
+> first-bad-event detection, certificates, fair-baseline contract, metrics and CLI. A paid
+> Anthropic adapter (budget guard, prompt hashing) and a zero-billed Gemini Free Tier adapter
+> share one no-key replay cache. **All 40 real-model traces are frozen in `data/frozen/`
+> (Gemini Free Tier, `gemini-3.1-flash-lite`, billed $0.00) and replay with no key; 194 tests
+> pass (94% coverage), none of them touch the network.** Human label verification, the B1
+> comparison over the frozen inputs and final competition assets are still pending. See
+> [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and handoff target.
 
 ---
 
@@ -193,11 +195,11 @@ and [available regions](https://ai.google.dev/gemini-api/docs/available-regions)
 | Scenarios | 10 families, deterministic seed data, generator, provisional ground truth | ✅ |
 | Agent | Provider-neutral tool loop, trace recorder and explicit offline replay client | ✅ |
 | ProofTrail | Claims → evidence → reconciliation → temporal verifier → certificate | ✅ |
-| Fair baseline | B1 one-call contract sees the same trace + ledger and fails closed | ✅ contract; data pending |
+| Fair baseline | B1 one-call contract sees the same trace + ledger and fails closed | ✅ contract; B1 run over the frozen dataset pending |
 | Evaluation | Family weighting, Macro-F1, first-bad hit rate, coverage, reports | ✅ |
 | Reproduction | CLI demo + JSON/Markdown evidence + secret scan | ✅ offline milestone |
-| Live providers | Anthropic paid adapter or Gemini Free Tier REST adapter + prompt-hash replay | ✅ offline provider tests; real traces pending |
-| Live benchmark | 40 frozen traces, human-approved labels, repeats | ⏳ |
+| Live providers | Anthropic paid adapter or Gemini Free Tier REST adapter + prompt-hash replay | ✅ offline provider tests; 40 real traces frozen (Gemini Free Tier, $0.00) |
+| Live benchmark | 40 frozen traces, human-approved labels, repeats | ✅ traces 40/40 (`data/frozen/`, no-key replay); ⏳ human labels, repeats |
 
 Run `pytest` from this folder.
 
