@@ -3,32 +3,15 @@ import json
 import pytest
 
 from prooftrail import cli
-from prooftrail.agent import AnthropicModelClient, ScriptedModelClient
+from prooftrail.agent import ScriptedModelClient
 from prooftrail.agent.runner import MODE_LIVE, MODE_REPLAY
 
-from fakes import FakeAnthropic, blind_retry_script, text_turn
-
-
-def _fake_live_factory(script_builder):
-    from prooftrail.scenarios import generate_scenario
-
-    def build(*, model, budget, label):
-        family, _, seed = label.partition("-s")
-        scenario = generate_scenario(family, int(seed))
-        try:
-            request = scenario.user_requests[0]
-            order = scenario.seeded.orders[0]
-            script = script_builder(order_id=order["order_id"], intent_id=request.intent_id, amount_cents=order["amount_cents"])
-        finally:
-            scenario.close()
-        return AnthropicModelClient(model=model, client=FakeAnthropic(script), budget=budget, label=label, sleep=lambda _s: None)
-
-    return build
+from fakes import blind_retry_script, fake_live_factory, text_turn
 
 
 def test_live_then_replay_round_trip_without_a_key(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    monkeypatch.setattr(cli, "build_live_client", _fake_live_factory(blind_retry_script))
+    monkeypatch.setattr(cli, "build_live_client", fake_live_factory(blind_retry_script))
     cache_dir = tmp_path / "replay"
     out_live = tmp_path / "live"
 
@@ -92,7 +75,7 @@ def test_live_without_a_key_fails_before_running(tmp_path, monkeypatch, capsys):
 
 
 def test_budget_guard_stops_a_live_run(tmp_path, monkeypatch, capsys):
-    monkeypatch.setattr(cli, "build_live_client", _fake_live_factory(blind_retry_script))
+    monkeypatch.setattr(cli, "build_live_client", fake_live_factory(blind_retry_script))
     code = cli.main(
         ["agent", "run", "--live", "--family", "F02", "--seed", "0",
          "--cache-dir", str(tmp_path), "--output", str(tmp_path / "out"), "--budget-usd", "0.00001"]
@@ -106,7 +89,7 @@ def test_human_readable_live_output_mentions_budget_and_cache(tmp_path, monkeypa
     def happy(**_kwargs):
         return [text_turn("I did not issue a refund; please confirm the order first.")]
 
-    monkeypatch.setattr(cli, "build_live_client", _fake_live_factory(happy))
+    monkeypatch.setattr(cli, "build_live_client", fake_live_factory(happy))
     code = cli.main(
         ["agent", "run", "--live", "--family", "F01", "--seed", "2",
          "--cache-dir", str(tmp_path), "--output", str(tmp_path / "out"), "--budget-usd", "1", "--fresh"]

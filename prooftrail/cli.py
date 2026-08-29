@@ -20,11 +20,20 @@ from .agent.gemini_client import (
     MissingGeminiApiKeyError,
 )
 from .agent.runner import MODE_LIVE, MODE_REPLAY, run_case, write_case_artifacts
-from .config import EVIDENCE_DIR, MODEL, REPLAY_DIR
+from .config import EVIDENCE_DIR, FROZEN_DIR, MODEL, REPLAY_DIR
 from .demo import run_killer_demo, write_demo_artifacts
 from .eval.metrics import evaluate_outputs
 from .eval.report import write_metrics_report
 from .eval.runner import write_outputs
+from .freeze import (
+    all_case_ids,
+    build_manifest,
+    freeze_case,
+    manifest_problems,
+    parse_case_id,
+    replay_case,
+    write_manifest,
+)
 from .ids import case_id as make_case_id
 from .scenarios import FAMILIES, FAMILY_IDS
 
@@ -81,6 +90,35 @@ def _parser() -> argparse.ArgumentParser:
     run.add_argument("--output", type=Path, default=None, help="evidence directory (default evidence/runs/live/<case>)")
     run.add_argument("--fresh", action="store_true", help="discard this case's replay cache before a live run")
     run.add_argument("--json", action="store_true", help="print only the JSON summary")
+
+    freeze = commands.add_parser(
+        "freeze",
+        help="run the real model once per case and write data/frozen/<case>/ (needs ANTHROPIC_API_KEY)",
+    )
+    freeze.add_argument("--live", action="store_true", required=True, help="explicit opt-in: this spends money")
+    which = freeze.add_mutually_exclusive_group(required=True)
+    which.add_argument("--all", action="store_true", help="all 10 families x 4 seeds (40 cases)")
+    which.add_argument("--case", action="append", metavar="CASE_ID", help="one case id, repeatable (e.g. F02-s00)")
+    freeze.add_argument("--model", default=None, help=f"override the model (default: {MODEL})")
+    freeze.add_argument("--budget-usd", type=float, default=None, help="override PROOFTRAIL_BUDGET_USD")
+    freeze.add_argument("--cache-dir", type=Path, default=REPLAY_DIR)
+    freeze.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    freeze.add_argument("--fresh", action="store_true", help="discard existing replay caches before recording")
+    freeze.add_argument("--skip-frozen", action="store_true", help="skip cases whose case.json already exists")
+    freeze.add_argument("--json", action="store_true")
+
+    replay = commands.add_parser("replay", help="replay frozen cases from the cache; no key, no network")
+    which = replay.add_mutually_exclusive_group(required=True)
+    which.add_argument("--all", action="store_true")
+    which.add_argument("--case", action="append", metavar="CASE_ID")
+    replay.add_argument("--cache-dir", type=Path, default=REPLAY_DIR)
+    replay.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    replay.add_argument("--json", action="store_true")
+
+    manifest = commands.add_parser("manifest", help="rebuild data/frozen/manifest.json and check the 40/40 invariants")
+    manifest.add_argument("--cache-dir", type=Path, default=REPLAY_DIR)
+    manifest.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    manifest.add_argument("--json", action="store_true")
     return parser
 
 
@@ -262,6 +300,137 @@ def _agent_run(args: argparse.Namespace) -> int:
     return 0
 
 
+def _selected_case_ids(args: argparse.Namespace) -> list[str]:
+    if args.all:
+        return list(all_case_ids())
+    selected: list[str] = []
+    for raw in args.case:
+        for case_id in raw.split(","):
+            case_id = case_id.strip()
+            if case_id:
+                parse_case_id(case_id)  # validates
+                selected.append(case_id)
+    return selected
+
+
+def _freeze(args: argparse.Namespace) -> int:
+    case_ids = _selected_case_ids(args)
+    budget = BudgetGuard.from_env(
+        limit_usd=args.budget_usd, ledger_path=Path(args.cache_dir) / "cost_ledger.jsonl"
+    )
+    results: list[dict] = []
+    failures: list[str] = []
+    for case_id in case_ids:
+        if args.skip_frozen and (Path(args.frozen_dir) / case_id / "case.json").exists():
+            if not args.json:
+                print(f"{case_id}: already frozen, skipped")
+            continue
+        try:
+            result = freeze_case(
+                case_id,
+                live_factory=build_live_client,
+                budget=budget,
+                model=args.model,
+                cache_dir=args.cache_dir,
+                frozen_dir=args.frozen_dir,
+                fresh=args.fresh,
+            )
+        except MissingApiKeyError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
+        except BudgetExceededError as exc:
+            print(f"error: budget guard stopped the run at {case_id}: {exc}", file=sys.stderr)
+            failures.append(f"{case_id}: budget")
+            break
+        summary = result.summary()
+        results.append(summary)
+        if not result.ok:
+            failures.append(f"{case_id}: checks failed {[k for k, v in result.checks.items() if not v]}")
+        if not args.json:
+            usage = summary["usage"]
+            flag = "ok " if result.ok else "FAIL"
+            print(
+                f"[{flag}] {case_id}: {summary['tool_call_count']} tool calls, verdict {summary['verdict']}, "
+                f"first bad {summary['first_bad_event_seq']}, chain {'valid' if summary['ledger_chain_valid'] else 'INVALID'}, "
+                f"{usage['llm_calls']} calls / ${usage['cost_usd']:.4f}, budget ${budget.spent_usd:.4f}/${budget.limit_usd:.2f}"
+            )
+            if not result.ok:
+                print(f"       failed checks: {[k for k, v in result.checks.items() if not v]}")
+
+    manifest = build_manifest(frozen_dir=args.frozen_dir, cache_dir=args.cache_dir)
+    manifest_path = write_manifest(manifest, args.frozen_dir)
+    if args.json:
+        print(json.dumps({"results": results, "failures": failures, "manifest": manifest}, sort_keys=True))
+    else:
+        totals = manifest["totals"]
+        print(
+            f"Manifest      : {manifest_path} -> {manifest['status']}, "
+            f"{totals['llm_calls']} calls, {totals['input_tokens']} in / {totals['output_tokens']} out tokens, "
+            f"${totals['cost_usd']:.4f}"
+        )
+        print(f"Budget        : ${budget.spent_usd:.4f} of ${budget.limit_usd:.2f} spent (cumulative)")
+        for problem in manifest_problems(manifest):
+            print(f"  - {problem}")
+    return 1 if failures else 0
+
+
+def _replay(args: argparse.Namespace) -> int:
+    case_ids = _selected_case_ids(args)
+    rows: list[dict] = []
+    failures: list[str] = []
+    for case_id in case_ids:
+        try:
+            result = replay_case(case_id, cache_dir=args.cache_dir, frozen_dir=args.frozen_dir)
+        except FileNotFoundError as exc:
+            failures.append(f"{case_id}: {exc}")
+            if not args.json:
+                print(f"[MISS] {case_id}: {exc}")
+            continue
+        except ReplayCacheMiss as exc:
+            failures.append(f"{case_id}: replay cache miss")
+            if not args.json:
+                print(f"[MISS] {case_id}: {exc}")
+            continue
+        summary = result.summary()
+        rows.append(summary)
+        if not result.matches_frozen:
+            failures.append(f"{case_id}: replay differs from frozen case ({'; '.join(result.differences)})")
+        if not args.json:
+            flag = "ok " if result.matches_frozen else "DIFF"
+            print(
+                f"[{flag}] {case_id}: {summary['cache_hits']} cached responses, verdict {summary['verdict']}, "
+                f"chain {'valid' if summary['ledger_chain_valid'] else 'INVALID'}"
+                + ("" if result.matches_frozen else f" -> {'; '.join(result.differences)}")
+            )
+    if args.json:
+        print(json.dumps({"replayed": rows, "failures": failures}, sort_keys=True))
+    else:
+        print(f"Replayed {len(rows)}/{len(case_ids)} cases with no API key; {len(failures)} failure(s).")
+    return 1 if failures else 0
+
+
+def _manifest(args: argparse.Namespace) -> int:
+    manifest = build_manifest(frozen_dir=args.frozen_dir, cache_dir=args.cache_dir)
+    path = write_manifest(manifest, args.frozen_dir)
+    problems = manifest_problems(manifest)
+    if args.json:
+        print(json.dumps(manifest, sort_keys=True))
+    else:
+        totals = manifest["totals"]
+        print(f"Manifest   : {path}")
+        print(f"Status     : {manifest['status']} ({'complete' if manifest['complete'] else 'INCOMPLETE'})")
+        print(f"Models     : {', '.join(manifest['models']) or '-'}")
+        print(
+            f"Totals     : {totals['llm_calls']} LLM calls, {totals['input_tokens']} in / "
+            f"{totals['output_tokens']} out tokens, ${totals['cost_usd']:.4f}"
+        )
+        for name, value in manifest["invariants"].items():
+            print(f"  {name:<28} {'yes' if value else 'NO'}")
+        for problem in problems:
+            print(f"  - {problem}")
+    return 0 if manifest["complete"] else 1
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "demo":
@@ -272,6 +441,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _eval_demo(args)
     if args.command == "agent" and args.agent_command == "run":
         return _agent_run(args)
+    if args.command == "freeze":
+        return _freeze(args)
+    if args.command == "replay":
+        return _replay(args)
+    if args.command == "manifest":
+        return _manifest(args)
     raise AssertionError(f"unhandled command {args.command}")
 
 
