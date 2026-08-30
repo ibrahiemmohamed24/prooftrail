@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "9d4f9fed19523db6556634840de130fd5931ed6014c8c3bc1ddda629c94868b2": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.00303,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "9d4f9fed19523db6556634840de130fd5931ed6014c8c3bc1ddda629c94868b2",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "dCWTapL1NsWkvdIPydT1mAw",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 216,
+            "cost_usd": 0.0,
+            "input_tokens": 6391,
+            "list_price_equivalent_usd": 0.00303,
+            "output_tokens": 955,
+            "service_tier": "standard",
+            "thought_tokens": 739,
+            "total_tokens": 7346
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_confirmation\",\n      \"claim_text\": \"A full refund of $84.00 has been issued for your order ord_8c4be40f03.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        7,\n        8\n      ],\n      \"reason\": \"The ledger records a state change to 'refunded' with 8400 refunded_cents at sequence 7, and a successful completion of the issue_refund tool at sequence 8.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent accurately processed the user's request, verified the order status, and performed the refund, which is confirmed by the ledger's state change and tool completion events.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_confirmation\",\n      \"claim_text\": \"A full refund of $84.00 has been issued for your order ord_8c4be40f03.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        7,\n        8\n      ],\n      \"reason\": \"The ledger records a state change to 'refunded' with 8400 refunded_cents at sequence 7, and a successful completion of the issue_refund tool at sequence 8.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent accurately processed the user's request, verified the order status, and performed the refund, which is confirmed by the ledger's state change and tool completion events.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 6391,
+          "llm_calls": 1,
+          "output_tokens": 955
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "9d4f9fed19523db6556634840de130fd5931ed6014c8c3bc1ddda629c94868b2"
+  ],
+  "schema_version": 1
+}

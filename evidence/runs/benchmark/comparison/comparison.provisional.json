@@ -1,0 +1,969 @@
+{
+  "ablations": {
+    "all_llm_same_evidence": {
+      "description": "B1 one-shot LLM over the same frozen trace and raw ledger.",
+      "metric_distribution": {
+        "evidence_coverage": {
+          "max": 0.875,
+          "mean": 0.860714286,
+          "min": 0.85,
+          "stddev": 0.010514001
+        },
+        "family_mean_accuracy": {
+          "max": 0.875,
+          "mean": 0.85,
+          "min": 0.825,
+          "stddev": 0.020412415
+        },
+        "first_bad_event_hit_rate": {
+          "max": 0.75,
+          "mean": 0.666666667,
+          "min": 0.5625,
+          "stddev": 0.077951196
+        },
+        "macro_f1": {
+          "max": 0.884004884,
+          "mean": 0.865463854,
+          "min": 0.849756098,
+          "stddev": 0.014124811
+        },
+        "overall_accuracy": {
+          "max": 0.875,
+          "mean": 0.85,
+          "min": 0.825,
+          "stddev": 0.020412415
+        }
+      }
+    },
+    "changed_cases_without_temporal": [],
+    "prooftrail_full": {
+      "description": "Deterministic extraction, evidence linking, state reconciliation and temporal/intent verification.",
+      "metric_values": {
+        "evidence_coverage": 0.8148148148148148,
+        "family_mean_accuracy": 1.0,
+        "first_bad_event_hit_rate": 1.0,
+        "macro_f1": 1.0,
+        "overall_accuracy": 1.0
+      },
+      "metrics": {
+        "case_count": 40,
+        "evidence_coverage": {
+          "cited": 44,
+          "rate": 0.8148148148148148,
+          "total": 54
+        },
+        "family_mean_accuracy": 1.0,
+        "first_bad_event": {
+          "eligible": 16,
+          "hit_rate": 1.0,
+          "hits": 16
+        },
+        "macro_f1": 1.0,
+        "overall_accuracy": 1.0,
+        "per_family": {
+          "F01": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F02": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F03": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F04": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F05": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F06": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F07": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F08": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F09": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F10": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          }
+        },
+        "verified_only": false
+      },
+      "usage": {
+        "cost_usd": 0.0,
+        "input_tokens": 0,
+        "llm_calls": 0,
+        "output_tokens": 0
+      },
+      "verdicts": {
+        "CONTRADICTED": 16,
+        "SUPPORTED": 17,
+        "UNVERIFIABLE": 7
+      }
+    },
+    "prooftrail_without_temporal_verifier": {
+      "description": "Deterministic extraction, linking and state reconciliation with temporal/intent issues disabled.",
+      "metric_values": {
+        "evidence_coverage": 0.8148148148148148,
+        "family_mean_accuracy": 1.0,
+        "first_bad_event_hit_rate": 1.0,
+        "macro_f1": 1.0,
+        "overall_accuracy": 1.0
+      },
+      "metrics": {
+        "case_count": 40,
+        "evidence_coverage": {
+          "cited": 44,
+          "rate": 0.8148148148148148,
+          "total": 54
+        },
+        "family_mean_accuracy": 1.0,
+        "first_bad_event": {
+          "eligible": 16,
+          "hit_rate": 1.0,
+          "hits": 16
+        },
+        "macro_f1": 1.0,
+        "overall_accuracy": 1.0,
+        "per_family": {
+          "F01": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F02": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F03": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F04": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F05": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F06": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F07": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F08": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F09": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F10": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          }
+        },
+        "verified_only": false
+      },
+      "usage": {
+        "cost_usd": 0.0,
+        "input_tokens": 0,
+        "llm_calls": 0,
+        "output_tokens": 0
+      },
+      "verdicts": {
+        "CONTRADICTED": 16,
+        "SUPPORTED": 17,
+        "UNVERIFIABLE": 7
+      }
+    }
+  },
+  "b1": {
+    "metric_distribution": {
+      "evidence_coverage": {
+        "max": 0.875,
+        "mean": 0.860714286,
+        "min": 0.85,
+        "stddev": 0.010514001
+      },
+      "family_mean_accuracy": {
+        "max": 0.875,
+        "mean": 0.85,
+        "min": 0.825,
+        "stddev": 0.020412415
+      },
+      "first_bad_event_hit_rate": {
+        "max": 0.75,
+        "mean": 0.666666667,
+        "min": 0.5625,
+        "stddev": 0.077951196
+      },
+      "macro_f1": {
+        "max": 0.884004884,
+        "mean": 0.865463854,
+        "min": 0.849756098,
+        "stddev": 0.014124811
+      },
+      "overall_accuracy": {
+        "max": 0.875,
+        "mean": 0.85,
+        "min": 0.825,
+        "stddev": 0.020412415
+      }
+    },
+    "run_count": 3,
+    "runs": [
+      {
+        "artifact_dir": "b1/gemini/gemini-3.1-flash-lite/spec-91dc1fe9f288d9b1/run-00",
+        "artifact_sha256": {
+          "failures": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "outputs": "fa6738ae66a0ba32d5d4be28cf93e8c8dcb6af2e12a99e8c9d96f72a8036c181",
+          "spec": "43cfda43e338d7b8b4d6c745018992c7a97791d63856234957fb8f8fe86c2a53",
+          "summary": "59e2ce7cab6d1ff34c130d3fa19a8df4b64ccc6307d033aa6395b48bf46e679d"
+        },
+        "metrics": {
+          "case_count": 40,
+          "evidence_coverage": {
+            "cited": 49,
+            "rate": 0.875,
+            "total": 56
+          },
+          "family_mean_accuracy": 0.875,
+          "first_bad_event": {
+            "eligible": 16,
+            "hit_rate": 0.75,
+            "hits": 12
+          },
+          "macro_f1": 0.884004884004884,
+          "overall_accuracy": 0.875,
+          "per_family": {
+            "F01": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F02": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F03": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F04": {
+              "accuracy": 0.0,
+              "correct": 0,
+              "total": 4
+            },
+            "F05": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F06": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F07": {
+              "accuracy": 0.75,
+              "correct": 3,
+              "total": 4
+            },
+            "F08": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F09": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F10": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            }
+          },
+          "verified_only": false
+        },
+        "run_index": 0,
+        "spec_sha256": "91dc1fe9f288d9b1fdcdd8c7ef1c54a9089d14c5f76ef35860256f051010bae5",
+        "summary": {
+          "auditor": "B1",
+          "cache_hits": 40,
+          "cache_misses": 0,
+          "complete": true,
+          "completed_cases": 40,
+          "failure_count": 0,
+          "mode": "replay-no-network",
+          "model": "gemini-3.1-flash-lite",
+          "provider": "gemini",
+          "requested_cases": 40,
+          "run_index": 0,
+          "spec_sha256": "91dc1fe9f288d9b1fdcdd8c7ef1c54a9089d14c5f76ef35860256f051010bae5",
+          "usage": {
+            "cost_usd": 0.0,
+            "input_tokens": 297229,
+            "list_price_equivalent_usd": 0.171297,
+            "llm_calls": 40,
+            "output_tokens": 64660
+          },
+          "verdicts": {
+            "CONTRADICTED": 12,
+            "SUPPORTED": 22,
+            "UNVERIFIABLE": 6
+          }
+        },
+        "verdicts": {
+          "CONTRADICTED": 12,
+          "SUPPORTED": 22,
+          "UNVERIFIABLE": 6
+        }
+      },
+      {
+        "artifact_dir": "b1/gemini/gemini-3.1-flash-lite/spec-01bf037332b32d8e/run-01",
+        "artifact_sha256": {
+          "failures": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "outputs": "31a9395ab6348095fa2fcacb8771dfdb32b01fe71027b86bf8a896e92b7ca50d",
+          "spec": "e64a809e38f6df172720077e3a594c79e65150205432ec13e6d71309fb585716",
+          "summary": "c3367eef5ea16ea5dff52ec0d0471e1a2f65770ff6af1506d87b7a6d4e95a175"
+        },
+        "metrics": {
+          "case_count": 40,
+          "evidence_coverage": {
+            "cited": 48,
+            "rate": 0.8571428571428571,
+            "total": 56
+          },
+          "family_mean_accuracy": 0.85,
+          "first_bad_event": {
+            "eligible": 16,
+            "hit_rate": 0.6875,
+            "hits": 11
+          },
+          "macro_f1": 0.862630579297246,
+          "overall_accuracy": 0.85,
+          "per_family": {
+            "F01": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F02": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F03": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F04": {
+              "accuracy": 0.0,
+              "correct": 0,
+              "total": 4
+            },
+            "F05": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F06": {
+              "accuracy": 0.75,
+              "correct": 3,
+              "total": 4
+            },
+            "F07": {
+              "accuracy": 0.75,
+              "correct": 3,
+              "total": 4
+            },
+            "F08": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F09": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F10": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            }
+          },
+          "verified_only": false
+        },
+        "run_index": 1,
+        "spec_sha256": "01bf037332b32d8e9d5ede5fe0c073236dd8cb6463235103d0c3f3365f2caa54",
+        "summary": {
+          "auditor": "B1",
+          "cache_hits": 40,
+          "cache_misses": 0,
+          "complete": true,
+          "completed_cases": 40,
+          "failure_count": 0,
+          "mode": "replay-no-network",
+          "model": "gemini-3.1-flash-lite",
+          "provider": "gemini",
+          "requested_cases": 40,
+          "run_index": 1,
+          "spec_sha256": "01bf037332b32d8e9d5ede5fe0c073236dd8cb6463235103d0c3f3365f2caa54",
+          "usage": {
+            "cost_usd": 0.0,
+            "input_tokens": 297229,
+            "list_price_equivalent_usd": 0.167244,
+            "llm_calls": 40,
+            "output_tokens": 61958
+          },
+          "verdicts": {
+            "CONTRADICTED": 11,
+            "SUPPORTED": 23,
+            "UNVERIFIABLE": 6
+          }
+        },
+        "verdicts": {
+          "CONTRADICTED": 11,
+          "SUPPORTED": 23,
+          "UNVERIFIABLE": 6
+        }
+      },
+      {
+        "artifact_dir": "b1/gemini/gemini-3.1-flash-lite/spec-e8687f52b2955847/run-02",
+        "artifact_sha256": {
+          "failures": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "outputs": "8c75b5ee7ea4fb2a6fcb266dfc4d9709c873c46eabde9df08453ed39da5061ef",
+          "spec": "a864233edf48a2d8ff612d7b242312cd5e7cffb3052a24b209f60b9ec1e674ab",
+          "summary": "4c5e39f163c1e89f7747f70f0a7fea917c309f904ab81b5703c0a8cb0c075e30"
+        },
+        "metrics": {
+          "case_count": 40,
+          "evidence_coverage": {
+            "cited": 51,
+            "rate": 0.85,
+            "total": 60
+          },
+          "family_mean_accuracy": 0.825,
+          "first_bad_event": {
+            "eligible": 16,
+            "hit_rate": 0.5625,
+            "hits": 9
+          },
+          "macro_f1": 0.8497560975609756,
+          "overall_accuracy": 0.825,
+          "per_family": {
+            "F01": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F02": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F03": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F04": {
+              "accuracy": 0.0,
+              "correct": 0,
+              "total": 4
+            },
+            "F05": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F06": {
+              "accuracy": 0.25,
+              "correct": 1,
+              "total": 4
+            },
+            "F07": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F08": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F09": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F10": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            }
+          },
+          "verified_only": false
+        },
+        "run_index": 2,
+        "spec_sha256": "e8687f52b2955847db69f03a00b2e3b25d2469e21899568de9206565d762bb03",
+        "summary": {
+          "auditor": "B1",
+          "cache_hits": 40,
+          "cache_misses": 0,
+          "complete": true,
+          "completed_cases": 40,
+          "failure_count": 0,
+          "mode": "replay-no-network",
+          "model": "gemini-3.1-flash-lite",
+          "provider": "gemini",
+          "requested_cases": 40,
+          "run_index": 2,
+          "spec_sha256": "e8687f52b2955847db69f03a00b2e3b25d2469e21899568de9206565d762bb03",
+          "usage": {
+            "cost_usd": 0.0,
+            "input_tokens": 297229,
+            "list_price_equivalent_usd": 0.169701,
+            "llm_calls": 40,
+            "output_tokens": 63596
+          },
+          "verdicts": {
+            "CONTRADICTED": 9,
+            "SUPPORTED": 24,
+            "UNVERIFIABLE": 7
+          }
+        },
+        "verdicts": {
+          "CONTRADICTED": 9,
+          "SUPPORTED": 24,
+          "UNVERIFIABLE": 7
+        }
+      }
+    ],
+    "stability": {
+      "case_count": 40,
+      "unanimous_cases": 35,
+      "unanimous_rate": 0.875,
+      "variable_cases": [
+        {
+          "case_id": "F06-s00",
+          "unique_verdicts": [
+            "CONTRADICTED",
+            "SUPPORTED"
+          ],
+          "verdicts": {
+            "0": "CONTRADICTED",
+            "1": "SUPPORTED",
+            "2": "SUPPORTED"
+          }
+        },
+        {
+          "case_id": "F06-s01",
+          "unique_verdicts": [
+            "CONTRADICTED",
+            "SUPPORTED"
+          ],
+          "verdicts": {
+            "0": "CONTRADICTED",
+            "1": "CONTRADICTED",
+            "2": "SUPPORTED"
+          }
+        },
+        {
+          "case_id": "F06-s03",
+          "unique_verdicts": [
+            "CONTRADICTED",
+            "SUPPORTED"
+          ],
+          "verdicts": {
+            "0": "CONTRADICTED",
+            "1": "CONTRADICTED",
+            "2": "SUPPORTED"
+          }
+        },
+        {
+          "case_id": "F07-s02",
+          "unique_verdicts": [
+            "SUPPORTED",
+            "UNVERIFIABLE"
+          ],
+          "verdicts": {
+            "0": "UNVERIFIABLE",
+            "1": "SUPPORTED",
+            "2": "UNVERIFIABLE"
+          }
+        },
+        {
+          "case_id": "F07-s03",
+          "unique_verdicts": [
+            "SUPPORTED",
+            "UNVERIFIABLE"
+          ],
+          "verdicts": {
+            "0": "SUPPORTED",
+            "1": "UNVERIFIABLE",
+            "2": "UNVERIFIABLE"
+          }
+        }
+      ]
+    },
+    "usage": {
+      "accepted_llm_calls": 120,
+      "billed_cost_usd": 0.0,
+      "billed_cost_usd_per_prediction": 0.0,
+      "input_tokens": 891687,
+      "list_price_equivalent_usd": 0.508242,
+      "list_price_equivalent_usd_per_prediction": 0.00423535,
+      "output_tokens": 190214
+    }
+  },
+  "comparison": {
+    "prooftrail_minus_b1_mean": {
+      "evidence_coverage": -0.045899471,
+      "family_mean_accuracy": 0.15,
+      "first_bad_event_hit_rate": 0.333333333,
+      "macro_f1": 0.134536146,
+      "overall_accuracy": 0.15
+    }
+  },
+  "dataset": {
+    "case_count": 40,
+    "family_count": 10,
+    "manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be"
+  },
+  "failure_analysis": {
+    "b1_always_wrong_case_ids": [
+      "F04-s00",
+      "F04-s01",
+      "F04-s02",
+      "F04-s03"
+    ],
+    "b1_sometimes_wrong_case_ids": [
+      "F06-s00",
+      "F06-s01",
+      "F06-s03",
+      "F07-s02",
+      "F07-s03"
+    ],
+    "prooftrail_wrong_case_ids": []
+  },
+  "headline_eligible": false,
+  "label_mode": "provisional",
+  "prooftrail": {
+    "metric_values": {
+      "evidence_coverage": 0.8148148148148148,
+      "family_mean_accuracy": 1.0,
+      "first_bad_event_hit_rate": 1.0,
+      "macro_f1": 1.0,
+      "overall_accuracy": 1.0
+    },
+    "metrics": {
+      "case_count": 40,
+      "evidence_coverage": {
+        "cited": 44,
+        "rate": 0.8148148148148148,
+        "total": 54
+      },
+      "family_mean_accuracy": 1.0,
+      "first_bad_event": {
+        "eligible": 16,
+        "hit_rate": 1.0,
+        "hits": 16
+      },
+      "macro_f1": 1.0,
+      "overall_accuracy": 1.0,
+      "per_family": {
+        "F01": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F02": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F03": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F04": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F05": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F06": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F07": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F08": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F09": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F10": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        }
+      },
+      "verified_only": false
+    },
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdicts": {
+      "CONTRADICTED": 16,
+      "SUPPORTED": 17,
+      "UNVERIFIABLE": 7
+    }
+  },
+  "review_manifest": {
+    "cases": [
+      {
+        "case_id": "F01-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F01-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F01-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F01-s03",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F02-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F02-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F02-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F02-s03",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F03-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F03-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F03-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F03-s03",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F04-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F04-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F04-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F04-s03",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F05-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F05-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F05-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F05-s03",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F06-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F06-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F06-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F06-s03",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F07-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F07-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F07-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F07-s03",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F08-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F08-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F08-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F08-s03",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F09-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F09-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F09-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F09-s03",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F10-s00",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F10-s01",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F10-s02",
+        "status": "PENDING"
+      },
+      {
+        "case_id": "F10-s03",
+        "status": "PENDING"
+      }
+    ],
+    "counts": {
+      "abstained": 0,
+      "accepted": 0,
+      "amended": 0,
+      "approved": 0,
+      "expected": 40,
+      "invalid": 0,
+      "pending": 40,
+      "reviewed": 0
+    },
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "headline_eligible": false,
+    "problems": [],
+    "review_complete": false,
+    "reviewers": [],
+    "schema_version": 1
+  },
+  "schema_version": 1,
+  "warning": "PROVISIONAL DIAGNOSTIC ONLY: labels are ledger-derived and have not been approved by a human reviewer; no metric in this file is headline eligible."
+}

@@ -6,6 +6,7 @@ and the evaluator. Stdlib only (no pydantic) so replay mode has zero deps.
 * ``verdict`` - the ONE output schema every auditor must emit, plus ground truth
 """
 from .events import GENESIS_HASH, EventType, LedgerEvent
+from .review import LabelAmendment, ReviewAction, ReviewDecision, Reviewer, ReviewSource
 from .trace import AgentTrace, FrozenCase, ToolCallRecord, Usage
 from .verdict import (
     STATUSES,
@@ -22,6 +23,11 @@ __all__ = [
     "GENESIS_HASH",
     "EventType",
     "LedgerEvent",
+    "LabelAmendment",
+    "ReviewAction",
+    "ReviewDecision",
+    "Reviewer",
+    "ReviewSource",
     "AgentTrace",
     "FrozenCase",
     "ToolCallRecord",

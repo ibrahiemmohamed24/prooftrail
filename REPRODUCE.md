@@ -115,12 +115,112 @@ replayed case differs from its frozen bundle. `manifest` exits non-zero until
 all 40 cases exist with valid hash chains, provisional labels, recorded usage
 and family-blind auditor views.
 
+## Prepare and verify human review
+
+Review tooling never edits `data/frozen/` and never approves a case in bulk:
+
+```powershell
+python -m prooftrail review pack --all
+python -m prooftrail review status
+python -m prooftrail review verify
+```
+
+The pack appears at `evidence/review-pack-v1/`. A named person must read each
+case and record one explicit decision as documented in
+`docs/HUMAN_REVIEW.md`. Accepted decisions live under
+`data/reviews/v1/decisions/`; the deterministic review manifest separates
+review-complete from headline-eligible so an honest `ABSTAIN` cannot be counted
+as a verified benchmark label.
+
+After all decisions are committed:
+
+```powershell
+python -m prooftrail review status --write-manifest
+python -m prooftrail review verify --require-complete
+```
+
+## Record and replay the fair B1 baseline
+
+B1 uses a separate cache namespace from the refund agent and an explicit spec
+for each run. With the Gemini Free Tier environment loaded as shown above:
+
+```powershell
+python -m prooftrail benchmark b1 --live --case F02-s00 --run-index 0
+0..2 | ForEach-Object {
+    python -m prooftrail benchmark b1 --live --all --run-index $_
+}
+Remove-Item Env:GEMINI_API_KEY -ErrorAction SilentlyContinue
+0..2 | ForEach-Object {
+    python -m prooftrail benchmark b1 --replay --all --run-index $_
+}
+
+# Historical non-headline diagnostic from before human review
+python -m prooftrail benchmark report --allow-provisional
+
+# The committed 40/40 review makes this the headline-eligible report.
+python -m prooftrail benchmark report
+```
+
+The committed dataset already contains all three runs (120 accepted outputs).
+Each index has independent caches under
+`data/replay/auditors/b1/gemini/gemini-3.1-flash-lite/spec-<hash>/run-NN/`.
+The spec hash changes if the prompt, output schema, model, limits or dataset
+changes. Replay exits non-zero on a missing cache or malformed frozen output
+and never falls back to a live call. The comparison validates spec and artifact
+hashes, reports costs and repeat stability, and writes the committed verified
+report. `--allow-provisional` reproduces the historical pre-review diagnostic.
+
 ## Honesty boundary
 
 `prooftrail demo` uses a class named `ScriptedModelClient` and records the mode
 as `scripted-offline-demo-not-a-real-llm-run`. The one-case 100% result proves
 the pipeline works; it is not the competition headline result. The real agent
 run and the 40 frozen traces are done (`data/frozen/`, Gemini Free Tier, billed
-$0.00, replayable with no key). What remains before any headline number is
-human verification of the provisional labels and the B1 run over the
-byte-identical trace-plus-ledger inputs.
+$0.00, replayable with no key). Three B1 runs over the byte-identical
+trace-plus-ledger inputs are also done and replayable with no key. Their
+85.0% ± 2.04 pp → 100% comparison is now human-verified: 40/40 accepted
+source-bound decisions, 33 approved and 7 amended, with
+`headline_eligible: true`. The provisional artifact remains committed as a
+historical diagnostic and is never presented as the result.
+
+## Final verification from a clean clone (no key)
+
+Run this from `git archive` output or a fresh `git clone`, never only from a
+working tree that may hold uncommitted files. No `GEMINI_API_KEY` or
+`ANTHROPIC_API_KEY` may be present in the environment.
+
+```powershell
+python -m pip install -e ".[dev]"
+python -m pytest                                      # 212 passed
+python -m prooftrail demo --json                      # CONTRADICTED, first bad event 6, scripted mode
+python -m prooftrail replay --provider gemini --all   # Replayed 40/40 cases with no API key; 0 failure(s).
+python -m prooftrail manifest --provider gemini       # 40/40 cases frozen, every invariant yes
+
+0..2 | ForEach-Object {
+    python -m prooftrail benchmark b1 --replay --all `
+        --provider gemini `
+        --model gemini-3.1-flash-lite `
+        --run-index $_ `
+        --json
+    if ($LASTEXITCODE -ne 0) { throw "B1 replay run $_ failed" }
+}
+
+python -m prooftrail review verify --require-complete
+python -m prooftrail benchmark report --json
+python scripts/check_no_secrets.py
+git diff --check
+```
+
+With the committed 40/40 accepted decisions, `review verify
+--require-complete` and `benchmark report` must succeed. The report writes
+`evidence/runs/benchmark/comparison/comparison.verified.{json,md}` with
+`label_mode: verified` and `headline_eligible: true`.
+
+Also check that the committed reports and docs contain no absolute local path
+and no credential:
+
+```powershell
+git grep -n -E "C:\\Users|/home/[a-z]" -- docs README.md REPRODUCE.md PROJECT_STATUS.md evidence/runs/benchmark/comparison
+```
+
+That command must print nothing.

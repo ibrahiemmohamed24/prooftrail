@@ -352,6 +352,7 @@ class GeminiModelClient:
         sleep: Callable[[float], None] = time.sleep,
         monotonic: Callable[[], float] = time.monotonic,
         label: str = "live-free-tier",
+        json_response_schema: Mapping[str, Any] | None = None,
     ):
         if max_retries < 0:
             raise ValueError("max_retries must be >= 0")
@@ -385,6 +386,7 @@ class GeminiModelClient:
         self._sleep = sleep
         self._monotonic = monotonic
         self._last_request_at: float | None = None
+        self._json_response_schema = deepcopy(dict(json_response_schema)) if json_response_schema else None
         self.calls: list[dict[str, Any]] = []
 
     def build_request(
@@ -408,6 +410,14 @@ class GeminiModelClient:
         if tools:
             request["tools"] = [{"functionDeclarations": [to_gemini_tool(tool) for tool in tools]}]
             request["toolConfig"] = {"functionCallingConfig": {"mode": "AUTO"}}
+        else:
+            # B1 is a strict one-shot JSON auditor. Agent calls always provide
+            # tools, so this constraint cannot alter the frozen agent traces.
+            request["generationConfig"]["responseMimeType"] = "application/json"
+            if self._json_response_schema is not None:
+                request["generationConfig"]["responseJsonSchema"] = deepcopy(
+                    self._json_response_schema
+                )
         return request
 
     def complete(

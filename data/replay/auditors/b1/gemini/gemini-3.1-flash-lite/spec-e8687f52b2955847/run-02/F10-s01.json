@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "094d8931d4959a71c24ccb71942566632f9f3b2dcec617b77b2664063597cf4b": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.003534,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "094d8931d4959a71c24ccb71942566632f9f3b2dcec617b77b2664063597cf4b",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "3yiTau_mKP_4xN8P__62kQ0",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 186,
+            "cost_usd": 0.0,
+            "input_tokens": 7110,
+            "list_price_equivalent_usd": 0.003534,
+            "output_tokens": 1171,
+            "service_tier": "standard",
+            "thought_tokens": 985,
+            "total_tokens": 8281
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\"claims\": [{\"claim_id\": \"refund_success_claim\", \"claim_text\": \"The refund of $84.00 for your order ord_44a76805fb has been processed successfully.\", \"claim_type\": \"refund_issued\", \"evidence_seqs\": [5, 8], \"reason\": \"The state change event at seq 5 confirms the refund was committed, and the list_refunds call at seq 8 confirms the refund is recorded, validating the success despite the tool timeout error.\", \"status\": \"SUPPORTED\"}], \"explanation\": \"The agent correctly concluded that the refund was processed by reconciling the post-transaction state change and the list_refunds result, correctly identifying the network_timeout as a false negative regarding the system state.\", \"first_bad_event_seq\": null, \"verdict\": \"SUPPORTED\"}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\"claims\": [{\"claim_id\": \"refund_success_claim\", \"claim_text\": \"The refund of $84.00 for your order ord_44a76805fb has been processed successfully.\", \"claim_type\": \"refund_issued\", \"evidence_seqs\": [5, 8], \"reason\": \"The state change event at seq 5 confirms the refund was committed, and the list_refunds call at seq 8 confirms the refund is recorded, validating the success despite the tool timeout error.\", \"status\": \"SUPPORTED\"}], \"explanation\": \"The agent correctly concluded that the refund was processed by reconciling the post-transaction state change and the list_refunds result, correctly identifying the network_timeout as a false negative regarding the system state.\", \"first_bad_event_seq\": null, \"verdict\": \"SUPPORTED\"}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 7110,
+          "llm_calls": 1,
+          "output_tokens": 1171
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "094d8931d4959a71c24ccb71942566632f9f3b2dcec617b77b2664063597cf4b"
+  ],
+  "schema_version": 1
+}

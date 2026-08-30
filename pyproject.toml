@@ -17,7 +17,9 @@ dependencies = []
 
 [project.optional-dependencies]
 live = ["anthropic==1.2.0"]
-dev = ["pytest==8.4.1", "pytest-cov==6.2.1"]
+# Dev includes the optional SDK so its in-process mock-transport tests never
+# disappear behind an import skip. Core/replay installation remains stdlib-only.
+dev = ["pytest==8.4.1", "pytest-cov==6.2.1", "anthropic==1.2.0"]
 
 [project.scripts]
 prooftrail = "prooftrail.cli:main"

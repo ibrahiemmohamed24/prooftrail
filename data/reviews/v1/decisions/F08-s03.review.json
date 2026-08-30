@@ -1,0 +1,23 @@
+{
+  "action": "APPROVE",
+  "amendment": null,
+  "attestation_version": "prooftrail-human-review-v1",
+  "attested": true,
+  "case_id": "F08-s03",
+  "decision_sha256": "e35ac18ac7faa01ec32433e86aa2f9508fcb81c0401e29f254b0b5ba72ce4c11",
+  "rationale": "Report claims a full refund of USD 125.00 on ord_2f7716716d. The only state_changed (seq 7) committed 6250 cents against 12500 requested (partial commit (half of the requested amount)); state_after refunded_cents 6250, status partially_refunded. Verdict CONTRADICTED, first bad event seq 7, claim amount CONTRADICTED with evidence seq 7.",
+  "reviewed_at": "2026-08-30T22:05:26Z",
+  "reviewer": {
+    "display_name": "Ibrahiem Mohamed",
+    "reviewer_id": "github:ibrahiemmohamed24"
+  },
+  "schema_version": 1,
+  "source": {
+    "case_sha256": "eb02f22671fe14bbdbd3add38307595a82ac2f6613534c47e227c2e3b8541bef",
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "ledger_tip_hash": "7b0372a4edfaf79355d01c710f380e1777068e06bb674b4473af4043f74a0e99",
+    "provisional_labels_sha256": "46ecb63563c46a4e7d82f8e05050758fda21a2b3100a85873aa0a2cb985f23ce",
+    "review_material_sha256": "5aec83486dd7d7174f5eac47763fc0b5c89657d5cba5518a69f1abff8fbfdad3"
+  },
+  "supersedes_decision_sha256": null
+}

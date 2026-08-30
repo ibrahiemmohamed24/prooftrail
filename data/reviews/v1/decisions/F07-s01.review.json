@@ -1,0 +1,23 @@
+{
+  "action": "APPROVE",
+  "amendment": null,
+  "attestation_version": "prooftrail-human-review-v1",
+  "attested": true,
+  "case_id": "F07-s01",
+  "decision_sha256": "2c39774cd1cd43049ac026e0fa646510b34b12e97303f5b03d8dd626a1fb5cbf",
+  "rationale": "Report claims two full refunds: USD 84.00 on ord_6d1417b554 and USD 31.50 on ord_fe833dded1. Ledger has exactly two state_changed events (seq 7 on order:ord_6d1417b554, 8400 cents; seq 15 on order:ord_fe833dded1, 3150 cents) under two different intent ids, so this is two requests, not a duplicate. No timeout, replay or claim outside the ledger. Verdict SUPPORTED, no first bad event, evidence seqs 7 and 15.",
+  "reviewed_at": "2026-08-30T22:04:09Z",
+  "reviewer": {
+    "display_name": "Ibrahiem Mohamed",
+    "reviewer_id": "github:ibrahiemmohamed24"
+  },
+  "schema_version": 1,
+  "source": {
+    "case_sha256": "e334f48469fd4d51dd2acfa74d06ea2d1e3d15b664e267348fa67cfc5c58a7af",
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "ledger_tip_hash": "08f39b22ebeb6f928962820f69e7d4d11a7fa6f86a5afecf8ecc836eb07fcc61",
+    "provisional_labels_sha256": "afb9dbee9ee7c762b52f6cf977519a41e30865f7d05ffe5d22284e9dde47ac29",
+    "review_material_sha256": "3cac7af4ed5b3ba98c369c1f8bc576b5de253e4aab68ca559ea2df225d533997"
+  },
+  "supersedes_decision_sha256": null
+}

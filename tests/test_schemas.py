@@ -68,8 +68,22 @@ def test_validate_audit_output_catches_llm_garbage():
     assert any("claim_text" in p for p in problems)
     assert any("evidence_seqs" in p for p in problems)
     assert any("claims[1]" in p for p in problems)
-    assert validate_audit_output({"verdict": "SUPPORTED", "claims": []}) == []
-    assert validate_audit_output({"verdict": "SUPPORTED", "claims": [], "first_bad_event_seq": True})
+    assert validate_audit_output(
+        {
+            "verdict": "UNVERIFIABLE",
+            "claims": [],
+            "first_bad_event_seq": None,
+            "explanation": "No checkable claim was found.",
+        }
+    ) == []
+    assert validate_audit_output(
+        {
+            "verdict": "SUPPORTED",
+            "claims": [],
+            "first_bad_event_seq": True,
+            "explanation": "invalid",
+        }
+    )
 
 
 def test_frozen_case_roundtrip():

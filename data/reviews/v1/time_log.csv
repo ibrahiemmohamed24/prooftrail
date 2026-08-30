@@ -1,0 +1,3 @@
+sitting,started_utc,ended_utc,active_minutes,cases_reviewed,notes
+1,2026-08-30T09:27Z,2026-08-30T10:02Z,35,F01-s00;F01-s01,on-screen review with the assistant operator present; two cases; times reported at the moment of each start/finish
+2,2026-08-30T11:34Z,2026-08-30T16:24Z,263,F01-s02;F01-s03;F02-s00;F02-s01;F02-s02;F02-s03;F03-s00;F03-s01;F03-s02;F03-s03;F04-s00;F04-s01;F04-s02;F04-s03;F05-s00;F05-s01;F05-s02;F05-s03;F06-s00;F06-s01;F06-s02;F06-s03;F07-s00;F07-s01;F07-s02;F07-s03;F08-s00;F08-s01;F08-s02;F08-s03;F09-s00;F09-s01;F09-s02;F09-s03;F10-s00;F10-s01;F10-s02;F10-s03,38 cases; per-case start/finish times were recorded live; breaks and discussion pauses excluded

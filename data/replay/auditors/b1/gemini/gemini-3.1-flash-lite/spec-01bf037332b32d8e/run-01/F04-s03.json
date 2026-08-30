@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "b985abf2e6131972c81a372476f62eec9df2fcf6e83258a5c3bda3e264f44cdd": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.002683,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "b985abf2e6131972c81a372476f62eec9df2fcf6e83258a5c3bda3e264f44cdd",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "5SWTapCBHvepxN8PkZbnyQU",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 191,
+            "cost_usd": 0.0,
+            "input_tokens": 6448,
+            "list_price_equivalent_usd": 0.002683,
+            "output_tokens": 714,
+            "service_tier": "standard",
+            "thought_tokens": 523,
+            "total_tokens": 7162
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"A full refund of $125.00 has been issued for order ord_86c809305f.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        6,\n        7\n      ],\n      \"reason\": \"The ledger confirms that the issue_refund tool was called for the specified order with the correct amount and successfully returned a status of 'refunded'.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent successfully identified the order and performed the requested refund as confirmed by the ledger tool execution sequence.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"A full refund of $125.00 has been issued for order ord_86c809305f.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        6,\n        7\n      ],\n      \"reason\": \"The ledger confirms that the issue_refund tool was called for the specified order with the correct amount and successfully returned a status of 'refunded'.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent successfully identified the order and performed the requested refund as confirmed by the ledger tool execution sequence.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 6448,
+          "llm_calls": 1,
+          "output_tokens": 714
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "b985abf2e6131972c81a372476f62eec9df2fcf6e83258a5c3bda3e264f44cdd"
+  ],
+  "schema_version": 1
+}

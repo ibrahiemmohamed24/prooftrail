@@ -1,190 +1,193 @@
-# ProofTrail — Architecture & File Map
+# ProofTrail architecture
 
-> Three words: **same evidence, independent truth, frozen traces.**
+> Same evidence. Independent truth. Frozen traces.
 
-## Pipeline
+This document describes the code and verified evidence at the 95/100 milestone
+on `feat/final-submission`. It deliberately
+separates implemented paths from planned work; nothing described as planned is
+part of any reported number.
 
+## End-to-end data flow
+
+```text
+Real Gemini refund agent (data creation only)
+        │ function calls
+        ▼
+Mock refund tools ──► SQLite state
+        │                    │
+        └──────────────► append-only, hash-chained ledger
+                             │
+                             ▼
+                 FrozenCase: trace + raw ledger
+                    │                    │
+                    │                    ├── B1 baseline
+                    │                    │   one-shot LLM over the same evidence
+                    │                    │   explicit spec + live/frozen replay
+                    │                    │
+                    │                    └── ProofTrail today
+                    │                        deterministic claim extraction
+                    │                        + evidence linking
+                    │                        + state reconciliation
+                    │                        + temporal verification
+                    │                        + evidence certificate
+                    ▼
+       provisional ledger-derived label (not benchmark truth yet)
+                    │
+                    ▼
+       explicit, source-bound human review decision
+                    │
+                    ▼
+       verified GroundTruth resolved in memory for evaluation
 ```
-Real LLM Refund Agent            (runs ONCE, at data-creation time, --live)
-        │
-        ▼
-Mock Tools ──► SQLite State + Append-only Event Ledger (hash-chained)
-        │
-        ▼
-Frozen Trace + Same Raw Ledger   (data/frozen/<case>/case.json — committed)
-        ├── B0: one-shot LLM, sees TRACE ONLY            (operational reference)
-        ├── B1: one-shot LLM, sees TRACE + LEDGER        (the official fair baseline)
-        └── ProofTrail:
-              LLM Claim Extractor          (1 call — same model, same caps as B1)
-                      ▼
-              Deterministic Reconciler     (0 tokens)
-              + Temporal / Intent Verifier (0 tokens)
-                      ▼
-              Evidence Certificate         (template, not a second LLM)
-        │
-        ▼
-Evaluator: Macro-F1 over instances, accuracy per family,
-           unweighted mean over families, first-bad-event hit rate,
-           evidence coverage, cost & tokens per case.
-```
 
-## Fairness rules (enforced in code, see `prooftrail/config.py`)
+The refund agent runs only while creating the dataset. The committed 40-case
+dataset and prompt-hash replay caches let a judge reproduce its exact traces
+without a key, network access, or provider spend.
 
-| Rule | Where enforced |
+## Trust boundaries
+
+### 1. Agent view versus system-of-record view
+
+`AgentTrace.tool_calls` records what the agent experienced: returned results,
+timeouts and exceptions. The ledger independently records what committed,
+including `state_before`, `state_after`, intent, call and transaction IDs. A
+post-commit timeout can therefore look uncertain to the agent while remaining
+provable in the ledger.
+
+### 2. Auditor input versus hidden labels
+
+Every auditor accepts `FrozenCase`. `FrozenCase.auditor_view()` removes case,
+family and seed metadata and returns only the trace and raw ledger. Auditors do
+not import the ground-truth generator or open label/review files.
+
+### 3. Provisional labels versus human-reviewed truth
+
+`labels.provisional.json` is deterministic ledger-derived pre-annotation and
+always keeps `verified_by_human: false`. It is never edited during review.
+Human decisions live separately under `data/reviews/v1/decisions/` and bind:
+
+- the dataset manifest hash;
+- the frozen case hash;
+- the provisional label hash;
+- a canonical hash of the exact material shown to the reviewer; and
+- the ledger tip hash.
+
+An accepted decision resolves to `GroundTruth(verified_by_human=True)` only in
+memory after all hashes, the ledger chain, the decision hash, reviewer identity,
+UTC timestamp, rationale and explicit attestation validate. `ABSTAIN` is a valid
+review outcome but produces no benchmark label. There is intentionally no bulk
+approve command.
+
+The hashes make changes detectable; they are not identity signatures. Reviewer
+authenticity comes from Git history and should be strengthened with a signed
+commit or an independently reviewed pull request.
+
+## Current auditor implementations
+
+| Auditor | Evidence | LLM calls per case | Current status |
+|---|---|---:|---|
+| B1 | family-blind trace + raw ledger | 1 | Three explicit-spec 40-case runs are committed; strict JSON, provider-namespaced caches, artifact hashes and no-network replay are verified |
+| ProofTrail deterministic | the same family-blind trace + raw ledger | 0 | Implemented end to end; deterministic refund-domain extractor, linker, reconciler, temporal verifier and certificate |
+| ProofTrail hybrid | the same evidence | 1 extractor call, then deterministic checks | Planned ablation; not implemented and not claimed in current results |
+
+The current deterministic extractor is intentionally narrow and auditable. It
+is not presented as a general natural-language parser. A future LLM extractor
+must implement the same `ClaimExtractor` contract and be reported as a separate
+configuration.
+
+## Fair-comparison invariants
+
+The comparison is fair only when the benchmark runner proves all of these:
+
+| Invariant | Enforcement today |
 |---|---|
-| One model for every role | `config.MODEL` — only a *global* override exists |
-| Same max output tokens / effort / max LLM calls for B0, B1, ProofTrail | `config.AUDITOR_LIMITS` (one frozen dataclass) |
-| Same raw evidence | `schemas.trace.FrozenCase` is the *only* input type an auditor accepts |
-| Same output schema | `schemas.verdict.AuditOutput` + `validate_audit_output()` on raw LLM JSON |
-| Hidden labels | `labels.json` lives next to `case.json`; loaders in `auditor/` and `baselines/` never open it |
-| Frozen traces | agent runs only under `--live`; default is `--replay` from `data/frozen/` + `data/replay/` |
+| Same 40 frozen instances | `data/frozen/manifest.json` and per-file SHA-256 hashes |
+| Same raw evidence | `FrozenCase.auditor_view()` and `b1_evidence_payload()` |
+| No family/case leakage | frozen dataset tests inspect every auditor view |
+| Same output contract | `AuditOutput` and fail-closed `validate_audit_output()` |
+| Hidden labels | auditor modules never load provisional or reviewed labels |
+| Verified labels only in headline metrics | `evaluate_outputs(..., include_unverified=False)` default |
+| Family-balanced headline accuracy | unweighted mean across the ten families |
+| Resource differences disclosed | usage is part of every `AuditOutput`; deterministic ProofTrail uses 0 calls while B1 uses 1 |
 
-## Ground truth is independent of any model
+The B1 runner writes an explicit provider, model, limits, system-prompt hash and
+dataset-manifest hash beside every output. It does not inherit the old
+`config.MODEL` default. The offline comparison validates those specs and the
+exact output/failure/summary hashes before scoring. A committed provisional
+diagnostic exists, but no B1-versus-ProofTrail **headline** number exists until
+the human review manifest is headline-eligible.
 
-1. **Ledger facts** (deterministic): refund count per intent, committed cents per order,
-   entity of each `STATE_CHANGED`, presence of `IDEMPOTENT_REPLAY`, fired faults.
-2. **Claim labels** (human-verified): `ground_truth.py` proposes per-claim statuses from
-   the ledger facts; each case gets `verified_by_human: true` only after manual review.
-   Unverified cases are reported separately and never enter the headline number.
+## Frozen dataset facts
 
-## Repository map — status of every file
+- 40 cases: 10 scenario families × 4 fixed seeds.
+- Real tool-using agent: Gemini `gemini-3.1-flash-lite` Free Tier.
+- 175 recorded model calls; 142,227 input and 16,950 output tokens.
+- Billed cost: `$0.00`; recorded list-price equivalent: `$0.060977`.
+- 133 tool calls and 330 hash-chained ledger events.
+- Replay: 40/40 from `data/replay/gemini/`, no key or network.
+- Current ProofTrail outputs: 17 `SUPPORTED`, 16 `CONTRADICTED`, 7 `UNVERIFIABLE`.
+- Human-reviewed labels: 40/40 accepted (33 approve, 7 amend, 0 abstain).
+- B1: three independent 40-case runs, 120 accepted completions, 891,687 input
+  and 190,214 output tokens, billed `$0.00` (list-price equivalent `$0.508242`).
+- Verified result: B1 family-mean accuracy `85.0% ± 2.04 pp`, verdict
+  unanimity `35/40`; ProofTrail agreement with accepted human truth `40/40`.
+  Disabling temporal verification changes no verdict or first-bad
+  localization on v1, so the report attributes no measured gain to it.
 
-Legend: ✅ written · ◐ working subset · ⏳ planned · 🔒 generated data
+The earlier provisional 40/40 agreement remains only an internal consistency
+check. The headline artifact resolves truth from the separate source-bound
+human decisions and is marked `headline_eligible: true`.
 
-```
+## Repository map
+
+```text
 prooftrail/
-├── README.md                          ✅ user / bottleneck / value / changelog skeleton
-├── pyproject.toml                     ✅ stdlib-only core; anthropic only in [live]
-├── requirements.txt                   ✅ pinned
-├── requirements-dev.txt               ✅ pinned
-├── .gitignore  .gitattributes         ✅ LF everywhere; frozen data is committed
-├── .env.example                       ✅ API key + budget ceiling
-├── REPRODUCE.md                       ✅ zero-key demo/test/eval commands + honesty boundary
-├── PROVENANCE.md                      ✅ inspected starting state and milestone additions
-├── CHANGELOG.md                       ✅ Improvement Changelog through offline milestone
-├── .github/workflows/eval.yml         ✅ pytest + zero-key demo/eval + secret scan
-│
-├── prooftrail/
-│   ├── __init__.py                    ✅
-│   ├── config.py                      ✅ model, pricing, budget, fairness caps, paths, seeds
-│   ├── ids.py                         ✅ intent_id / tool_call_id / transaction_id / idempotency_key
-│   ├── cli.py  __main__.py            ◐ `{cases,demo,eval-demo}` work; live/frozen commands pending
-│   ├── demo.py                        ✅ F02 zero-network end-to-end orchestration + artifacts
-│   │
-│   ├── schemas/                       — the contracts everything else obeys
-│   │   ├── __init__.py                ✅
-│   │   ├── events.py                  ✅ LedgerEvent (hash-chained) + verify_chain()
-│   │   ├── trace.py                   ✅ AgentTrace, ToolCallRecord, FrozenCase, Usage
-│   │   └── verdict.py                 ✅ Status, ClaimType, AuditOutput, GroundTruth, validator
-│   │
-│   ├── env/                           — the mock world the agent acts on
-│   │   ├── __init__.py                ✅
-│   │   ├── clock.py                   ✅ deterministic simulated time
-│   │   ├── database.py                ✅ SQLite: customers/orders/refunds + append-only ledger table
-│   │   ├── ledger.py                  ✅ Ledger.append / events / verify_chain / to_json
-│   │   ├── faults.py                  ✅ FaultKind, FaultSpec, FaultInjector, ToolTimeout
-│   │   ├── tools.py                   ✅ lookup_customer / lookup_order / list_refunds / issue_refund / send_email
-│   │   └── seed_data.py               ✅ (family, seed) → customers & orders, deterministic
-│   │
-│   ├── agent/                         — the REAL refund agent we audit (live only)
-│   │   ├── __init__.py                ✅
-│   │   ├── interfaces.py adapters.py  ✅ provider-neutral model/tool boundary
-│   │   ├── prompts.py tool_defs.py    ✅ system prompt + JSON tool schemas
-│   │   ├── refund_agent.py            ✅ manual tool-use loop, max_turns, records everything
-│   │   ├── recorder.py                ✅ builds AgentTrace incl. usage/cost
-│   │   ├── scripted.py replay.py      ✅ explicit offline fixture + stable JSON replay
-│   │   └── live_provider.py           ⏳ real model SDK adapter
-│   │
-│   ├── scenarios/                     — families, instances, hidden labels, freezing
-│   │   ├── __init__.py                ✅
-│   │   ├── families.py                ✅ the 10 families (pressure conditions, not labels)
-│   │   ├── generator.py               ✅ family × seed → env + user requests
-│   │   ├── ground_truth.py            ✅ ledger → provisional GroundTruth (never self-approves)
-│   │   └── freeze.py                  ⏳ run agent once, write data/frozen/<case>/{case,labels}.json
-│   │
-│   ├── llm/                           — the only place that talks to the API
-│   │   ├── __init__.py                ⏳
-│   │   ├── client.py                  ⏳ Anthropic SDK wrapper: budget guard, usage, retries
-│   │   ├── cache.py                   ⏳ replay cache: sha256(request) → response (data/replay/)
-│   │   └── pricing.py                 ⏳ thin wrapper over config.cost_usd
-│   │
-│   ├── baselines/                     — fair comparators (same model, caps, evidence, schema)
-│   │   ├── __init__.py                ✅
-│   │   ├── prompts.py                 ✅ B1 trace+ledger prompt and exact evidence payload
-│   │   ├── b0_trace_only.py           ⏳
-│   │   └── b1_trace_plus_ledger.py    ✅ one-call protocol, shared caps/schema, fail-closed output
-│   │
-│   ├── auditor/                       — ProofTrail itself
-│   │   ├── __init__.py                ✅
-│   │   ├── claim_extractor.py         ◐ typed contract + offline fallback; LLM implementation pending
-│   │   ├── evidence_linker.py         ✅ claims ↔ candidate ledger events (deterministic)
-│   │   ├── reconciler.py              ✅ amounts / entities / counts vs STATE_CHANGED
-│   │   ├── temporal_verifier.py       ✅ retry/intent/idempotency + first bad event
-│   │   ├── certificate.py             ✅ template-rendered JSON + Markdown certificate
-│   │   └── pipeline.py                ✅ FrozenCase → AuditOutput
-│   │
-│   └── eval/
-│       ├── __init__.py                ✅
-│       ├── metrics.py                 ✅ macro-F1, family-mean, first-bad hit, coverage
-│       ├── runner.py                  ◐ generic offline runner; repeated live runs pending
-│       ├── cost.py                    ⏳ tokens/cost/human-time rows
-│       └── report.py                  ✅ Markdown + JSON metrics reports
-│
-├── tests/
-│   ├── conftest.py                    ✅ in-memory env fixtures
-│   ├── test_ids.py                    ✅
-│   ├── test_ledger.py                 ✅ chain, tamper detection, append-only triggers
-│   ├── test_database.py               ✅ refund semantics incl. representable double refund
-│   ├── test_faults.py                 ✅
-│   ├── test_families.py               ✅ 10 families, balance, killer + controls
-│   ├── test_schemas.py                ✅ validator, round-trips, verdict aggregation
-│   ├── test_tools.py                  ✅ every FaultKind produces the intended ledger shape
-│   ├── test_generator.py              ✅ stable 40-instance generation
-│   ├── test_ground_truth.py           ✅ independent provisional facts/labels
-│   ├── test_auditor.py                ✅ extraction/reconciliation/temporal/certificate
-│   ├── test_agent*.py                 ✅ loop, integration and replay round-trips
-│   ├── test_demo.py test_cli.py       ✅ full F02 + command/artifact contract
-│   ├── test_metrics.py                ✅
-│   └── test_replay_cache.py           ⏳
-│
-├── scripts/
-│   ├── go_no_go.py                    ⏳ the 6-hour gate: 5 families × 2 seeds, B1 vs ProofTrail
-│   ├── check_no_secrets.py            ✅ credential-shaped string scan
-│   └── run_eval.ps1 / run_eval.sh     ⏳ wrappers for judges
-│
-├── data/
-│   ├── frozen/<case>/case.json        🔒 trace + ledger (auditor input)
-│   ├── frozen/<case>/labels.json      🔒 hidden ground truth
-│   ├── replay/*.json                  🔒 cached LLM responses
-│   └── replay/cost_ledger.jsonl       🔒 every live call, cost, model
-│
-├── evidence/runs/<date_iter>/         🔒 command.txt env.txt output.log metrics.json (append-only)
-├── trajectories/INDEX.md              ⏳ Claude Code sessions used to build this
-└── docs/
-    ├── ARCHITECTURE.md                ✅ this file
-    ├── SCENARIO_FAMILIES.md           ✅
-    ├── METRICS.md                     ⏳ exact definitions + why family-mean
-    ├── GO_NO_GO.md                    ⏳ decision record after the 6-hour gate
-    └── DECISIONS.md                   ⏳ ADRs (why no confidence score, why no 2nd LLM, ...)
+├── agent/                  real/replay model boundary, tool-use loop, caches
+│   ├── anthropic_client.py paid live adapter with budget guard
+│   └── gemini_client.py    zero-billed live adapter used for frozen v1
+├── env/                    SQLite world, fault injection and append-only ledger
+├── scenarios/              ten families, deterministic instances, provisional truth
+├── schemas/                trace, ledger, audit, ground-truth and review contracts
+├── auditor/                deterministic ProofTrail pipeline and certificates
+├── baselines/              B1 prompt, strict JSON adapter and fail-closed protocol
+├── eval/                   runner, family-balanced metrics and reports
+├── benchmark.py            explicit B1 live/cache/replay batch runner
+├── benchmark_report.py     hash-validated repeats, costs, stability and ablations
+├── freeze.py               freeze/replay/manifest integrity
+├── review.py               review packs, decisions, validation and resolved truth
+└── cli.py                  demo, live/replay/freeze/manifest/review commands
+
+data/
+├── frozen/<case>/          immutable case + provisional label + derived artifacts
+├── replay/gemini/          committed real-model response caches
+├── replay/auditors/b1/     three committed same-evidence B1 cache namespaces
+└── reviews/v1/             human decisions and deterministic review manifest
+
+docs/
+├── ARCHITECTURE.md         this file
+├── HUMAN_REVIEW.md         reviewer procedure and attestation boundary
+├── HUMAN_REVIEW_RESULTS.md reviewer identity, counts, measured time (filled by the reviewer)
+├── REVIEW_FOCUS_v1.md      generated per-case reading aid; records no decision
+├── SCENARIO_FAMILIES.md    pressure conditions and controls
+├── SUBMISSION_REPORT.md    final write-up; verified metrics only, limitations first
+├── TRAJECTORIES.md         seven real traces walked event by event
+├── DEMO_SCRIPT.md          2:30 video script and recording rules
+└── JUDGE_CHECKLIST.md      15-minute offline verification with expected outputs
+
+scripts/
+├── check_no_secrets.py     credential-shaped string scan (CI and pre-merge)
+└── gen_review_focus.py     deterministic generator for docs/REVIEW_FOCUS_v1.md
 ```
 
-Current state: a working offline milestone at roughly **55% of the submission
-plan**, with **98 passing tests** and 93% measured statement coverage. The core
-F02 path is complete; the percentage remains deliberately conservative because
-the real-model adapter, frozen 40-case data, human verification, repeated B1
-comparison and final submission media do not exist yet.
+## Remaining work from 95 to 100
 
-## Data flow at the type level
+The verified benchmark is complete. The remaining submission work is to record
+and upload the short demo video, add its link to README and the submission
+report, reproduce the full no-key checklist from a clean clone, and merge the
+green final pull request. An optional evidence viewer is not required.
 
-```
-ScenarioFamily ──generator──► (StateDB, [UserRequest], FaultInjector)
-                                     │  refund_agent (live) / replay
-                                     ▼
-                              AgentTrace + [LedgerEvent]  ──freeze──► FrozenCase (case.json)
-                                     │                                GroundTruth (labels.json)
-                                     ▼
-                     B0 / B1 / auditor.pipeline  ──► AuditOutput
-                                     │
-                                     ▼
-                     eval.metrics(AuditOutput, GroundTruth) ──► metrics.json + report.md
-```
+## Closing branch
+
+`feat/final-submission` contains the source-bound decisions, verified report,
+measured review time and final written assets. It does not modify frozen agent
+traces or B1 responses. The only remaining external artifact is the demo video.
