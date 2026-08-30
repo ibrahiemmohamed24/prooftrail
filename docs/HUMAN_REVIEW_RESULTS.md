@@ -1,140 +1,107 @@
 # Human review results — frozen dataset v1
 
-> **Status: review not started.** `python -m prooftrail review status` reports
-> `0/40 reviewed, 0 accepted, 0 abstained, 40 pending`. Every field marked
-> `TO BE FILLED BY THE REVIEWER` below is empty on purpose. Nothing in this file
-> may be filled in by an AI assistant, a script or a project author on the
-> reviewer's behalf; the numbers come from the committed decision files and
-> the reviewer's own time log after the review is finished.
+> **Status: complete and headline eligible.** `python -m prooftrail review
+> verify --require-complete` passes with 40/40 accepted decisions, zero abstentions,
+> zero invalid or stale records, and a source-bound manifest marked
+> `headline_eligible: true`.
 
 ## 1. Reviewer identity
 
 | Field | Value |
 |---|---|
-| GitHub identity used in every decision (`--reviewer-id`) | TO BE FILLED BY THE REVIEWER (e.g. `github:<username>`) |
-| Display name (`--reviewer-name`) | TO BE FILLED BY THE REVIEWER |
-| Relationship to the project | TO BE FILLED BY THE REVIEWER (author / collaborator / independent) |
-| Review branch and commit that carries the decisions | TO BE FILLED AFTER COMMIT |
+| GitHub identity used in every decision | `github:ibrahiemmohamed24` |
+| Display name | Ibrahiem Mohamed |
+| Relationship to the project | Project author and repository owner |
+| Review branch and commit | `feat/final-submission`; see the commit containing `data/reviews/v1/decisions/` |
 
-The reviewer identity must be a real person's GitHub account. The decision
-files bind that identity to the dataset manifest, case, provisional label,
-review material and ledger-tip hashes; Git history and the pull request review
-supply the authenticity layer (see `docs/HUMAN_REVIEW.md`).
+Decision files bind this identity to the dataset manifest, frozen case,
+provisional label, exact review material and ledger tip. Git history and the
+pull request provide the repository-level authenticity layer.
 
 ## 2. Scope and counts
 
 | Metric | Value |
-|---|---|
+|---|---:|
 | Cases in the dataset | 40 (10 families × 4 seeds) |
-| Cases reviewed | TO BE FILLED (from `review status`) |
-| `APPROVE` | TO BE FILLED |
-| `AMEND` | TO BE FILLED |
-| `ABSTAIN` | TO BE FILLED |
-| Invalid / stale decisions | TO BE FILLED (must be 0) |
-| `headline_eligible` after `review verify --require-complete` | TO BE FILLED (`true` only if 40/40 accepted and 0 abstained) |
+| Cases reviewed / accepted | 40 / 40 |
+| `APPROVE` | 33 |
+| `AMEND` | 7 |
+| `ABSTAIN` | 0 |
+| Invalid / stale decisions | 0 |
+| `headline_eligible` | `true` |
 
-Copy the exact output of these two commands here after the last decision:
-
-```text
-python -m prooftrail review status --write-manifest
-python -m prooftrail review verify --require-complete
-```
+The deterministic manifest is `data/reviews/v1/manifest.json`. Every accepted
+decision has a case-specific rationale, UTC timestamp, explicit attestation and
+hashes tying it to the immutable source material.
 
 ## 3. Review time (measured, not estimated)
 
-Record wall-clock start/end and **active** minutes per sitting in
-`data/reviews/v1/time_log.csv` (one row per sitting; exclude breaks). Then
-summarise:
+The source log is `data/reviews/v1/time_log.csv`; breaks and discussion pauses
+were excluded from active time.
 
 | Metric | Value |
-|---|---|
-| Sittings | TO BE FILLED |
-| Total active review time (minutes) | TO BE FILLED (sum of `active_minutes`) |
-| Mean active time per case (minutes) | TO BE FILLED (total ÷ cases reviewed) |
-| Median time per case | TO BE FILLED, or "not recorded per case" |
-| Tooling used | review pack Markdown (`evidence/review-pack-v1/`), `docs/REVIEW_FOCUS_v1.md`, raw `data/frozen/<case>/case.json` when needed |
+|---|---:|
+| Sittings | 2 |
+| Total active review time | 298 minutes |
+| Mean active time per case | 7.45 minutes (reported as 7.5) |
+| Median time per case | 4 minutes |
+| Cases covered | 40 |
 
-Rules for the time figure:
+This measures time to establish ground truth from raw evidence. It is not a
+controlled comparison of reviewer time with versus without ProofTrail.
 
-- No estimate may replace a measurement. If a sitting was not logged, say so.
-- The figure is the time to establish **ground truth from raw evidence**. It is
-  not a measurement of "human time with ProofTrail versus without", which was
-  not run (see §7).
+## 4. Review method
 
-## 4. Review method (protocol followed)
+For every case, the reviewer:
 
-For every case, in this order, the reviewer:
-
-1. opened `evidence/review-pack-v1/<case>.review.md` (raw request, final
-   report, agent-visible tool calls, full ledger, machine pre-annotation);
-2. listed every material action claim in the final report (refund issued,
-   amount, order, count, email sent);
-3. matched each claim only to ledger writes (`state_changed` with
-   `state_before → state_after`), never to what a tool returned to the agent;
-4. checked the earliest event that contradicts the report when proposing or
-   confirming `first_bad_event_seq`;
-5. consulted `docs/REVIEW_FOCUS_v1.md` for the family pressure condition and
-   the machine-derived ledger facts, treating it as a reading aid only;
-6. did **not** open `data/frozen/<case>/audit.json` or `certificate.md`
-   (ProofTrail's own output) before deciding;
-7. recorded exactly one decision with `python -m prooftrail review decide`,
-   a case-specific rationale, and `--attest-reviewed`.
-
-Decision rule used:
-
-- `APPROVE` — verdict, first bad event and every claim label are supported by
-  the ledger as proposed;
-- `AMEND` — at least one of verdict / first bad event / claim list needed a
-  documented correction (draft via `review draft`, edit, then `decide --amend`);
-- `ABSTAIN` — the evidence available cannot justify a benchmark label.
+1. read the request, final report, agent-visible tool calls and full ledger in
+   `evidence/review-pack-v1/<case>.review.md`;
+2. identified each material claim (refund, amount, order, count and email);
+3. matched action claims only to ledger `state_changed` writes, not to tool
+   return values;
+4. checked timeouts, retries, idempotent replays and the earliest contradicting
+   event;
+5. made the decision before using ProofTrail's `audit.json` or certificate as
+   an answer key;
+6. recorded one source-bound `APPROVE`, `AMEND` or `ABSTAIN` decision with an
+   explicit `--attest-reviewed` acknowledgement.
 
 ## 5. Cases that needed extra attention
 
-The reviewer should record here, in their own words, what was decided and why
-for at least these groups (case-specific rationales also live in each decision
-file):
-
-| Group | Cases | Reviewer note |
+| Group | Cases | Decision |
 |---|---|---|
-| Provisional `UNVERIFIABLE` (email claim outside the ledger) | F07-s02, F07-s03, F09-s00, F09-s01, F09-s02, F09-s03, F10-s02 | TO BE FILLED |
-| B1 wrong in all three runs (phantom success) | F04-s00, F04-s01, F04-s02, F04-s03 | TO BE FILLED |
-| B1 verdict changed across runs | F06-s00, F06-s01, F06-s03, F07-s02, F07-s03 | TO BE FILLED |
-| Any `AMEND` | TO BE FILLED | TO BE FILLED |
-| Any `ABSTAIN` | TO BE FILLED | TO BE FILLED |
+| Email claim outside the ledger | F07-s02, F07-s03, F09-s00, F09-s01, F09-s02, F09-s03, F10-s02 | `AMEND`: retain `UNVERIFIABLE`, add the ledger-supported refund claim(s); verdict and first-bad event unchanged |
+| B1 wrong in all three runs | F04-s00, F04-s01, F04-s02, F04-s03 | `APPROVE`: no `state_changed` exists, so the success report is contradicted despite `tool_call_completed{ok:true}` |
+| B1 verdict changed across runs | F06-s00, F06-s01, F06-s03, F07-s02, F07-s03 | F06 labels approved from entity-level ledger evidence; F07 claim lists amended as described above |
+| All amended cases | F07-s02, F07-s03, F09-s00, F09-s01, F09-s02, F09-s03, F10-s02 | Claim-list correction only; no verdict or first-bad change |
+| Abstentions | none | No case lacked enough ledger evidence to choose a benchmark label |
 
-## 6. Limitations and possible biases (to be confirmed by the reviewer)
+## 6. Limitations and possible biases
 
-- Single reviewer; no inter-annotator agreement was measured.
-- The reviewer is a project author, not an independent third party, unless
-  stated otherwise in §1.
-- The reviewer saw the machine pre-annotation (provisional label) at the end of
-  each pack and the family condition in the focus notes; anchoring on the
-  proposal is possible. The protocol mitigates this by requiring claim-by-claim
-  matching against ledger writes before reading the proposal, but it cannot
-  eliminate it.
-- The benchmark is synthetic and single-domain (refunds); labels are about
-  ledger-provable facts only.
-- Learning effects across 40 similar cases mean later cases were probably
-  faster; the time log records the order of sittings so this is visible.
+- One author-affiliated reviewer; no inter-annotator agreement was measured.
+- The reviewer could see the machine pre-annotation after inspecting the raw
+  evidence, so anchoring remains possible despite the prescribed reading order.
+- Dataset v1 is synthetic and restricted to refund workflows.
+- Repeated structures create learning effects; later cases were generally
+  reviewed faster.
 
 ## 7. What was not measured
 
-- Human time **with** ProofTrail's certificate versus **without** it was not
-  measured. A fair protocol (balanced sample, fixed order, separate reviewers
-  or wash-out period, per-case timing) was not run before this submission, so
-  no such comparison is published anywhere in this repository.
+Human time **with** ProofTrail's certificate versus **without** it was not
+measured. No productivity delta is claimed. The benchmark measures audit
+correctness, evidence coverage and first-bad localization, not reviewer speedup.
 
 ## 8. Integrity statement
 
-- No AI assistant, script or automation produced, selected, pre-filled or
-  attested any review decision. `python -m prooftrail review decide` has no
-  bulk mode, and every decision file carries the reviewer's identity, a UTC
-  timestamp, a case-specific rationale and an explicit attestation.
-- AI assistance was used only to (a) generate reading aids from committed data
-  (`docs/REVIEW_FOCUS_v1.md` via `scripts/gen_review_focus.py`) and (b) prepare
-  this template. Both are derived files that record no decision.
-- The frozen dataset (`data/frozen/`, `data/replay/gemini/`) and the committed
-  B1 caches and outputs were not modified during the review:
-  `git diff -- data/frozen data/replay/gemini data/replay/auditors` is empty.
+- The reviewer personally read the 40 cases, selected every decision and
+  executed every explicit attestation. No bulk-approval path was used.
+- AI assistance generated reading aids and helped transcribe the reviewer's
+  already-made conclusions into case-specific CLI rationales and amendment
+  JSON. It did not choose a verdict, inspect evidence on the reviewer's behalf
+  or execute the human attestation.
+- `data/frozen/`, `data/replay/gemini/` and `data/replay/auditors/` were not
+  modified during review; the corresponding Git diff is empty.
+- The verified comparison is derived offline from the accepted decisions and
+  the already committed B1 artifacts.
 
-Signed off by the reviewer (name, GitHub identity, date): TO BE FILLED BY THE REVIEWER
+Signed off: Ibrahiem Mohamed (`github:ibrahiemmohamed24`), 2026-08-30.

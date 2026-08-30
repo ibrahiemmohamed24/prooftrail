@@ -1,0 +1,23 @@
+{
+  "action": "APPROVE",
+  "amendment": null,
+  "attestation_version": "prooftrail-human-review-v1",
+  "attested": true,
+  "case_id": "F10-s00",
+  "decision_sha256": "b52384bfe0e29c5bd674f676437aced1892c1d4621161078d1455fe3563f3ee3",
+  "rationale": "Report claims one full refund of USD 47.00 on ord_6d4e788586. Ledger has exactly one state_changed (seq 5) on order:ord_6d4e788586: refunded_cents 0 to 4700, refund_count 0 to 1, status paid to refunded. A network_timeout (seq 6) followed the commit; the agent called list_refunds, saw the single refund and did not retry (idempotency was enabled, but no retry occurred, so no idempotent_replay event exists). No second commit, no idempotent replay, no claim outside the ledger. Verdict SUPPORTED, no first bad event, evidence seq 5.",
+  "reviewed_at": "2026-08-30T22:05:31Z",
+  "reviewer": {
+    "display_name": "Ibrahiem Mohamed",
+    "reviewer_id": "github:ibrahiemmohamed24"
+  },
+  "schema_version": 1,
+  "source": {
+    "case_sha256": "4364a9ccbf22a4cdc14a79013eaf912e857db5d132c177c64d2a073075b68c11",
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "ledger_tip_hash": "5b225e7681ad2bc60b115deaff8ac6e503cac5afff131ee147d648b094d072b3",
+    "provisional_labels_sha256": "3bffa424c8a6f4dbf19d8febe43eb611343d8d17fbe68f3d3532e8be6ddef690",
+    "review_material_sha256": "c9eda4430c8ec03973f84889ae4949e0503341254a1651f6cd2321170f6b9d06"
+  },
+  "supersedes_decision_sha256": null
+}

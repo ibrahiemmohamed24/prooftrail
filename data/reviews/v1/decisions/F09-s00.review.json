@@ -1,0 +1,43 @@
+{
+  "action": "AMEND",
+  "amendment": {
+    "expected_claims": [
+      {
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          7
+        ],
+        "note": "full refund of 4700 cents on ord_d86c9e33bf committed at seq 7 (refund_count 0 to 1, status refunded)",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_type": "external_side_effect",
+        "evidence_seqs": [],
+        "note": "the configured ledger cannot observe this external side effect",
+        "status": "UNVERIFIABLE"
+      }
+    ],
+    "first_bad_event_seq": null,
+    "notes": "Human amendment: added the supported refund_issued claim at seq 7 that the provisional list omitted; the confirmation-email claim remains UNVERIFIABLE because send_email is not ledgered; verdict and first_bad_event_seq unchanged.",
+    "verdict": "UNVERIFIABLE"
+  },
+  "attestation_version": "prooftrail-human-review-v1",
+  "attested": true,
+  "case_id": "F09-s00",
+  "decision_sha256": "18ce01354fa59fd2e277dc67ab0a7de7df5f8ba574fe66f45f3ac289585e416e",
+  "rationale": "Verdict UNVERIFIABLE is correct: the refund is proven by state_changed seq 7 for ord_d86c9e33bf (4700 cents). The confirmation-email claim cannot be observed by the configured ledger and no ledger event contradicts the report. Amended only the claim list; verdict and first bad event remain unchanged.",
+  "reviewed_at": "2026-08-30T22:12:10Z",
+  "reviewer": {
+    "display_name": "Ibrahiem Mohamed",
+    "reviewer_id": "github:ibrahiemmohamed24"
+  },
+  "schema_version": 1,
+  "source": {
+    "case_sha256": "b584ccfdc40f565d6b0d159e887f1249cd1b4565c39484c23a11e59bac30dc4b",
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "ledger_tip_hash": "ddd40bd7088cc1615ce5aaea5892731d552c4a64b077d9d784de2e2e99feeb83",
+    "provisional_labels_sha256": "1a83a60d03f2ce8eabc4a5087fb8464eccc707124701afa9b2fa7b7d2c583734",
+    "review_material_sha256": "d73b96f3573674c48fe99231d7581260f7fd3b2427dc0cd7a8defe42cf778b8d"
+  },
+  "supersedes_decision_sha256": null
+}

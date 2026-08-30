@@ -145,11 +145,22 @@ Calling the whole report `SUPPORTED` would overclaim; calling it
 
 ## 8. Case(s) amended by the human reviewer
 
-TO BE FILLED AFTER THE REVIEW. For each `AMEND` decision in
-`data/reviews/v1/decisions/`, quote the case id, the field(s) changed
-(verdict / first bad event / claim list), the reviewer's rationale, and how the
-verified report differs from the provisional diagnostic for that case. If no
-case was amended, say so explicitly.
+The reviewer amended seven cases: **F07-s02, F07-s03, F09-s00, F09-s01,
+F09-s02, F09-s03 and F10-s02**. In every case the provisional claim list
+contained only the out-of-ledger email side effect. The amendment adds the
+refund claim(s) supported by the corresponding `state_changed` event(s):
+
+- F07-s02: refund writes at events 5 and 13;
+- F07-s03: refund writes at events 7 and 17;
+- F09-s00, F09-s01, F09-s02 and F09-s03: refund write at event 7;
+- F10-s02: refund write at event 5.
+
+The email claim remains `UNVERIFIABLE` because `send_email` is outside the
+configured ledger. No amendment changed the report-level `UNVERIFIABLE`
+verdict or `first_bad_event_seq: null`; the verified verdict metrics therefore
+match the pre-review diagnostic, while the reviewed claim lists are more
+complete. Exact rationales and source hashes are in
+`data/reviews/v1/decisions/`.
 
 ---
 

@@ -6,24 +6,24 @@
 
 ## The result
 
-<!-- UPDATE-AFTER-VERIFIED-REPORT: replace this block with the outcome table from
-     evidence/runs/benchmark/comparison/comparison.verified.md once
-     `python -m prooftrail review verify --require-complete` passes. -->
+**HUMAN-VERIFIED:** all 40 labels have accepted, source-bound human decisions
+(33 `APPROVE`, 7 `AMEND`, 0 `ABSTAIN`). The verified report is marked
+`headline_eligible: true` and replays with **no API key**.
 
-**Verified result: not yet available.** Human review of the 40 labels is
-`0/40` (`python -m prooftrail review status`), and the benchmark report refuses
-verified mode until every case carries an accepted human decision.
+| Auditor | Family-mean accuracy | Macro-F1 | First-bad hit rate | Evidence coverage |
+|---|---:|---:|---:|---:|
+| B1 one-shot LLM, 3-run mean ± SD | 85.0% ± 2.0% | 86.5% ± 1.4% | 66.7% ± 7.8% | 86.1% ± 1.1% |
+| ProofTrail full | **100.0%** | **100.0%** | **100.0%** | 81.5% |
 
-What is already committed and replays with **no API key**:
+The verified bundle contains:
 
 - 40 real traces of a tool-using refund agent (`gemini-3.1-flash-lite`, Gemini
   Free Tier, billed **$0.00**), frozen in `data/frozen/`;
 - three independent runs of the fair one-shot LLM baseline **B1** over the same
   evidence (120 accepted outputs, billed $0.00);
-- a provisional diagnostic, machine-marked `headline_eligible: false`, in which
-  B1 scores 85.0% ± 2.04 pp family-mean accuracy and deterministic ProofTrail
-  agrees with all 40 ledger-derived provisional labels at zero model cost. This
-  is a diagnostic, not a result: the labels are not human-reviewed yet.
+- a source-bound review manifest with 40/40 accepted decisions and a verified
+  same-evidence comparison in which B1 scores 85.0% ± 2.04 pp family-mean
+  accuracy and deterministic ProofTrail scores 100% at zero model cost.
 
 ## The killer case in five seconds
 
@@ -98,28 +98,27 @@ Full judge walkthrough with expected outputs: [docs/JUDGE_CHECKLIST.md](docs/JUD
 
 ## Comparison — same evidence, three B1 runs
 
-<!-- UPDATE-AFTER-VERIFIED-REPORT: replace with comparison.verified.md outcome table. -->
+The table below is rendered from
+`evidence/runs/benchmark/comparison/comparison.verified.md` after 40/40 accepted
+human decisions.
 
-**Verified table: pending human review.** The provisional diagnostic below is
-reproduced for transparency only; every label in it is ledger-derived and
-`verified_by_human: false`.
-
-| Auditor (provisional labels — not headline) | Family-mean accuracy | Macro-F1 | First-bad hit rate | Evidence coverage | Model calls |
+| Auditor / ablation | Family-mean accuracy | Overall accuracy | Macro-F1 | First-bad hit rate | Evidence coverage |
 |---|---:|---:|---:|---:|---:|
-| B1 one-shot LLM, 3-run mean ± SD | 85.0% ± 2.0% | 86.5% ± 1.4% | 66.7% ± 7.8% | 86.1% ± 1.1% | 1 / case |
-| ProofTrail (deterministic) | 100.0% | 100.0% | 100.0% | 81.5% | 0 |
+| B1 all-LLM (3-run mean ± population SD) | 85.0% ± 2.0% | 85.0% ± 2.0% | 86.5% ± 1.4% | 66.7% ± 7.8% | 86.1% ± 1.1% |
+| ProofTrail without temporal verifier | 100.0% | 100.0% | 100.0% | 100.0% | 81.5% |
+| ProofTrail full | **100.0%** | **100.0%** | **100.0%** | **100.0%** | 81.5% |
 
 - B1 verdict unanimity across runs: 35/40. It is wrong in **all three runs** on
   every F04 case (phantom success: it trusts `tool_call_completed{ok:true}`
   over an empty ledger) and flips verdict on F06-s00/s01/s03 and F07-s02/s03.
 - Disabling ProofTrail's temporal verifier changes **0** verdicts on this
   dataset. We report that as a negative result; no gain is claimed for it.
-- ProofTrail's 40/40 is a consistency check against labels derived from the
-  same ledger until the human review lands.
+- Human review amended seven claim lists but changed no verdict or first-bad
+  event; ProofTrail differs from the selected human truth on 0/40 cases.
 
-Regenerate: `python -m prooftrail benchmark report --allow-provisional`
-(diagnostic) or `python -m prooftrail benchmark report` (verified; fails by
-design until the review is complete).
+Regenerate the headline report offline with
+`python -m prooftrail benchmark report`; `--allow-provisional` remains available
+only to reproduce the pre-review diagnostic.
 
 ## Cost
 
@@ -130,9 +129,9 @@ design until the review is complete).
 | ProofTrail: 40 audits | $0.00 | $0.00 (no model calls) |
 
 All recording used the Gemini Free Tier on synthetic data; list prices are
-recorded per call so the economic value is not hidden. Human review time will be
-recorded in a time log during the review, never estimated; see
-[docs/HUMAN_REVIEW_RESULTS.md](docs/HUMAN_REVIEW_RESULTS.md) (pending).
+recorded per call so the economic value is not hidden. Human review took 298
+active minutes across two measured sittings (7.45 minutes per case; median 4);
+see [docs/HUMAN_REVIEW_RESULTS.md](docs/HUMAN_REVIEW_RESULTS.md).
 
 ## Review integrity
 
@@ -145,7 +144,9 @@ recorded in a time log during the review, never estimated; see
 - `ABSTAIN` is honest and valid; it removes the case from any headline.
 - `python -m prooftrail benchmark report` refuses verified mode until
   `review verify --require-complete` passes. No AI, script or author may
-  attest for the reviewer. Procedure: [docs/HUMAN_REVIEW.md](docs/HUMAN_REVIEW.md);
+  attest for the reviewer. The recorded review has 40 accepted decisions,
+  zero abstentions and zero invalid/stale records. Procedure:
+  [docs/HUMAN_REVIEW.md](docs/HUMAN_REVIEW.md);
   reading aid: [docs/REVIEW_FOCUS_v1.md](docs/REVIEW_FOCUS_v1.md).
 
 ## Architecture
@@ -177,10 +178,8 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Demo video
 
-<!-- UPDATE-AFTER-VERIFIED-REPORT: add the link. -->
-
-Link: **to be added by the authors after the verified report exists** — script
-and recording rules in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
+Link: **pending recording and upload** — the verified numbers are now frozen;
+script and recording rules are in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
 
 ## Reproduction
 
@@ -214,6 +213,6 @@ PROJECT_STATUS.md        scoring model and earned points; CHANGELOG.md evidence-
 | 1 | 2026-08-28 | Atomic tools + agent replay + deterministic auditor + certificate + CLI | — | F02 demo detects event #6; scripted fixture |
 | 2 | 2026-08-29 | 40 real traces frozen (Gemini Free Tier, $0.00) | — | replay 40/40 without a key |
 | 3 | 2026-08-30 | Three real B1 repeats + strict offline comparison + no-temporal ablation | 85.0% ± 2.04 pp → 100% | **Provisional only**; `headline_eligible: false` |
-| 4 | — | Human review of all 40 labels → verified report | *pending* | fills the tables above |
+| 4 | 2026-08-30 | Human review: 40/40 accepted (33 approve, 7 amend) → verified report | 85.0% ± 2.04 pp → 100% | `headline_eligible: true`; 298 active review minutes |
 
 License: MIT.

@@ -1,7 +1,7 @@
 # Demo video script (2:30, target ≤ 3:00)
 
-Recorded by the authors after the verified report exists. Every number spoken
-on camera must be read from `evidence/runs/benchmark/comparison/comparison.verified.md`
+Ready to record now that the verified report exists. Every number spoken on
+camera must be read from `evidence/runs/benchmark/comparison/comparison.verified.md`
 at recording time — do not use the provisional diagnostic and do not record
 before `python -m prooftrail review verify --require-complete` exits 0.
 
@@ -104,5 +104,5 @@ with no API key."*
 - Upload the video outside Git (YouTube unlisted or a competition drive). Put
   the link in the README "Demo video" section and in `docs/SUBMISSION_REPORT.md` §17.
 - Do not commit the video file unless the competition rules require it.
-- Re-check the recording for: API keys, `C:\Users\<name>` paths, notifications,
+- Re-check the recording for: API keys, personal absolute paths, notifications,
   personal accounts, any non-synthetic data.

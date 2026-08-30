@@ -20,5 +20,24 @@ jobs:
         run: |
           python -m prooftrail demo
           python -m prooftrail eval-demo
+      - name: Replay frozen agent traces
+        run: |
+          python -m prooftrail replay --provider gemini --all
+          python -m prooftrail manifest --provider gemini
+      - name: Replay all three B1 runs
+        run: |
+          for run_index in 0 1 2; do
+            python -m prooftrail benchmark b1 --replay --all \
+              --provider gemini \
+              --model gemini-3.1-flash-lite \
+              --run-index "$run_index" \
+              --json
+          done
+      - name: Verify human truth and headline report
+        run: |
+          python -m prooftrail review verify --require-complete
+          python -m prooftrail benchmark report --json
       - name: Check for committed secrets
         run: python scripts/check_no_secrets.py
+      - name: Assert deterministic artifacts stay clean
+        run: git diff --exit-code

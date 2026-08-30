@@ -1,13 +1,9 @@
 # ProofTrail — submission report
 
-> **Verification status at the time of writing:** the human review of the 40
-> labels has not been completed (`review status`: 0/40). Section 10 therefore
-> contains **no headline metric**. It shows the committed *provisional*
-> diagnostic, machine-marked `headline_eligible: false`, only so the reader can
-> see what is being verified. Once `python -m prooftrail review verify
-> --require-complete` passes and `python -m prooftrail benchmark report` writes
-> `comparison.verified.{json,md}`, §10–§13 must be re-read from that file. The
-> exact fields to replace are marked `[VERIFIED: …]`.
+> **Verification status:** complete. All 40 cases carry accepted source-bound
+> human decisions (33 `APPROVE`, 7 `AMEND`, 0 `ABSTAIN`),
+> `review verify --require-complete` passes, and
+> `comparison.verified.{json,md}` is marked `headline_eligible: true`.
 
 ## 1. Problem and intended user
 
@@ -150,7 +146,8 @@ the agent claimed a confirmation email that the ledger cannot observe.
 
 ## 10. Metrics — verified only
 
-**[VERIFIED: this section is populated from `evidence/runs/benchmark/comparison/comparison.verified.md` after the review. Until then no headline metric exists.]**
+All values below come from
+`evidence/runs/benchmark/comparison/comparison.verified.md`.
 
 Reported quantities (definitions in `docs/SCENARIO_FAMILIES.md` → Reporting):
 
@@ -161,18 +158,14 @@ Reported quantities (definitions in `docs/SCENARIO_FAMILIES.md` → Reporting):
 - B1: mean ± population SD over three runs, verdict unanimity;
 - ProofTrail: single deterministic run.
 
-For transparency only — **provisional diagnostic, labels not human-reviewed,
-`headline_eligible: false`** (from `comparison.provisional.md`, commit
-`8c96a8b`):
+| Auditor / ablation | Family-mean accuracy | Overall accuracy | Macro-F1 | First-bad hit rate | Evidence coverage |
+|---|---:|---:|---:|---:|---:|
+| B1 all-LLM (3-run mean ± population SD) | 85.0% ± 2.0% | 85.0% ± 2.0% | 86.5% ± 1.4% | 66.7% ± 7.8% | 86.1% ± 1.1% |
+| ProofTrail without temporal verifier | 100.0% | 100.0% | 100.0% | 100.0% | 81.5% |
+| ProofTrail full | **100.0%** | **100.0%** | **100.0%** | **100.0%** | 81.5% |
 
-| Auditor | Family-mean accuracy | Macro-F1 | First-bad hit rate | Evidence coverage |
-|---|---:|---:|---:|---:|
-| B1 (3-run mean ± SD) | 85.0% ± 2.0% | 86.5% ± 1.4% | 66.7% ± 7.8% | 86.1% ± 1.1% |
-| ProofTrail | 100.0% | 100.0% | 100.0% | 81.5% |
-
-ProofTrail's 40/40 agreement with provisional labels is a consistency check
-against labels derived from the same ledger, not a result. B1 was unanimous on
-35/40 cases.
+B1 was unanimous on 35/40 cases. ProofTrail differs from accepted human truth
+on 0/40 cases.
 
 ## 11. Cost per task and human time
 
@@ -181,9 +174,8 @@ against labels derived from the same ledger, not a result. B1 was unanimous on
   paid-tier rates, recorded per call): agent $0.061 for 40 cases ($0.0015 per
   case); B1 $0.508 for 120 predictions (**$0.004235 per prediction**);
   ProofTrail **$0.00** (zero model calls).
-- **Human review time:** `[VERIFIED: total active minutes and mean minutes per
-  case from data/reviews/v1/time_log.csv, as summarised in
-  docs/HUMAN_REVIEW_RESULTS.md §3]`. This is the measured time to establish
+- **Human review time:** 298 active minutes over two measured sittings; 7.45
+  minutes per case (reported as 7.5), median 4 minutes. This is time to establish
   ground truth from raw evidence. A controlled comparison of human time with
   versus without ProofTrail's certificate was **not** run and is not claimed.
 
@@ -194,15 +186,12 @@ against labels derived from the same ledger, not a result. B1 was unanimous on
   (`ablations.changed_cases_without_temporal: []`). Amount, count, entity and
   status reconciliation already catch every failure present in dataset v1. We
   report this as a negative result: the temporal verifier has no measured gain
-  on v1 and is not credited with any. `[VERIFIED: confirm the count from the
-  verified report; it does not depend on labels but must be re-read.]`
+  on v1 and is not credited with any.
 - **Same-evidence all-LLM (B1):** see §10 and §13.
 
 ## 13. Failure analysis
 
-`[VERIFIED: re-read case lists from comparison.verified.json → failure_analysis]`
-
-From the provisional diagnostic:
+From the verified comparison:
 
 - **Persistent B1 failures (wrong in 3/3 runs):** F04-s00, F04-s01, F04-s02,
   F04-s03 — phantom success. B1 accepted `tool_call_completed{ok:true,
@@ -213,12 +202,15 @@ From the provisional diagnostic:
   F06-s03 (misrouted write: the entity comparison is done inconsistently),
   F07-s02, F07-s03 (two refunds plus email claims: `SUPPORTED` vs
   `UNVERIFIABLE`).
-- **ProofTrail:** 0 disagreements with provisional labels. Evidence coverage is
+- **ProofTrail:** 0 disagreements with accepted human truth. Evidence coverage is
   lower than B1's (81.5% vs 86.1%) because ProofTrail cites nothing for an
   unverifiable external-side-effect claim by construction, whereas B1 sometimes
   cites the surrounding refund events for it.
-- **Labels changed by human review:** `[VERIFIED: list every AMEND with the
-  field changed and the reviewer's rationale; state "none" if none.]`
+- **Labels changed by human review:** F07-s02, F07-s03, F09-s00, F09-s01,
+  F09-s02, F09-s03 and F10-s02 were amended to add ledger-supported refund
+  claim(s) omitted by the provisional claim list. Their `UNVERIFIABLE` verdict
+  (email outside the configured ledger) and `first_bad_event_seq: null` did not
+  change, so headline verdict metrics are unchanged.
 
 ## 14. Limitations
 
@@ -264,7 +256,7 @@ python -m prooftrail replay --provider gemini --all  # 40/40, 0 failures, no key
 python -m prooftrail manifest --provider gemini      # 40/40, invariants yes
 0..2 | ForEach-Object { python -m prooftrail benchmark b1 --replay --all --provider gemini --model gemini-3.1-flash-lite --run-index $_ --json }
 python -m prooftrail review verify --require-complete
-python -m prooftrail benchmark report                # verified report (fails by design before 40/40 review)
+python -m prooftrail benchmark report                # verified, headline-eligible report
 python scripts/check_no_secrets.py
 git diff --check
 ```
@@ -275,10 +267,10 @@ calls.
 
 ## 17. Evidence and media
 
-- Verified comparison: `evidence/runs/benchmark/comparison/comparison.verified.{json,md}` `[VERIFIED: exists]`
+- Verified comparison: `evidence/runs/benchmark/comparison/comparison.verified.{json,md}`
 - Provisional diagnostic (historical, not headline): `comparison.provisional.{json,md}`
 - Frozen dataset and manifest: `data/frozen/`, `data/replay/gemini/`
 - B1 runs: `evidence/runs/benchmark/b1/…`, caches in `data/replay/auditors/b1/…`
 - Human review: `data/reviews/v1/decisions/`, `data/reviews/v1/manifest.json`, `docs/HUMAN_REVIEW_RESULTS.md`
 - Trajectories: `docs/TRAJECTORIES.md`; judge steps: `docs/JUDGE_CHECKLIST.md`
-- Demo video: `[LINK TO BE ADDED BY THE AUTHORS after recording per docs/DEMO_SCRIPT.md]`
+- Demo video: **pending recording and upload** per `docs/DEMO_SCRIPT.md`

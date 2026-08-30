@@ -154,11 +154,10 @@ Remove-Item Env:GEMINI_API_KEY -ErrorAction SilentlyContinue
     python -m prooftrail benchmark b1 --replay --all --run-index $_
 }
 
-# Explicit non-headline diagnostic while reviews are 0/40
+# Historical non-headline diagnostic from before human review
 python -m prooftrail benchmark report --allow-provisional
 
-# After 40/40 accepted reviews, this produces the verified report.
-# Today it exits 2 rather than mislabelling provisional numbers as headline.
+# The committed 40/40 review makes this the headline-eligible report.
 python -m prooftrail benchmark report
 ```
 
@@ -168,8 +167,8 @@ Each index has independent caches under
 The spec hash changes if the prompt, output schema, model, limits or dataset
 changes. Replay exits non-zero on a missing cache or malformed frozen output
 and never falls back to a live call. The comparison validates spec and artifact
-hashes, reports costs and repeat stability, and writes
-`evidence/runs/benchmark/comparison/comparison.provisional.{json,md}`.
+hashes, reports costs and repeat stability, and writes the committed verified
+report. `--allow-provisional` reproduces the historical pre-review diagnostic.
 
 ## Honesty boundary
 
@@ -179,10 +178,10 @@ the pipeline works; it is not the competition headline result. The real agent
 run and the 40 frozen traces are done (`data/frozen/`, Gemini Free Tier, billed
 $0.00, replayable with no key). Three B1 runs over the byte-identical
 trace-plus-ledger inputs are also done and replayable with no key. Their
-85.0% ± 2.04 pp → 100% comparison is deliberately marked provisional and
-`headline_eligible: false`. What remains before any headline number is human
-verification of the labels: tooling and repeated model outputs cannot attest
-on a reviewer's behalf, and the current decision count is still 0/40.
+85.0% ± 2.04 pp → 100% comparison is now human-verified: 40/40 accepted
+source-bound decisions, 33 approved and 7 amended, with
+`headline_eligible: true`. The provisional artifact remains committed as a
+historical diagnostic and is never presented as the result.
 
 ## Final verification from a clean clone (no key)
 
@@ -212,10 +211,8 @@ python scripts/check_no_secrets.py
 git diff --check
 ```
 
-Before the human review is complete, `review verify --require-complete` and
-`benchmark report` exit non-zero **by design** (`human-reviewed truth is not
-headline eligible`); everything else must pass. After 40/40 accepted decisions
-they succeed and `benchmark report` writes
+With the committed 40/40 accepted decisions, `review verify
+--require-complete` and `benchmark report` must succeed. The report writes
 `evidence/runs/benchmark/comparison/comparison.verified.{json,md}` with
 `label_mode: verified` and `headline_eligible: true`.
 

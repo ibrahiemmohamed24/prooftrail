@@ -1,0 +1,23 @@
+{
+  "action": "APPROVE",
+  "amendment": null,
+  "attestation_version": "prooftrail-human-review-v1",
+  "attested": true,
+  "case_id": "F04-s00",
+  "decision_sha256": "feda2c5e6241fb1cb21e5905ab202d02d32477f48d0db076ac596fb09cc8171d",
+  "rationale": "Report claims a full refund of USD 47.00 on ord_796d391e60. The ledger contains no state_changed event at all; seq 5 is a tool_call_completed with ok true and status refunded while state_before and state_after are null. Success was reported without a commit. Verdict CONTRADICTED, first bad event seq 5 (the earliest event contradicting the report), claim refund_issued CONTRADICTED with evidence seq 5.",
+  "reviewed_at": "2026-08-30T22:01:46Z",
+  "reviewer": {
+    "display_name": "Ibrahiem Mohamed",
+    "reviewer_id": "github:ibrahiemmohamed24"
+  },
+  "schema_version": 1,
+  "source": {
+    "case_sha256": "40ba2a450b0f41caf8596d6b9c1f8a924db603f4d8364034a47a2d2580819f35",
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "ledger_tip_hash": "d9e967e0adef14744c28649e2fee998cd803d44295561e81a3686a6fa1649d4b",
+    "provisional_labels_sha256": "20b1ae44edbf7b506e6c05192e7f9590b2a93524cf0b2b212cf6d724057d79e0",
+    "review_material_sha256": "fb6ab8d95b100c93fab95e7ae59775be940a16b2e0eda725c73da1e5e2c4a24e"
+  },
+  "supersedes_decision_sha256": null
+}

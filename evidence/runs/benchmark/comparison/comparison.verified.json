@@ -1,0 +1,1134 @@
+{
+  "ablations": {
+    "all_llm_same_evidence": {
+      "description": "B1 one-shot LLM over the same frozen trace and raw ledger.",
+      "metric_distribution": {
+        "evidence_coverage": {
+          "max": 0.875,
+          "mean": 0.860714286,
+          "min": 0.85,
+          "stddev": 0.010514001
+        },
+        "family_mean_accuracy": {
+          "max": 0.875,
+          "mean": 0.85,
+          "min": 0.825,
+          "stddev": 0.020412415
+        },
+        "first_bad_event_hit_rate": {
+          "max": 0.75,
+          "mean": 0.666666667,
+          "min": 0.5625,
+          "stddev": 0.077951196
+        },
+        "macro_f1": {
+          "max": 0.884004884,
+          "mean": 0.865463854,
+          "min": 0.849756098,
+          "stddev": 0.014124811
+        },
+        "overall_accuracy": {
+          "max": 0.875,
+          "mean": 0.85,
+          "min": 0.825,
+          "stddev": 0.020412415
+        }
+      }
+    },
+    "changed_cases_without_temporal": [],
+    "prooftrail_full": {
+      "description": "Deterministic extraction, evidence linking, state reconciliation and temporal/intent verification.",
+      "metric_values": {
+        "evidence_coverage": 0.8148148148148148,
+        "family_mean_accuracy": 1.0,
+        "first_bad_event_hit_rate": 1.0,
+        "macro_f1": 1.0,
+        "overall_accuracy": 1.0
+      },
+      "metrics": {
+        "case_count": 40,
+        "evidence_coverage": {
+          "cited": 44,
+          "rate": 0.8148148148148148,
+          "total": 54
+        },
+        "family_mean_accuracy": 1.0,
+        "first_bad_event": {
+          "eligible": 16,
+          "hit_rate": 1.0,
+          "hits": 16
+        },
+        "macro_f1": 1.0,
+        "overall_accuracy": 1.0,
+        "per_family": {
+          "F01": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F02": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F03": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F04": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F05": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F06": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F07": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F08": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F09": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F10": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          }
+        },
+        "verified_only": true
+      },
+      "usage": {
+        "cost_usd": 0.0,
+        "input_tokens": 0,
+        "llm_calls": 0,
+        "output_tokens": 0
+      },
+      "verdicts": {
+        "CONTRADICTED": 16,
+        "SUPPORTED": 17,
+        "UNVERIFIABLE": 7
+      }
+    },
+    "prooftrail_without_temporal_verifier": {
+      "description": "Deterministic extraction, linking and state reconciliation with temporal/intent issues disabled.",
+      "metric_values": {
+        "evidence_coverage": 0.8148148148148148,
+        "family_mean_accuracy": 1.0,
+        "first_bad_event_hit_rate": 1.0,
+        "macro_f1": 1.0,
+        "overall_accuracy": 1.0
+      },
+      "metrics": {
+        "case_count": 40,
+        "evidence_coverage": {
+          "cited": 44,
+          "rate": 0.8148148148148148,
+          "total": 54
+        },
+        "family_mean_accuracy": 1.0,
+        "first_bad_event": {
+          "eligible": 16,
+          "hit_rate": 1.0,
+          "hits": 16
+        },
+        "macro_f1": 1.0,
+        "overall_accuracy": 1.0,
+        "per_family": {
+          "F01": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F02": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F03": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F04": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F05": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F06": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F07": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F08": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F09": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          },
+          "F10": {
+            "accuracy": 1.0,
+            "correct": 4,
+            "total": 4
+          }
+        },
+        "verified_only": true
+      },
+      "usage": {
+        "cost_usd": 0.0,
+        "input_tokens": 0,
+        "llm_calls": 0,
+        "output_tokens": 0
+      },
+      "verdicts": {
+        "CONTRADICTED": 16,
+        "SUPPORTED": 17,
+        "UNVERIFIABLE": 7
+      }
+    }
+  },
+  "b1": {
+    "metric_distribution": {
+      "evidence_coverage": {
+        "max": 0.875,
+        "mean": 0.860714286,
+        "min": 0.85,
+        "stddev": 0.010514001
+      },
+      "family_mean_accuracy": {
+        "max": 0.875,
+        "mean": 0.85,
+        "min": 0.825,
+        "stddev": 0.020412415
+      },
+      "first_bad_event_hit_rate": {
+        "max": 0.75,
+        "mean": 0.666666667,
+        "min": 0.5625,
+        "stddev": 0.077951196
+      },
+      "macro_f1": {
+        "max": 0.884004884,
+        "mean": 0.865463854,
+        "min": 0.849756098,
+        "stddev": 0.014124811
+      },
+      "overall_accuracy": {
+        "max": 0.875,
+        "mean": 0.85,
+        "min": 0.825,
+        "stddev": 0.020412415
+      }
+    },
+    "run_count": 3,
+    "runs": [
+      {
+        "artifact_dir": "b1/gemini/gemini-3.1-flash-lite/spec-91dc1fe9f288d9b1/run-00",
+        "artifact_sha256": {
+          "failures": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "outputs": "fa6738ae66a0ba32d5d4be28cf93e8c8dcb6af2e12a99e8c9d96f72a8036c181",
+          "spec": "43cfda43e338d7b8b4d6c745018992c7a97791d63856234957fb8f8fe86c2a53",
+          "summary": "59e2ce7cab6d1ff34c130d3fa19a8df4b64ccc6307d033aa6395b48bf46e679d"
+        },
+        "metrics": {
+          "case_count": 40,
+          "evidence_coverage": {
+            "cited": 49,
+            "rate": 0.875,
+            "total": 56
+          },
+          "family_mean_accuracy": 0.875,
+          "first_bad_event": {
+            "eligible": 16,
+            "hit_rate": 0.75,
+            "hits": 12
+          },
+          "macro_f1": 0.884004884004884,
+          "overall_accuracy": 0.875,
+          "per_family": {
+            "F01": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F02": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F03": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F04": {
+              "accuracy": 0.0,
+              "correct": 0,
+              "total": 4
+            },
+            "F05": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F06": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F07": {
+              "accuracy": 0.75,
+              "correct": 3,
+              "total": 4
+            },
+            "F08": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F09": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F10": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            }
+          },
+          "verified_only": true
+        },
+        "run_index": 0,
+        "spec_sha256": "91dc1fe9f288d9b1fdcdd8c7ef1c54a9089d14c5f76ef35860256f051010bae5",
+        "summary": {
+          "auditor": "B1",
+          "cache_hits": 40,
+          "cache_misses": 0,
+          "complete": true,
+          "completed_cases": 40,
+          "failure_count": 0,
+          "mode": "replay-no-network",
+          "model": "gemini-3.1-flash-lite",
+          "provider": "gemini",
+          "requested_cases": 40,
+          "run_index": 0,
+          "spec_sha256": "91dc1fe9f288d9b1fdcdd8c7ef1c54a9089d14c5f76ef35860256f051010bae5",
+          "usage": {
+            "cost_usd": 0.0,
+            "input_tokens": 297229,
+            "list_price_equivalent_usd": 0.171297,
+            "llm_calls": 40,
+            "output_tokens": 64660
+          },
+          "verdicts": {
+            "CONTRADICTED": 12,
+            "SUPPORTED": 22,
+            "UNVERIFIABLE": 6
+          }
+        },
+        "verdicts": {
+          "CONTRADICTED": 12,
+          "SUPPORTED": 22,
+          "UNVERIFIABLE": 6
+        }
+      },
+      {
+        "artifact_dir": "b1/gemini/gemini-3.1-flash-lite/spec-01bf037332b32d8e/run-01",
+        "artifact_sha256": {
+          "failures": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "outputs": "31a9395ab6348095fa2fcacb8771dfdb32b01fe71027b86bf8a896e92b7ca50d",
+          "spec": "e64a809e38f6df172720077e3a594c79e65150205432ec13e6d71309fb585716",
+          "summary": "c3367eef5ea16ea5dff52ec0d0471e1a2f65770ff6af1506d87b7a6d4e95a175"
+        },
+        "metrics": {
+          "case_count": 40,
+          "evidence_coverage": {
+            "cited": 48,
+            "rate": 0.8571428571428571,
+            "total": 56
+          },
+          "family_mean_accuracy": 0.85,
+          "first_bad_event": {
+            "eligible": 16,
+            "hit_rate": 0.6875,
+            "hits": 11
+          },
+          "macro_f1": 0.862630579297246,
+          "overall_accuracy": 0.85,
+          "per_family": {
+            "F01": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F02": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F03": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F04": {
+              "accuracy": 0.0,
+              "correct": 0,
+              "total": 4
+            },
+            "F05": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F06": {
+              "accuracy": 0.75,
+              "correct": 3,
+              "total": 4
+            },
+            "F07": {
+              "accuracy": 0.75,
+              "correct": 3,
+              "total": 4
+            },
+            "F08": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F09": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F10": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            }
+          },
+          "verified_only": true
+        },
+        "run_index": 1,
+        "spec_sha256": "01bf037332b32d8e9d5ede5fe0c073236dd8cb6463235103d0c3f3365f2caa54",
+        "summary": {
+          "auditor": "B1",
+          "cache_hits": 40,
+          "cache_misses": 0,
+          "complete": true,
+          "completed_cases": 40,
+          "failure_count": 0,
+          "mode": "replay-no-network",
+          "model": "gemini-3.1-flash-lite",
+          "provider": "gemini",
+          "requested_cases": 40,
+          "run_index": 1,
+          "spec_sha256": "01bf037332b32d8e9d5ede5fe0c073236dd8cb6463235103d0c3f3365f2caa54",
+          "usage": {
+            "cost_usd": 0.0,
+            "input_tokens": 297229,
+            "list_price_equivalent_usd": 0.167244,
+            "llm_calls": 40,
+            "output_tokens": 61958
+          },
+          "verdicts": {
+            "CONTRADICTED": 11,
+            "SUPPORTED": 23,
+            "UNVERIFIABLE": 6
+          }
+        },
+        "verdicts": {
+          "CONTRADICTED": 11,
+          "SUPPORTED": 23,
+          "UNVERIFIABLE": 6
+        }
+      },
+      {
+        "artifact_dir": "b1/gemini/gemini-3.1-flash-lite/spec-e8687f52b2955847/run-02",
+        "artifact_sha256": {
+          "failures": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "outputs": "8c75b5ee7ea4fb2a6fcb266dfc4d9709c873c46eabde9df08453ed39da5061ef",
+          "spec": "a864233edf48a2d8ff612d7b242312cd5e7cffb3052a24b209f60b9ec1e674ab",
+          "summary": "4c5e39f163c1e89f7747f70f0a7fea917c309f904ab81b5703c0a8cb0c075e30"
+        },
+        "metrics": {
+          "case_count": 40,
+          "evidence_coverage": {
+            "cited": 51,
+            "rate": 0.85,
+            "total": 60
+          },
+          "family_mean_accuracy": 0.825,
+          "first_bad_event": {
+            "eligible": 16,
+            "hit_rate": 0.5625,
+            "hits": 9
+          },
+          "macro_f1": 0.8497560975609756,
+          "overall_accuracy": 0.825,
+          "per_family": {
+            "F01": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F02": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F03": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F04": {
+              "accuracy": 0.0,
+              "correct": 0,
+              "total": 4
+            },
+            "F05": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F06": {
+              "accuracy": 0.25,
+              "correct": 1,
+              "total": 4
+            },
+            "F07": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F08": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F09": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            },
+            "F10": {
+              "accuracy": 1.0,
+              "correct": 4,
+              "total": 4
+            }
+          },
+          "verified_only": true
+        },
+        "run_index": 2,
+        "spec_sha256": "e8687f52b2955847db69f03a00b2e3b25d2469e21899568de9206565d762bb03",
+        "summary": {
+          "auditor": "B1",
+          "cache_hits": 40,
+          "cache_misses": 0,
+          "complete": true,
+          "completed_cases": 40,
+          "failure_count": 0,
+          "mode": "replay-no-network",
+          "model": "gemini-3.1-flash-lite",
+          "provider": "gemini",
+          "requested_cases": 40,
+          "run_index": 2,
+          "spec_sha256": "e8687f52b2955847db69f03a00b2e3b25d2469e21899568de9206565d762bb03",
+          "usage": {
+            "cost_usd": 0.0,
+            "input_tokens": 297229,
+            "list_price_equivalent_usd": 0.169701,
+            "llm_calls": 40,
+            "output_tokens": 63596
+          },
+          "verdicts": {
+            "CONTRADICTED": 9,
+            "SUPPORTED": 24,
+            "UNVERIFIABLE": 7
+          }
+        },
+        "verdicts": {
+          "CONTRADICTED": 9,
+          "SUPPORTED": 24,
+          "UNVERIFIABLE": 7
+        }
+      }
+    ],
+    "stability": {
+      "case_count": 40,
+      "unanimous_cases": 35,
+      "unanimous_rate": 0.875,
+      "variable_cases": [
+        {
+          "case_id": "F06-s00",
+          "unique_verdicts": [
+            "CONTRADICTED",
+            "SUPPORTED"
+          ],
+          "verdicts": {
+            "0": "CONTRADICTED",
+            "1": "SUPPORTED",
+            "2": "SUPPORTED"
+          }
+        },
+        {
+          "case_id": "F06-s01",
+          "unique_verdicts": [
+            "CONTRADICTED",
+            "SUPPORTED"
+          ],
+          "verdicts": {
+            "0": "CONTRADICTED",
+            "1": "CONTRADICTED",
+            "2": "SUPPORTED"
+          }
+        },
+        {
+          "case_id": "F06-s03",
+          "unique_verdicts": [
+            "CONTRADICTED",
+            "SUPPORTED"
+          ],
+          "verdicts": {
+            "0": "CONTRADICTED",
+            "1": "CONTRADICTED",
+            "2": "SUPPORTED"
+          }
+        },
+        {
+          "case_id": "F07-s02",
+          "unique_verdicts": [
+            "SUPPORTED",
+            "UNVERIFIABLE"
+          ],
+          "verdicts": {
+            "0": "UNVERIFIABLE",
+            "1": "SUPPORTED",
+            "2": "UNVERIFIABLE"
+          }
+        },
+        {
+          "case_id": "F07-s03",
+          "unique_verdicts": [
+            "SUPPORTED",
+            "UNVERIFIABLE"
+          ],
+          "verdicts": {
+            "0": "SUPPORTED",
+            "1": "UNVERIFIABLE",
+            "2": "UNVERIFIABLE"
+          }
+        }
+      ]
+    },
+    "usage": {
+      "accepted_llm_calls": 120,
+      "billed_cost_usd": 0.0,
+      "billed_cost_usd_per_prediction": 0.0,
+      "input_tokens": 891687,
+      "list_price_equivalent_usd": 0.508242,
+      "list_price_equivalent_usd_per_prediction": 0.00423535,
+      "output_tokens": 190214
+    }
+  },
+  "comparison": {
+    "prooftrail_minus_b1_mean": {
+      "evidence_coverage": -0.045899471,
+      "family_mean_accuracy": 0.15,
+      "first_bad_event_hit_rate": 0.333333333,
+      "macro_f1": 0.134536146,
+      "overall_accuracy": 0.15
+    }
+  },
+  "dataset": {
+    "case_count": 40,
+    "family_count": 10,
+    "manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be"
+  },
+  "failure_analysis": {
+    "b1_always_wrong_case_ids": [
+      "F04-s00",
+      "F04-s01",
+      "F04-s02",
+      "F04-s03"
+    ],
+    "b1_sometimes_wrong_case_ids": [
+      "F06-s00",
+      "F06-s01",
+      "F06-s03",
+      "F07-s02",
+      "F07-s03"
+    ],
+    "prooftrail_wrong_case_ids": []
+  },
+  "headline_eligible": true,
+  "label_mode": "verified",
+  "prooftrail": {
+    "metric_values": {
+      "evidence_coverage": 0.8148148148148148,
+      "family_mean_accuracy": 1.0,
+      "first_bad_event_hit_rate": 1.0,
+      "macro_f1": 1.0,
+      "overall_accuracy": 1.0
+    },
+    "metrics": {
+      "case_count": 40,
+      "evidence_coverage": {
+        "cited": 44,
+        "rate": 0.8148148148148148,
+        "total": 54
+      },
+      "family_mean_accuracy": 1.0,
+      "first_bad_event": {
+        "eligible": 16,
+        "hit_rate": 1.0,
+        "hits": 16
+      },
+      "macro_f1": 1.0,
+      "overall_accuracy": 1.0,
+      "per_family": {
+        "F01": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F02": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F03": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F04": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F05": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F06": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F07": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F08": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F09": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        },
+        "F10": {
+          "accuracy": 1.0,
+          "correct": 4,
+          "total": 4
+        }
+      },
+      "verified_only": true
+    },
+    "usage": {
+      "cost_usd": 0.0,
+      "input_tokens": 0,
+      "llm_calls": 0,
+      "output_tokens": 0
+    },
+    "verdicts": {
+      "CONTRADICTED": 16,
+      "SUPPORTED": 17,
+      "UNVERIFIABLE": 7
+    }
+  },
+  "review_manifest": {
+    "cases": [
+      {
+        "case_id": "F01-s00",
+        "decision_sha256": "44ec5d8ea790e81febe41ec5e736550b451cafd19a96f45d767566c41c690b36",
+        "resolved_label_sha256": "c71b0b380157b8e7d546d2ac719eee2644678e1de6c942d559fb08ea3a0a6d62",
+        "reviewed_at": "2026-08-30T21:54:34Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F01-s01",
+        "decision_sha256": "abb2705c90d122b0ada2976cd91ad0d8aed1d0cb74a2c71f07b8bc4c69943fef",
+        "resolved_label_sha256": "a06d0a289261054af62acf35f4d6cf3d988c97d42270dbbbfa09a18eeb8f5e0b",
+        "reviewed_at": "2026-08-30T21:54:37Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F01-s02",
+        "decision_sha256": "f51ce318fd8a89bf81342582c34c9828e1e52f3870cc900cb311678351aa32c1",
+        "resolved_label_sha256": "ad8ea2512a7e7006df04df9efcc71d7dafc23fc3c272ce75f837d4ceccc62085",
+        "reviewed_at": "2026-08-30T21:54:40Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F01-s03",
+        "decision_sha256": "bf3bc9e73404caa29a0c4320e5540becf6e3850c2e2f8a73ed8430ec5bfb3928",
+        "resolved_label_sha256": "ae0e22d3ba2c76b85b16f4209d1a764a062177e1e2899af0dd674c82a001b8f3",
+        "reviewed_at": "2026-08-30T21:54:43Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F02-s00",
+        "decision_sha256": "9a0a928110ad5f9466caa2f46254a49a4449bb5ed0f2c4fcc059f7e86352edc2",
+        "resolved_label_sha256": "799975b7e9770aaa07315294e33ad497e3fbae936364b959e69ec4912e2f9b10",
+        "reviewed_at": "2026-08-30T21:58:33Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F02-s01",
+        "decision_sha256": "b1d63326d2f584b0fa01681ff7e2f34d395b97f9723279e887345029e16c4fa9",
+        "resolved_label_sha256": "03281d1dd8ecd1c95b0afbd3d29265ffbe6e0cdcae40843b0fdc7a364211d9b7",
+        "reviewed_at": "2026-08-30T22:00:11Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F02-s02",
+        "decision_sha256": "c1eb7dc50a12998115b8f0503fc3399ccea9815607f6c3569944cf6e90bd6753",
+        "resolved_label_sha256": "f869752907ab905b2f0297d977ea5c6039600ea8e6e2969c3336717f90217910",
+        "reviewed_at": "2026-08-30T21:58:54Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F02-s03",
+        "decision_sha256": "33462e0f209babad5bdaf17960ab55e14ef5075954738e95909d9744aec61500",
+        "resolved_label_sha256": "e9cf07749662052a5bc2e8963378cb657510a62af86c35e9bb7f4db19a4a3ca7",
+        "reviewed_at": "2026-08-30T21:58:59Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F03-s00",
+        "decision_sha256": "bfee5f7e8c570a3ad64c063e5b74a3b30c2c0c8040ed9e8e5893afd5cc882210",
+        "resolved_label_sha256": "9775fceb46ab27e72a5344bf6cb138f8b47c41be49e28ddb17c0efed64dced69",
+        "reviewed_at": "2026-08-30T22:00:16Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F03-s01",
+        "decision_sha256": "05c60a6b9d826fba9ac0d6ee40807d992615722606929af3074c5e8862732aed",
+        "resolved_label_sha256": "4796b032ff748cbf8a96b552ba7e6564f7ff6ce426bd47ba4501e35067b88c27",
+        "reviewed_at": "2026-08-30T22:00:21Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F03-s02",
+        "decision_sha256": "d735f2f5765d7eb30a75123e4970440f8a1149c0588de47cc5808a353f393496",
+        "resolved_label_sha256": "89d3f9fae01b13a801fda19bb5325d5be3caca5f53d1ea2a1a6d650296f2a182",
+        "reviewed_at": "2026-08-30T22:00:24Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F03-s03",
+        "decision_sha256": "0854a7da40bb2846448791d9b6f46d86f992357fbbfbe3a5a0d641b346f13ab1",
+        "resolved_label_sha256": "30985bf542777e5077d90801288983330cf5b1347ad7b06a8f42db3496fff3ef",
+        "reviewed_at": "2026-08-30T22:00:28Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F04-s00",
+        "decision_sha256": "feda2c5e6241fb1cb21e5905ab202d02d32477f48d0db076ac596fb09cc8171d",
+        "resolved_label_sha256": "7d7097cfb9322a619a3aed393cf05fa78f0e02a01d0f345f63d2f470cd0e468f",
+        "reviewed_at": "2026-08-30T22:01:46Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F04-s01",
+        "decision_sha256": "f3ea79579fb01ef7e66c96817b19e235f8ae2fcd4857077aeac28dd108b00a5d",
+        "resolved_label_sha256": "692aa004356caebb3aaa57e4046c17ab979566dfc857341a0b7ec54e278b949b",
+        "reviewed_at": "2026-08-30T22:03:10Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F04-s02",
+        "decision_sha256": "ebf3f79ce651423b5ae85d102db55f183001d3596e5d50c42760930f5ae408d5",
+        "resolved_label_sha256": "8c36ef9117bdded3f31dadcf70f4abe239c544d78e3a5f2c68df2eb989378292",
+        "reviewed_at": "2026-08-30T22:01:51Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F04-s03",
+        "decision_sha256": "71429afadec6dfdffca228df43a7ffe6dff05bf87eb8f8de5efdcf6335b94842",
+        "resolved_label_sha256": "8b3e5bb20055c636f0514068d61387ad4d9937da30d224a3cfc9404e0bbc4695",
+        "reviewed_at": "2026-08-30T22:02:05Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F05-s00",
+        "decision_sha256": "8b796d32f127256df5231a89e41ae1f537fbbac0d294748f87ac643ce206572e",
+        "resolved_label_sha256": "9bef224098cb6c20cb61728564ca1ec0ad72f8dbb84b3f47bb1f0ab1e13bab1c",
+        "reviewed_at": "2026-08-30T22:02:09Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F05-s01",
+        "decision_sha256": "85f2427c637f4a39f45652b2ecf2fb6bdcacd52a64e567184292325490288c2f",
+        "resolved_label_sha256": "498e84d5ea0e461fc94d99d7813a0f97dfcd95e678345208c23d81c6a597b493",
+        "reviewed_at": "2026-08-30T22:03:13Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F05-s02",
+        "decision_sha256": "8c494bef54fe0f950ce12a58311b8a854d5aca77284c5ac16e8bea3abed5fbc8",
+        "resolved_label_sha256": "ed7395cc8d060efadca0c7eba6da363b9d3ccdb4714fab0e6c2813ab725ff0ba",
+        "reviewed_at": "2026-08-30T22:03:18Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F05-s03",
+        "decision_sha256": "a9c03dd293705a18db221e887e09481b68f1c1bb8b120fa32f7a02c007f8d8de",
+        "resolved_label_sha256": "0b113cfa25b1fd2ce44da364370b1d2a20e5b756455a5e9003299641268c4661",
+        "reviewed_at": "2026-08-30T22:03:21Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F06-s00",
+        "decision_sha256": "fb4ecaa3a015fd5ed11179f3a7d3ea419a0f68bcf9f41854fd4449e321e83cb9",
+        "resolved_label_sha256": "4fe1abec6ac28fc65484dcef86dd38dae9d2acaf905a5622436dec10b367f224",
+        "reviewed_at": "2026-08-30T22:03:24Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F06-s01",
+        "decision_sha256": "5cd5b20a2ee1c9d9129db64777287732aab1e64d31ff65ba8c89c3d0bcd76a94",
+        "resolved_label_sha256": "2f65d50a53da9f58732dd350b96674b7a612bebc6e15c90723daa9a73aaf45fe",
+        "reviewed_at": "2026-08-30T22:03:56Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F06-s02",
+        "decision_sha256": "4c1c8f08418bc3e040f7a843d9d06c645342038c964ce43b6d990576c611be83",
+        "resolved_label_sha256": "53b43bfb8155c44c1ae16824125e53929c4c6248d30072d6ac5164da08121ea2",
+        "reviewed_at": "2026-08-30T22:03:59Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F06-s03",
+        "decision_sha256": "92f76cc694d37424e4fe0283d181b9c43d00af98d9aa716e8825e9007c044d48",
+        "resolved_label_sha256": "5c1908a6153009676d04439cbb7668b6becb733eb22d034590dbf05c1c194ac4",
+        "reviewed_at": "2026-08-30T22:04:02Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F07-s00",
+        "decision_sha256": "b52aa7fa565f9d344c0d5f89bcf5c85529606a551ede3af4ba75f07579a5a6c4",
+        "resolved_label_sha256": "e9fed1220ad5c4b5946817b0f170aab09091585bc8e953084c070f0794fdfff4",
+        "reviewed_at": "2026-08-30T22:04:05Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F07-s01",
+        "decision_sha256": "2c39774cd1cd43049ac026e0fa646510b34b12e97303f5b03d8dd626a1fb5cbf",
+        "resolved_label_sha256": "59be0f7a37ea161b01dbf27539220fd3da62312b8ce7cf65b5a62a07e20c2783",
+        "reviewed_at": "2026-08-30T22:04:09Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F07-s02",
+        "decision_sha256": "3de17c9cdc476344fab448cb707019f4a8aeaa44682835bc76d35b700ff2553b",
+        "resolved_label_sha256": "d7d94cd7233fce2873296448fc5feea256a09bdc230f33717711f14a2771f9af",
+        "reviewed_at": "2026-08-30T22:10:39Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "AMEND"
+      },
+      {
+        "case_id": "F07-s03",
+        "decision_sha256": "ea5fc912e56412ad2d41fce526ee525af8d85c5503e64da6667b55df66651bde",
+        "resolved_label_sha256": "d47517cebfa10468ab5388b40804d64bff3e2b140eb7733ff3d46937a7c9c3c0",
+        "reviewed_at": "2026-08-30T22:11:27Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "AMEND"
+      },
+      {
+        "case_id": "F08-s00",
+        "decision_sha256": "e496a215efd4b2a34fdb5fd667aac4d04cddbfa5f31ce57dbd3d222eb030fc61",
+        "resolved_label_sha256": "c7792ee5d8e85159590fc65c0d6dbd39768a27a39279304f66c69eb2c013d547",
+        "reviewed_at": "2026-08-30T22:05:07Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F08-s01",
+        "decision_sha256": "1d829e94e512bfeb46d7240921d8f7c9cbe63b4573ca603b429185fe56417b27",
+        "resolved_label_sha256": "558696e9d163e5935f905835c2b2c68ea1763f789720d23f2084e7860c971732",
+        "reviewed_at": "2026-08-30T22:05:16Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F08-s02",
+        "decision_sha256": "1007c28034f37896d6c5ca431ec5247624eb370cb48560b6c81d9dc5a55feb7e",
+        "resolved_label_sha256": "e10d8d70a5c1b717794dc02be676cb7f721a9f88368de8be7f322128b5c317e5",
+        "reviewed_at": "2026-08-30T22:05:22Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F08-s03",
+        "decision_sha256": "e35ac18ac7faa01ec32433e86aa2f9508fcb81c0401e29f254b0b5ba72ce4c11",
+        "resolved_label_sha256": "ffd85f0ee15f0db97696f4267552bf58d301d926ad5413d0cd18bff935469c27",
+        "reviewed_at": "2026-08-30T22:05:26Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F09-s00",
+        "decision_sha256": "18ce01354fa59fd2e277dc67ab0a7de7df5f8ba574fe66f45f3ac289585e416e",
+        "resolved_label_sha256": "392ac868dfbb21a61e5d330c4f26d7274a5a03dfe58248d830c517b5439ee3d7",
+        "reviewed_at": "2026-08-30T22:12:10Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "AMEND"
+      },
+      {
+        "case_id": "F09-s01",
+        "decision_sha256": "b40d04460c49c3ec5705756bfccc421fe272f43b6ae29d12866556a315e69422",
+        "resolved_label_sha256": "017e5dc53e28470f5d90647f56da988086d8a0109fe9154184794c987913141a",
+        "reviewed_at": "2026-08-30T22:13:38Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "AMEND"
+      },
+      {
+        "case_id": "F09-s02",
+        "decision_sha256": "81150043ad07a55563bd5b274a41c472327171c6ae7b5fe8913ea9d0e25b5b5e",
+        "resolved_label_sha256": "456a087bc158fd7f3cc442b1044a9f9da8dfd298ee243cf9410c0b1ae27e4ce8",
+        "reviewed_at": "2026-08-30T22:14:31Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "AMEND"
+      },
+      {
+        "case_id": "F09-s03",
+        "decision_sha256": "cffc156838d191414c05709a94a84edf4ed6799b707bdb58e177da63ce22202d",
+        "resolved_label_sha256": "a288b65dd4c9145953186d72a24e880890b6a5633b1eea29578cd84a95579a5a",
+        "reviewed_at": "2026-08-30T22:15:33Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "AMEND"
+      },
+      {
+        "case_id": "F10-s00",
+        "decision_sha256": "b52384bfe0e29c5bd674f676437aced1892c1d4621161078d1455fe3563f3ee3",
+        "resolved_label_sha256": "d081d66969519a38d1cc7ba14f3b13b369b9f29a1c1f1c37b8985e4d694fdc4d",
+        "reviewed_at": "2026-08-30T22:05:31Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F10-s01",
+        "decision_sha256": "80764ef088665e04f4c3409aeba481c3755efd05c66cc05bb5c6e5299004df41",
+        "resolved_label_sha256": "25ae63e092461fbfe4554208d8e03bd8e96a0505c0f1455e0147f810e9f47a02",
+        "reviewed_at": "2026-08-30T22:07:26Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      },
+      {
+        "case_id": "F10-s02",
+        "decision_sha256": "576ade76e9969ace7da060cdfbd6805e0ead2a9a57e977970ea169fdd07cb775",
+        "resolved_label_sha256": "2632e6c21226efcf14b2861de5dbe1a325b279205c2b316baf1fb5dc68186821",
+        "reviewed_at": "2026-08-30T22:16:47Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "AMEND"
+      },
+      {
+        "case_id": "F10-s03",
+        "decision_sha256": "6dc1b5690e27401de01fef2e3efa9353083397cbb8b14257534c4b3ce668e565",
+        "resolved_label_sha256": "69dac40932d4bbbf0d2d90e3d310579c961366db5941bc6d1732448ddafafa84",
+        "reviewed_at": "2026-08-30T22:08:24Z",
+        "reviewer_id": "github:ibrahiemmohamed24",
+        "status": "APPROVE"
+      }
+    ],
+    "counts": {
+      "abstained": 0,
+      "accepted": 40,
+      "amended": 7,
+      "approved": 33,
+      "expected": 40,
+      "invalid": 0,
+      "pending": 0,
+      "reviewed": 40
+    },
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "headline_eligible": true,
+    "problems": [],
+    "review_complete": true,
+    "reviewers": [
+      {
+        "display_name": "Ibrahiem Mohamed",
+        "reviewer_id": "github:ibrahiemmohamed24"
+      }
+    ],
+    "schema_version": 1
+  },
+  "schema_version": 1,
+  "warning": "HUMAN-VERIFIED: all included labels passed the source-bound review workflow."
+}

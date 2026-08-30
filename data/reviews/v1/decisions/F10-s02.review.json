@@ -1,0 +1,43 @@
+{
+  "action": "AMEND",
+  "amendment": {
+    "expected_claims": [
+      {
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          5
+        ],
+        "note": "full refund of 1299 cents on ord_139eb31af4 committed at seq 5 (refund_count 0 to 1, status refunded)",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_type": "external_side_effect",
+        "evidence_seqs": [],
+        "note": "the configured ledger cannot observe this external side effect",
+        "status": "UNVERIFIABLE"
+      }
+    ],
+    "first_bad_event_seq": null,
+    "notes": "Human amendment: added the supported refund_issued claim at seq 5 that the provisional list omitted; the confirmation-email claim remains UNVERIFIABLE because send_email is not ledgered; verdict and first_bad_event_seq unchanged.",
+    "verdict": "UNVERIFIABLE"
+  },
+  "attestation_version": "prooftrail-human-review-v1",
+  "attested": true,
+  "case_id": "F10-s02",
+  "decision_sha256": "576ade76e9969ace7da060cdfbd6805e0ead2a9a57e977970ea169fdd07cb775",
+  "rationale": "Verdict UNVERIFIABLE is correct: the refund is proven by state_changed seq 5 for ord_139eb31af4 (1299 cents). A network_timeout followed the commit and the agent verified with list_refunds instead of retrying. The confirmation-email claim cannot be observed by the configured ledger and no ledger event contradicts the report. Amended only the claim list; verdict and first bad event remain unchanged.",
+  "reviewed_at": "2026-08-30T22:16:47Z",
+  "reviewer": {
+    "display_name": "Ibrahiem Mohamed",
+    "reviewer_id": "github:ibrahiemmohamed24"
+  },
+  "schema_version": 1,
+  "source": {
+    "case_sha256": "1240eb3b55257aab2ec31ab8aeafaa774ca6c1a363ca95836c390c0c6c9a80cb",
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "ledger_tip_hash": "b08251b45e60dffa3c26e668391fd4980f6823f76b7dd52f5bdb3ad35eff124f",
+    "provisional_labels_sha256": "8088e5c705b6640f4a69f0ca285438caa9dd63a311ffda37240cc53fcb7d9009",
+    "review_material_sha256": "bc7efbcb4548684328f38f0788c253f5e7002eea74e3f2424d4f09ca012b3b2d"
+  },
+  "supersedes_decision_sha256": null
+}

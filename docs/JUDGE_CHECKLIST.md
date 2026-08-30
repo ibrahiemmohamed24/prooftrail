@@ -109,7 +109,8 @@ git diff --check
 - [ ] `Secret scan passed`.
 - [ ] Billed provider spend across the repository is `$0.00` (Gemini Free Tier);
       list-price equivalents are recorded separately in the manifest and B1 summaries.
-- [ ] No absolute local paths in committed docs: `git grep -n "C:\\Users" -- docs README.md REPRODUCE.md`
+- [ ] No personal absolute paths in committed docs:
+      `git grep -n -E '[A-Za-z]:[/\\](Users|Documents and Settings)[/\\][^<]' -- docs README.md REPRODUCE.md`
       returns nothing.
 
 ## 8. What to read if you have five more minutes

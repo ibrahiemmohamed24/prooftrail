@@ -2,8 +2,8 @@
 
 > Same evidence. Independent truth. Frozen traces.
 
-This document describes the code that exists at the 85/100 milestone
-(`feat/verified-benchmark`, closing on `feat/final-submission`). It deliberately
+This document describes the code and verified evidence at the 95/100 milestone
+on `feat/final-submission`. It deliberately
 separates implemented paths from planned work; nothing described as planned is
 part of any reported number.
 
@@ -126,17 +126,17 @@ the human review manifest is headline-eligible.
 - 133 tool calls and 330 hash-chained ledger events.
 - Replay: 40/40 from `data/replay/gemini/`, no key or network.
 - Current ProofTrail outputs: 17 `SUPPORTED`, 16 `CONTRADICTED`, 7 `UNVERIFIABLE`.
-- Human-reviewed labels: 0/40 at the start of this branch.
+- Human-reviewed labels: 40/40 accepted (33 approve, 7 amend, 0 abstain).
 - B1: three independent 40-case runs, 120 accepted completions, 891,687 input
   and 190,214 output tokens, billed `$0.00` (list-price equivalent `$0.508242`).
-- Provisional-only diagnostics: B1 family-mean accuracy `85.0% ± 2.04 pp`,
-  verdict unanimity `35/40`; ProofTrail agreement with provisional labels
-  `40/40`. Disabling temporal verification changes no verdict or first-bad
+- Verified result: B1 family-mean accuracy `85.0% ± 2.04 pp`, verdict
+  unanimity `35/40`; ProofTrail agreement with accepted human truth `40/40`.
+  Disabling temporal verification changes no verdict or first-bad
   localization on v1, so the report attributes no measured gain to it.
 
-The 40/40 agreement previously observed between ProofTrail and provisional
-labels is only an internal consistency check because both use the same ledger.
-It is not a benchmark result.
+The earlier provisional 40/40 agreement remains only an internal consistency
+check. The headline artifact resolves truth from the separate source-bound
+human decisions and is marked `headline_eligible: true`.
 
 ## Repository map
 
@@ -179,23 +179,15 @@ scripts/
 └── gen_review_focus.py     deterministic generator for docs/REVIEW_FOCUS_v1.md
 ```
 
-## Remaining work from 85 to 95
+## Remaining work from 95 to 100
 
-1. Have a real person use the completed review workflow on all 40 cases. The
-   tooling cannot perform that attestation.
-2. Inspect the seven current `UNVERIFIABLE` labels, four persistent B1 F04
-   failures and five repeat-unstable F06/F07 cases rather than bulk-approving.
-3. Rerun `benchmark report` without `--allow-provisional`. It will reuse the
-   committed 120 B1 outputs and switch only the truth source to accepted
-   source-bound decisions.
+The verified benchmark is complete. The remaining submission work is to record
+and upload the short demo video, add its link to README and the submission
+report, reproduce the full no-key checklist from a clean clone, and merge the
+green final pull request. An optional evidence viewer is not required.
 
-Final submission media and any optional evidence viewer belong after the
-verified benchmark, not before it.
+## Closing branch
 
-## Closing branch: what exists before the review
-
-`feat/final-submission` adds only documents, templates and a deterministic
-generator; it changes no code path, no frozen data and no B1 artifact. The
-review decisions themselves, the verified comparison, the measured review time
-and the demo video are the remaining inputs for 95 and 100 and cannot be
-produced by tooling.
+`feat/final-submission` contains the source-bound decisions, verified report,
+measured review time and final written assets. It does not modify frozen agent
+traces or B1 responses. The only remaining external artifact is the demo video.
