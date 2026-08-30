@@ -1,0 +1,16 @@
+{
+  "auditor": "B1",
+  "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+  "effort": "high",
+  "input_contract": "FrozenCase.auditor_view/v1",
+  "max_llm_calls_per_case": 1,
+  "max_output_tokens": 4096,
+  "model": "gemini-3.1-flash-lite",
+  "output_contract": "AuditOutput/v1",
+  "output_schema_sha256": "2d6d81b279fe625a32b467365bf1da80d5b6a232c62c030b8bc33fd03e8e09ef",
+  "provider": "gemini",
+  "run_index": 1,
+  "schema_version": 1,
+  "spec_sha256": "01bf037332b32d8e9d5ede5fe0c073236dd8cb6463235103d0c3f3365f2caa54",
+  "system_prompt_sha256": "e256b7c5add7bfd8a319c00a40b967b46c5e4ed2ec1f0abfb6ac34821b451f4a"
+}

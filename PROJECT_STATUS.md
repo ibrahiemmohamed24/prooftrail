@@ -4,16 +4,18 @@
 
 ## Snapshot
 
-- **Overall completion:** 75 / 100
-- **Last verified:** 2026-08-29
+- **Overall completion:** 85 / 100
+- **Last verified:** 2026-08-30
 - **Default branch:** `main`
-- **Offline tests:** 194 passed, 0 skipped (no test uses the network or an API key; the Anthropic SDK is exercised over an in-process mock transport, Gemini over a fake transport; the 40 committed frozen cases are loaded, chain-verified and checked for family-blindness by the dataset tests)
-- **Real spend to date:** $0.00 — all 175 recorded LLM calls went through the Gemini Free Tier (`gemini-3.1-flash-lite`), billed at $0; list-price equivalent $0.061
-- **Statement coverage:** 94%
+- **Offline tests:** 212 passed, 0 skipped (no test uses the network or an API key; the Anthropic SDK is exercised over an in-process mock transport, Gemini over a fake transport; the committed agent and B1 artifacts are loaded and validated by integration tests)
+- **Real spend to date:** $0.00 — committed accepted caches contain 295 LLM calls: 175 agent calls plus 120 B1 calls, all on Gemini Free Tier (`gemini-3.1-flash-lite`). Their recorded list-price equivalent is $0.569219 ($0.060977 agent + $0.508242 B1). Malformed B1 completions were rejected and re-recorded rather than counted as accepted outputs.
 - **Working demo:** F02 claims one $47 refund; the ledger proves two commits and $94; ProofTrail returns `CONTRADICTED` with first bad event `#6`.
 - **Live providers:** paid `AnthropicModelClient` plus a tested zero-billed `GeminiModelClient` Free Tier route behind the same `ModelClient`; both use the prompt-hash replay cache. The validated Gemini default is `gemini-3.1-flash-lite`.
 - **Frozen dataset:** `data/frozen/` holds 40/40 real-model traces (10 families × 4 seeds), replayable with `python -m prooftrail replay --provider gemini --all` and no key; `manifest.json` reports every invariant `yes`. ProofTrail verdicts: 17 `SUPPORTED`, 16 `CONTRADICTED`, 7 `UNVERIFIABLE`.
-- **Honesty boundary:** the demo still uses `ScriptedModelClient`. Every frozen label is ledger-derived and `verified_by_human: false`; no human has reviewed a single case, no B1-vs-ProofTrail number exists, and the 40/40 agreement between ProofTrail verdicts and provisional labels is a consistency check against the same ledger, not a benchmark result.
+- **Human-review integrity:** source-bound pack/decision schemas, per-case `APPROVE`/`AMEND`/`ABSTAIN`, stale/tamper detection, reviewed-truth resolution and review manifests are implemented on `feat/verified-benchmark`. This earns no benchmark points by itself: real human decisions remain 0/40 and there is no bulk-approval path.
+- **B1 execution path:** complete for 3/3 independent runs and 120/120 accepted outputs. Each run pins provider/model/limits/prompt/dataset hashes, has its own cache namespace, and replays 40/40 with no key or network. The committed comparison validates artifact hashes, costs, repeat stability and a no-temporal ablation.
+- **Provisional diagnostic (not a headline result):** B1 family-mean accuracy is 85.0% ± 2.04 percentage points over three runs; ProofTrail is 100% against the provisional ledger-derived labels. B1 is unanimous on 35/40 cases. The report itself says `headline_eligible: false` and the CLI refuses verified mode while reviews remain 0/40.
+- **Honesty boundary:** the demo still uses `ScriptedModelClient`. Every frozen label is ledger-derived and `verified_by_human: false`; no human has reviewed a single case. The committed B1-vs-ProofTrail comparison is explicitly a provisional engineering diagnostic, not a competition headline result. ProofTrail's 40/40 score remains a consistency check against labels derived from the same ledger until independent review.
 
 ## Scoring model
 
@@ -25,11 +27,11 @@ definition of done is satisfied and linked evidence exists in the PR.
 | Foundation | 10 | 10 | Schemas, deterministic IDs, packaging and core tests work |
 | Stateful environment | 20 | 20 | SQLite state, atomic ledger, faults and 10 scenario families work |
 | Offline agent + ProofTrail | 20 | 20 | Tool loop, replay fixture, reconciliation, temporal checks and certificates work end to end |
-| Fair baseline + evaluation | 15 | 5 | B1 contract and metrics exist; full points require repeated B1/PT comparison, costs and ablations |
+| Fair baseline + evaluation | 15 | 15 | Same-evidence B1 ran 3×40, replays offline, records cost/stability, compares with ProofTrail and includes a no-temporal ablation; current metrics are explicitly provisional |
 | Live agent + frozen dataset | 20 | 20 | Real provider adapter plus 40 frozen, replayable traces with recorded usage |
 | Verified benchmark | 10 | 0 | Human-approved labels, family-balanced results and failure analysis |
 | Submission experience | 5 | 0 | Final README/report, short demo video and optional evidence viewer |
-| **Total** | **100** | **75** | |
+| **Total** | **100** | **85** | |
 
 ## Completed milestone: 55 → 75
 
@@ -60,7 +62,7 @@ Definition-of-done checklist:
 - `data/frozen/<case>/case.json` exists for all 40 cases. **Yes.**
 - Cached/replay mode reproduces the same trace inputs with no network. **Yes** (`replay --all` exits non-zero on any byte divergence from the frozen bundle; 0 failures).
 - No API key or personal data is committed. **Yes** (`scripts/check_no_secrets.py` passed; the dataset is fully synthetic).
-- `python -m pytest`, `python -m prooftrail demo`, and the secret scan pass. **Yes** (194 passed; demo unchanged: `CONTRADICTED`, event `#6`).
+- `python -m pytest`, `python -m prooftrail demo`, and the secret scan pass. **Yes** (212 passed; demo unchanged: `CONTRADICTED`, event `#6`).
 
 Known limits of this dataset (stated, not hidden):
 
@@ -68,19 +70,29 @@ Known limits of this dataset (stated, not hidden):
 - Free Tier content may be used by Google to improve its products; the benchmark contains no real people or data, which is why the route was acceptable.
 - `F07`, `F09` and `F10` produced `UNVERIFIABLE` outcomes on some seeds; these are recorded as-is and must be examined in the failure analysis of the next milestone, not re-rolled.
 
-## Next milestone: 75 → 90
+## Completed milestone: 75 → 85
 
-- **Verified benchmark (10):** human review of the 40 provisional labels, family-balanced results, failure analysis of the 7 `UNVERIFIABLE` cases.
-- **Fair baseline + evaluation (remaining 10):** repeated B1 vs ProofTrail comparison over the byte-identical frozen inputs, cost table, ablations.
+- Recorded three independent B1 runs over the same 40 frozen trace-plus-ledger inputs: 120/120 accepted outputs, 891,687 input and 190,214 output tokens, billed $0.00 (list-price equivalent $0.508242).
+- Replayed all three runs with the API key removed: 120/120 cache hits, zero network fallback and zero failures.
+- Added an offline comparison report that validates each spec/output/failure/summary hash before scoring. Without `--allow-provisional`, it fails closed at 0/40 reviewed labels.
+- Provisional diagnostics: B1 family-mean accuracy 85.0% ± 2.04 pp, Macro-F1 86.55% ± 1.41 pp, first-bad hit rate 66.67% ± 7.80 pp and verdict unanimity 87.5%. ProofTrail records 100% family accuracy/Macro-F1/first-bad localization against the provisional labels, with 81.48% evidence coverage.
+- Failure analysis is material rather than hidden: B1 misses every F04 case in all three runs and changes verdict across five F06/F07 cases. Disabling ProofTrail's temporal verifier changes no verdict or first-bad result on this dataset, so no measured gain is attributed to that component here.
 
-Human verification and headline benchmark numbers belong to that milestone;
-generated labels must remain explicitly provisional until reviewed.
+## Next milestone: 85 → 95
+
+- **Verified benchmark (10):** a real reviewer must decide all 40 provisional labels. Then rerun the same offline report without `--allow-provisional`; no B1 provider calls are needed.
+- Review the seven current `UNVERIFIABLE` labels, the four persistent B1 F04 failures and the five repeat-unstable cases explicitly. Amend or abstain where the ledger does not justify approval.
+
+Human verification and headline benchmark numbers belong to that milestone.
+Final submission media and any optional viewer are the separate 95 → 100 step.
 
 ## Required verification before every merge
 
 ```powershell
 python -m pytest
 python -m prooftrail demo --json
+python -m prooftrail review verify
+python -m prooftrail benchmark report --allow-provisional
 python scripts\check_no_secrets.py
 git diff --check
 ```

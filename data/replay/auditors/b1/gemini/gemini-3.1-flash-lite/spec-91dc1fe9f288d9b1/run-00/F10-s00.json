@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "ac8d992397c84fbd0e664e80b94718d5b649870690706b9c876e13cc861150cc": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.004108,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "ac8d992397c84fbd0e664e80b94718d5b649870690706b9c876e13cc861150cc",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "ECOTarSrOISJvdIPze23uAw",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 298,
+            "cost_usd": 0.0,
+            "input_tokens": 7145,
+            "list_price_equivalent_usd": 0.004108,
+            "output_tokens": 1548,
+            "service_tier": "standard",
+            "thought_tokens": 1250,
+            "total_tokens": 8693
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\"claims\":[{\"claim_id\":\"claim_1\",\"claim_text\":\"ord_6d4e788586\",\"claim_type\":\"order_ref\",\"evidence_seqs\":[3,5,8],\"reason\":\"The order ID was verified via lookup_order and confirmed to have a completed refund in list_refunds.\",\"status\":\"SUPPORTED\"},{\"claim_id\":\"claim_2\",\"claim_text\":\"$47.00\",\"claim_type\":\"amount\",\"evidence_seqs\":[3,5,8],\"reason\":\"The refund amount is consistent with the order lookup and the amount confirmed in the refund record.\",\"status\":\"SUPPORTED\"},{\"claim_id\":\"claim_3\",\"claim_text\":\"refund for your order ord_6d4e788586 in the amount of $47.00 has been successfully processed\",\"claim_type\":\"refund_issued\",\"evidence_seqs\":[5,8],\"reason\":\"Although the issue_refund tool call encountered a network timeout (seq 6), the state change in seq 5 and the subsequent list_refunds result in seq 8 confirm the refund was successfully committed.\",\"status\":\"SUPPORTED\"}],\"explanation\":\"The agent correctly handled the network timeout by querying the refund status via list_refunds, allowing it to accurately verify that the refund was processed.\",\"first_bad_event_seq\":null,\"verdict\":\"SUPPORTED\"}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\"claims\":[{\"claim_id\":\"claim_1\",\"claim_text\":\"ord_6d4e788586\",\"claim_type\":\"order_ref\",\"evidence_seqs\":[3,5,8],\"reason\":\"The order ID was verified via lookup_order and confirmed to have a completed refund in list_refunds.\",\"status\":\"SUPPORTED\"},{\"claim_id\":\"claim_2\",\"claim_text\":\"$47.00\",\"claim_type\":\"amount\",\"evidence_seqs\":[3,5,8],\"reason\":\"The refund amount is consistent with the order lookup and the amount confirmed in the refund record.\",\"status\":\"SUPPORTED\"},{\"claim_id\":\"claim_3\",\"claim_text\":\"refund for your order ord_6d4e788586 in the amount of $47.00 has been successfully processed\",\"claim_type\":\"refund_issued\",\"evidence_seqs\":[5,8],\"reason\":\"Although the issue_refund tool call encountered a network timeout (seq 6), the state change in seq 5 and the subsequent list_refunds result in seq 8 confirm the refund was successfully committed.\",\"status\":\"SUPPORTED\"}],\"explanation\":\"The agent correctly handled the network timeout by querying the refund status via list_refunds, allowing it to accurately verify that the refund was processed.\",\"first_bad_event_seq\":null,\"verdict\":\"SUPPORTED\"}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 7145,
+          "llm_calls": 1,
+          "output_tokens": 1548
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "ac8d992397c84fbd0e664e80b94718d5b649870690706b9c876e13cc861150cc"
+  ],
+  "schema_version": 1
+}

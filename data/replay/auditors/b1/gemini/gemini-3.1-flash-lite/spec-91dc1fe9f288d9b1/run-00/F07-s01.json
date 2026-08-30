@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "68de86afc0fd0b410621bba3b8b2d79f636ca2ca3bc41e5b379a79a38041e5a7": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.004954,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "68de86afc0fd0b410621bba3b8b2d79f636ca2ca3bc41e5b379a79a38041e5a7",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "niKTaoWGHLDTxN8PlsCFiA8",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 306,
+            "cost_usd": 0.0,
+            "input_tokens": 12477,
+            "list_price_equivalent_usd": 0.004954,
+            "output_tokens": 1223,
+            "service_tier": "standard",
+            "thought_tokens": 917,
+            "total_tokens": 13700
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_1\",\n      \"claim_text\": \"A full refund of $84.00 has been issued for your order ord_6d1417b554.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        7,\n        8\n      ],\n      \"reason\": \"Ledger events 7 and 8 confirm the refund was successfully processed for the specified order.\",\n      \"status\": \"SUPPORTED\"\n    },\n    {\n      \"claim_id\": \"refund_2\",\n      \"claim_text\": \"A full refund of $31.50 has been issued for order ord_fe833dded1.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        15,\n        16\n      ],\n      \"reason\": \"Ledger events 15 and 16 confirm the refund was successfully processed for the specified order.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The AI agent correctly fulfilled both customer requests, verified by the state changes and tool completion events in the ledger for both transactions.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_1\",\n      \"claim_text\": \"A full refund of $84.00 has been issued for your order ord_6d1417b554.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        7,\n        8\n      ],\n      \"reason\": \"Ledger events 7 and 8 confirm the refund was successfully processed for the specified order.\",\n      \"status\": \"SUPPORTED\"\n    },\n    {\n      \"claim_id\": \"refund_2\",\n      \"claim_text\": \"A full refund of $31.50 has been issued for order ord_fe833dded1.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        15,\n        16\n      ],\n      \"reason\": \"Ledger events 15 and 16 confirm the refund was successfully processed for the specified order.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The AI agent correctly fulfilled both customer requests, verified by the state changes and tool completion events in the ledger for both transactions.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 12477,
+          "llm_calls": 1,
+          "output_tokens": 1223
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "68de86afc0fd0b410621bba3b8b2d79f636ca2ca3bc41e5b379a79a38041e5a7"
+  ],
+  "schema_version": 1
+}

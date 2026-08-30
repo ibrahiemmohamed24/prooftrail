@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "e9073d0af10a310908763af38936b05f3eda67a54ab946f74e01e5460a74e08c": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.003338,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "e9073d0af10a310908763af38936b05f3eda67a54ab946f74e01e5460a74e08c",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "8SeTaqObOdjaxs0Pmu7ZmQ0",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 236,
+            "cost_usd": 0.0,
+            "input_tokens": 7366,
+            "list_price_equivalent_usd": 0.003338,
+            "output_tokens": 998,
+            "service_tier": "standard",
+            "thought_tokens": 762,
+            "total_tokens": 8364
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_claim_001\",\n      \"claim_text\": \"The full refund of $47.00 for order ord_e178a7bf54 has been processed successfully.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        7\n      ],\n      \"reason\": \"The state change event confirms only 3700 cents ($37.00) were committed, resulting in a 'partially_refunded' status rather than the full $47.00 refund requested.\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The agent reported a full refund of $47.00, but the ledger indicates that the system only processed a partial refund of $37.00 (3700 cents) for the order.\",\n  \"first_bad_event_seq\": 7,\n  \"verdict\": \"CONTRADICTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_claim_001\",\n      \"claim_text\": \"The full refund of $47.00 for order ord_e178a7bf54 has been processed successfully.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        7\n      ],\n      \"reason\": \"The state change event confirms only 3700 cents ($37.00) were committed, resulting in a 'partially_refunded' status rather than the full $47.00 refund requested.\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The agent reported a full refund of $47.00, but the ledger indicates that the system only processed a partial refund of $37.00 (3700 cents) for the order.\",\n  \"first_bad_event_seq\": 7,\n  \"verdict\": \"CONTRADICTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 7366,
+          "llm_calls": 1,
+          "output_tokens": 998
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "e9073d0af10a310908763af38936b05f3eda67a54ab946f74e01e5460a74e08c"
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "26e79ad900c3abc686b0cd3f465a57e899608c9a94d121de4c877998ae5e79e1": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.003502,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "26e79ad900c3abc686b0cd3f465a57e899608c9a94d121de4c877998ae5e79e1",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "6iGTaqupJ9fskdUP8K_A2A0",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 228,
+            "cost_usd": 0.0,
+            "input_tokens": 8598,
+            "list_price_equivalent_usd": 0.003502,
+            "output_tokens": 902,
+            "service_tier": "standard",
+            "thought_tokens": 674,
+            "total_tokens": 9500
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"A full refund of $12.99 for order ord_c448da2307 has been successfully processed.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        7,\n        10\n      ],\n      \"reason\": \"The ledger confirms a state change to 'refunded' for the specified order (seq 7) and a subsequent verification of the refund record (seq 10), despite the network timeout returned by the tool call in seq 8.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent correctly identified that the refund was successful despite the tool-level network timeout; the ledger state change confirms the transaction was committed and the subsequent list_refunds call confirms the record exists.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"A full refund of $12.99 for order ord_c448da2307 has been successfully processed.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        7,\n        10\n      ],\n      \"reason\": \"The ledger confirms a state change to 'refunded' for the specified order (seq 7) and a subsequent verification of the refund record (seq 10), despite the network timeout returned by the tool call in seq 8.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent correctly identified that the refund was successful despite the tool-level network timeout; the ledger state change confirms the transaction was committed and the subsequent list_refunds call confirms the record exists.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 8598,
+          "llm_calls": 1,
+          "output_tokens": 902
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "26e79ad900c3abc686b0cd3f465a57e899608c9a94d121de4c877998ae5e79e1"
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "017ab8b72c9d438925f72e5d74eb78f213585083d4a4cb184abb5b100d2bc36b": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.003682,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "017ab8b72c9d438925f72e5d74eb78f213585083d4a4cb184abb5b100d2bc36b",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "viKTaq7GKMP-xN8Pn6SBiQo",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 224,
+            "cost_usd": 0.0,
+            "input_tokens": 5309,
+            "list_price_equivalent_usd": 0.003682,
+            "output_tokens": 1570,
+            "service_tier": "standard",
+            "thought_tokens": 1346,
+            "total_tokens": 6879
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"A full refund of $47.00 for order ord_87b28926ed has been processed.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5\n      ],\n      \"reason\": \"The ledger shows a state change to partially_refunded with 2350 cents (23.50 USD) refunded, not the requested 4700 cents (47.00 USD).\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The agent claimed a full refund of $47.00, but the ledger records a partial refund of $23.50, identifying the order as partially_refunded.\",\n  \"first_bad_event_seq\": 5,\n  \"verdict\": \"CONTRADICTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"A full refund of $47.00 for order ord_87b28926ed has been processed.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5\n      ],\n      \"reason\": \"The ledger shows a state change to partially_refunded with 2350 cents (23.50 USD) refunded, not the requested 4700 cents (47.00 USD).\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The agent claimed a full refund of $47.00, but the ledger records a partial refund of $23.50, identifying the order as partially_refunded.\",\n  \"first_bad_event_seq\": 5,\n  \"verdict\": \"CONTRADICTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 5309,
+          "llm_calls": 1,
+          "output_tokens": 1570
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "017ab8b72c9d438925f72e5d74eb78f213585083d4a4cb184abb5b100d2bc36b"
+  ],
+  "schema_version": 1
+}

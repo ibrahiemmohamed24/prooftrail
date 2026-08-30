@@ -23,15 +23,22 @@ agent loop, auditor, baseline runner, evaluator, CLI or end-to-end demo.
 - Provider-neutral agent loop, recorder and explicit scripted replay fixture.
 - Claim extraction contract, deterministic evidence linking/reconciliation,
   temporal verifier and JSON/Markdown evidence certificate.
-- Fair B1 input/output contract, offline metrics, runner and report rendering.
-- CLI, reproducible F02 demo, 98-test suite, license and secret scanner.
+- Fair B1 input/output contract, explicit-spec live/cache/replay batch runner,
+  offline metrics and report rendering.
+- CLI, reproducible F02 demo, 212-test suite, license and secret scanner.
 - Paid Anthropic and zero-billed Gemini Free Tier provider adapters, with
   provider-neutral tool calls, usage metadata and prompt-hash replay.
+- Forty real-model frozen traces and their provider-response replay caches,
+  recorded on Gemini Free Tier using synthetic data only.
+- Three independent 40-case B1 response sets, explicit specs and replay caches,
+  plus a hash-validating offline comparison and no-temporal ProofTrail ablation.
+- Source-bound human-review packs and per-case decision validation. No human
+  decision has been produced by the tooling or claimed as complete.
 
 ## Still to be produced
 
-- Forty frozen benchmark cases and cached model responses.
-- Human-approved labels and repeated B1/ProofTrail comparison.
+- Human-approved labels (currently 0/40).
+- A headline-eligible rerender of the committed comparison after those reviews.
 - Final trajectories, video and submission report.
 
 No generated demo output is described as a real-model result.

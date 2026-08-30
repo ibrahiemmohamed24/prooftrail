@@ -20,11 +20,35 @@ from .agent.gemini_client import (
     MissingGeminiApiKeyError,
 )
 from .agent.runner import MODE_LIVE, MODE_REPLAY, run_case, write_case_artifacts
-from .config import EVIDENCE_DIR, FROZEN_DIR, MODEL, REPLAY_DIR, UnknownModelPricingError
+from .benchmark import (
+    MODE_LIVE as B1_MODE_LIVE,
+    MODE_REPLAY as B1_MODE_REPLAY,
+    run_b1_benchmark,
+    write_b1_benchmark_artifacts,
+)
+from .benchmark_report import (
+    BenchmarkReportError,
+    DEFAULT_COMPARISON_DIR,
+    build_comparison_report_from_disk,
+    write_comparison_report,
+)
+from .baselines.prompts import B1_JSON_SCHEMA
+from .config import (
+    B1_REPLAY_DIR,
+    BENCHMARK_DIR,
+    EVIDENCE_DIR,
+    FROZEN_DIR,
+    MODEL,
+    REPLAY_DIR,
+    REVIEW_DIR,
+    REVIEW_PACK_DIR,
+    UnknownModelPricingError,
+)
 from .demo import run_killer_demo, write_demo_artifacts
 from .eval.metrics import evaluate_outputs
 from .eval.report import write_metrics_report
 from .eval.runner import write_outputs
+from .eval.spec import build_b1_spec
 from .freeze import (
     all_case_ids,
     build_manifest,
@@ -35,7 +59,18 @@ from .freeze import (
     write_manifest,
 )
 from .ids import case_id as make_case_id
+from .review import (
+    ReviewValidationError,
+    build_review_manifest,
+    create_decision,
+    load_amendment,
+    write_amendment_draft,
+    write_decision,
+    write_review_manifest,
+    write_review_pack,
+)
 from .scenarios import FAMILIES, FAMILY_IDS
+from .schemas import ReviewAction
 
 
 DEFAULT_DEMO_DIR = EVIDENCE_DIR / "demo-f02"
@@ -142,6 +177,114 @@ def _parser() -> argparse.ArgumentParser:
     manifest.add_argument("--cache-dir", type=Path, default=REPLAY_DIR)
     manifest.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
     manifest.add_argument("--json", action="store_true")
+
+    review = commands.add_parser(
+        "review",
+        help="prepare and record source-bound human review decisions (never auto-approves labels)",
+    )
+    review_commands = review.add_subparsers(dest="review_command", required=True)
+
+    pack = review_commands.add_parser(
+        "pack",
+        help="write raw-evidence review aids; this does not create any decision",
+    )
+    which = pack.add_mutually_exclusive_group(required=True)
+    which.add_argument("--all", action="store_true")
+    which.add_argument("--case", action="append", metavar="CASE_ID")
+    pack.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    pack.add_argument("--output", type=Path, default=REVIEW_PACK_DIR)
+    pack.add_argument("--json", action="store_true")
+
+    draft = review_commands.add_parser(
+        "draft",
+        help="copy one provisional proposal to an editable amendment draft",
+    )
+    draft.add_argument("--case", required=True, metavar="CASE_ID")
+    draft.add_argument("--output", required=True, type=Path)
+    draft.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+
+    decide = review_commands.add_parser(
+        "decide",
+        help="record one explicit human decision; there is deliberately no --all",
+    )
+    decide.add_argument("--case", required=True, metavar="CASE_ID")
+    action = decide.add_mutually_exclusive_group(required=True)
+    action.add_argument("--approve", action="store_true")
+    action.add_argument("--amend", type=Path, metavar="AMENDMENT_JSON")
+    action.add_argument("--abstain", action="store_true")
+    decide.add_argument("--reviewer-id", required=True)
+    decide.add_argument("--reviewer-name", required=True)
+    decide.add_argument("--rationale", required=True)
+    decide.add_argument(
+        "--attest-reviewed",
+        action="store_true",
+        help="attest that you personally reviewed the raw final report, tool calls and ledger",
+    )
+    decide.add_argument("--replace", action="store_true")
+    decide.add_argument("--supersedes", default=None, metavar="DECISION_SHA256")
+    decide.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    decide.add_argument("--review-dir", type=Path, default=REVIEW_DIR)
+    decide.add_argument("--json", action="store_true")
+
+    status = review_commands.add_parser("status", help="show pending, accepted, abstained and invalid decisions")
+    status.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    status.add_argument("--review-dir", type=Path, default=REVIEW_DIR)
+    status.add_argument("--write-manifest", action="store_true")
+    status.add_argument("--json", action="store_true")
+
+    verify = review_commands.add_parser("verify", help="validate every decision and its frozen source hashes")
+    verify.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    verify.add_argument("--review-dir", type=Path, default=REVIEW_DIR)
+    verify.add_argument("--require-complete", action="store_true")
+    verify.add_argument("--json", action="store_true")
+
+    benchmark = commands.add_parser(
+        "benchmark",
+        help="run label-blind auditors over byte-identical frozen evidence",
+    )
+    benchmark_commands = benchmark.add_subparsers(dest="benchmark_command", required=True)
+    b1 = benchmark_commands.add_parser(
+        "b1",
+        help="run or replay the one-shot trace+ledger LLM baseline",
+    )
+    mode = b1.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--live", action="store_true", help="record/resume Gemini Free Tier B1 responses")
+    mode.add_argument("--replay", action="store_true", help="use only frozen B1 responses; no key or network")
+    which = b1.add_mutually_exclusive_group(required=True)
+    which.add_argument("--all", action="store_true")
+    which.add_argument("--case", action="append", metavar="CASE_ID")
+    b1.add_argument("--provider", choices=("gemini",), default="gemini")
+    b1.add_argument("--model", default=DEFAULT_GEMINI_MODEL)
+    b1.add_argument("--run-index", type=int, default=0)
+    b1.add_argument("--cache-dir", type=Path, default=B1_REPLAY_DIR)
+    b1.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    b1.add_argument("--output", type=Path, default=None)
+    b1.add_argument("--fresh", action="store_true", help="discard this run's selected B1 caches before live calls")
+    b1.add_argument("--json", action="store_true")
+
+    report = benchmark_commands.add_parser(
+        "report",
+        help="compare three frozen B1 runs with ProofTrail and its temporal ablation; no network",
+    )
+    report.add_argument("--provider", choices=("gemini",), default="gemini")
+    report.add_argument("--model", default=DEFAULT_GEMINI_MODEL)
+    report.add_argument(
+        "--run-index",
+        dest="run_indices",
+        action="append",
+        type=int,
+        help="B1 run index; repeat exactly three times (default: 0, 1, 2)",
+    )
+    report.add_argument(
+        "--allow-provisional",
+        action="store_true",
+        help="explicitly create a non-headline diagnostic from unreviewed labels",
+    )
+    report.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    report.add_argument("--review-dir", type=Path, default=REVIEW_DIR)
+    report.add_argument("--benchmark-dir", type=Path, default=BENCHMARK_DIR)
+    report.add_argument("--output", type=Path, default=DEFAULT_COMPARISON_DIR)
+    report.add_argument("--json", action="store_true")
     return parser
 
 
@@ -219,10 +362,19 @@ def build_live_client(*, model: str | None, budget: BudgetGuard, label: str) -> 
     return AnthropicModelClient(model=model, budget=budget, label=label)
 
 
-def build_gemini_client(*, model: str | None, label: str) -> GeminiModelClient:
+def build_gemini_client(
+    *,
+    model: str | None,
+    label: str,
+    json_response_schema: dict | None = None,
+) -> GeminiModelClient:
     """Factory for the real free-tier provider; tests replace its transport."""
 
-    return GeminiModelClient(model=model or DEFAULT_GEMINI_MODEL, label=label)
+    return GeminiModelClient(
+        model=model or DEFAULT_GEMINI_MODEL,
+        label=label,
+        json_response_schema=json_response_schema,
+    )
 
 
 def replay_cache_path(cache_dir: Path, case_id: str) -> Path:
@@ -506,6 +658,269 @@ def _manifest(args: argparse.Namespace) -> int:
     return 0 if manifest["complete"] else 1
 
 
+def _review_pack(args: argparse.Namespace) -> int:
+    case_ids = _selected_case_ids(args)
+    try:
+        written = write_review_pack(
+            case_ids,
+            frozen_dir=args.frozen_dir,
+            output_dir=args.output,
+        )
+    except (FileNotFoundError, KeyError, TypeError, ValueError) as exc:
+        print(f"error: cannot build review pack: {exc}", file=sys.stderr)
+        return 2
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "case_count": len(written),
+                    "output": str(Path(args.output).resolve()),
+                    "decisions_created": 0,
+                },
+                sort_keys=True,
+            )
+        )
+    else:
+        print(f"Review pack  : {Path(args.output).resolve()}")
+        print(f"Cases        : {len(written)}")
+        print("Decisions    : 0 (a review pack never verifies labels)")
+    return 0
+
+
+def _review_draft(args: argparse.Namespace) -> int:
+    try:
+        parse_case_id(args.case)
+        path = write_amendment_draft(args.case, args.output, frozen_dir=args.frozen_dir)
+    except (FileNotFoundError, KeyError, TypeError, ValueError) as exc:
+        print(f"error: cannot write amendment draft: {exc}", file=sys.stderr)
+        return 2
+    print(f"Amendment draft: {path.resolve()} (not a review decision)")
+    return 0
+
+
+def _review_decide(args: argparse.Namespace) -> int:
+    try:
+        parse_case_id(args.case)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    if not args.attest_reviewed:
+        print(
+            "error: --attest-reviewed is required; no script or AI may attest on a human's behalf",
+            file=sys.stderr,
+        )
+        return 2
+    action = (
+        ReviewAction.APPROVE
+        if args.approve
+        else ReviewAction.AMEND
+        if args.amend is not None
+        else ReviewAction.ABSTAIN
+    )
+    try:
+        amendment = load_amendment(args.amend) if args.amend is not None else None
+        decision = create_decision(
+            args.case,
+            action=action,
+            reviewer_id=args.reviewer_id,
+            reviewer_name=args.reviewer_name,
+            rationale=args.rationale,
+            attested=True,
+            amendment=amendment,
+            supersedes_decision_sha256=args.supersedes,
+            frozen_dir=args.frozen_dir,
+        )
+        path = write_decision(
+            decision,
+            review_dir=args.review_dir,
+            frozen_dir=args.frozen_dir,
+            replace_existing=args.replace,
+        )
+        manifest = build_review_manifest(
+            review_dir=args.review_dir,
+            frozen_dir=args.frozen_dir,
+        )
+        manifest_path = write_review_manifest(manifest, review_dir=args.review_dir)
+    except (ReviewValidationError, FileExistsError, FileNotFoundError, KeyError, TypeError, ValueError) as exc:
+        print(f"error: review decision was not recorded: {exc}", file=sys.stderr)
+        return 2
+    result = {
+        "case_id": decision.case_id,
+        "action": decision.action,
+        "decision_sha256": decision.decision_sha256,
+        "decision_path": str(path.resolve()),
+        "review_manifest": str(manifest_path.resolve()),
+        "headline_eligible": manifest["headline_eligible"],
+    }
+    if args.json:
+        print(json.dumps(result, sort_keys=True))
+    else:
+        print(f"Recorded      : {decision.action} for {decision.case_id}")
+        print(f"Decision hash : {decision.decision_sha256}")
+        print(f"Decision file : {path.resolve()}")
+        print(
+            f"Review status : {manifest['counts']['accepted']}/{manifest['counts']['expected']} accepted; "
+            f"headline eligible={'yes' if manifest['headline_eligible'] else 'no'}"
+        )
+    return 0
+
+
+def _print_review_status(manifest: dict, *, as_json: bool) -> None:
+    if as_json:
+        print(json.dumps(manifest, sort_keys=True))
+        return
+    counts = manifest["counts"]
+    print(
+        f"Review status : {counts['reviewed']}/{counts['expected']} reviewed, "
+        f"{counts['accepted']} accepted, {counts['abstained']} abstained, "
+        f"{counts['pending']} pending"
+    )
+    print(f"Complete      : {'yes' if manifest['review_complete'] else 'no'}")
+    print(f"Headline ready: {'yes' if manifest['headline_eligible'] else 'no'}")
+    for problem in manifest["problems"]:
+        print(f"  - {problem}")
+
+
+def _review_status(args: argparse.Namespace) -> int:
+    manifest = build_review_manifest(review_dir=args.review_dir, frozen_dir=args.frozen_dir)
+    if args.write_manifest:
+        write_review_manifest(manifest, review_dir=args.review_dir)
+    _print_review_status(manifest, as_json=args.json)
+    return 1 if manifest["problems"] else 0
+
+
+def _review_verify(args: argparse.Namespace) -> int:
+    manifest = build_review_manifest(review_dir=args.review_dir, frozen_dir=args.frozen_dir)
+    _print_review_status(manifest, as_json=args.json)
+    if manifest["problems"]:
+        return 1
+    if args.require_complete and not manifest["headline_eligible"]:
+        return 3
+    return 0
+
+
+def _benchmark_b1(args: argparse.Namespace) -> int:
+    try:
+        case_ids = _selected_case_ids(args)
+        spec = build_b1_spec(
+            provider=args.provider,
+            model=args.model,
+            run_index=args.run_index,
+            frozen_dir=args.frozen_dir,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"error: invalid B1 benchmark specification: {exc}", file=sys.stderr)
+        return 2
+    if args.replay and args.fresh:
+        print("error: --fresh is valid only with --live", file=sys.stderr)
+        return 2
+
+    shared_live_client: GeminiModelClient | None = None
+
+    def live_factory() -> GeminiModelClient:
+        nonlocal shared_live_client
+        if shared_live_client is None:
+            shared_live_client = build_gemini_client(
+                model=spec.model,
+                label=f"B1-run-{spec.run_index:02d}",
+                json_response_schema=B1_JSON_SCHEMA,
+            )
+        return shared_live_client
+
+    run = run_b1_benchmark(
+        case_ids,
+        spec,
+        mode=B1_MODE_LIVE if args.live else B1_MODE_REPLAY,
+        live_factory=live_factory if args.live else None,
+        cache_dir=args.cache_dir,
+        frozen_dir=args.frozen_dir,
+        fresh=args.fresh,
+    )
+    paths = write_b1_benchmark_artifacts(run, args.output)
+    summary = run.summary()
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "summary": summary,
+                    "failures": run.failures,
+                    "paths": {name: str(path.resolve()) for name, path in paths.items()},
+                },
+                sort_keys=True,
+            )
+        )
+    else:
+        usage = summary["usage"]
+        print(
+            f"B1 run       : {summary['completed_cases']}/{summary['requested_cases']} cases, "
+            f"{summary['failure_count']} failure(s)"
+        )
+        print(f"Spec hash    : {summary['spec_sha256']}")
+        print(f"Model        : {summary['provider']} / {summary['model']} / run {summary['run_index']}")
+        print(f"Cache        : {summary['cache_hits']} hits, {summary['cache_misses']} misses")
+        print(
+            f"Usage        : {usage['llm_calls']} calls, {usage['input_tokens']} in / "
+            f"{usage['output_tokens']} out, billed ${usage['cost_usd']:.4f}"
+        )
+        print(f"Artifacts    : {paths['summary'].parent.resolve()}")
+        for failure in run.failures:
+            print(f"  - {failure['case_id']}: {failure['error_type']}: {failure['message']}")
+    return 0 if run.complete else 1
+
+
+def _benchmark_report(args: argparse.Namespace) -> int:
+    try:
+        report = build_comparison_report_from_disk(
+            provider=args.provider,
+            model=args.model,
+            run_indices=tuple(args.run_indices or (0, 1, 2)),
+            allow_provisional=args.allow_provisional,
+            frozen_dir=args.frozen_dir,
+            review_dir=args.review_dir,
+            benchmark_dir=args.benchmark_dir,
+        )
+        paths = write_comparison_report(report, args.output)
+    except (BenchmarkReportError, FileNotFoundError, KeyError, TypeError, ValueError) as exc:
+        print(f"error: cannot build benchmark comparison: {exc}", file=sys.stderr)
+        return 2
+    summary = {
+        "label_mode": report["label_mode"],
+        "headline_eligible": report["headline_eligible"],
+        "case_count": report["dataset"]["case_count"],
+        "b1_run_count": report["b1"]["run_count"],
+        "b1_family_mean_accuracy": report["b1"]["metric_distribution"][
+            "family_mean_accuracy"
+        ],
+        "prooftrail_family_mean_accuracy": report["prooftrail"]["metric_values"][
+            "family_mean_accuracy"
+        ],
+        "b1_unanimous_rate": report["b1"]["stability"]["unanimous_rate"],
+        "b1_billed_cost_usd": report["b1"]["usage"]["billed_cost_usd"],
+        "paths": {name: str(path.resolve()) for name, path in paths.items()},
+    }
+    if args.json:
+        print(json.dumps(summary, sort_keys=True))
+    else:
+        status = "HEADLINE ELIGIBLE" if report["headline_eligible"] else "PROVISIONAL ONLY"
+        print(f"Comparison    : {status}")
+        print(
+            f"Cases / runs : {report['dataset']['case_count']} / "
+            f"{report['b1']['run_count']}"
+        )
+        b1_stats = report["b1"]["metric_distribution"]["family_mean_accuracy"]
+        print(
+            f"Family mean  : B1 {b1_stats['mean'] * 100:.1f}% ± "
+            f"{b1_stats['stddev'] * 100:.1f}% -> "
+            f"ProofTrail {report['prooftrail']['metric_values']['family_mean_accuracy'] * 100:.1f}%"
+        )
+        print(
+            f"B1 stability : {report['b1']['stability']['unanimous_rate'] * 100:.1f}% "
+            f"unanimous; billed ${report['b1']['usage']['billed_cost_usd']:.2f}"
+        )
+        print(f"Report       : {paths['markdown'].resolve()}")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "demo":
@@ -522,6 +937,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _replay(args)
     if args.command == "manifest":
         return _manifest(args)
+    if args.command == "review" and args.review_command == "pack":
+        return _review_pack(args)
+    if args.command == "review" and args.review_command == "draft":
+        return _review_draft(args)
+    if args.command == "review" and args.review_command == "decide":
+        return _review_decide(args)
+    if args.command == "review" and args.review_command == "status":
+        return _review_status(args)
+    if args.command == "review" and args.review_command == "verify":
+        return _review_verify(args)
+    if args.command == "benchmark" and args.benchmark_command == "b1":
+        return _benchmark_b1(args)
+    if args.command == "benchmark" and args.benchmark_command == "report":
+        return _benchmark_report(args)
     raise AssertionError(f"unhandled command {args.command}")
 
 

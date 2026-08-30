@@ -18,12 +18,18 @@ PROJECT_ROOT = PACKAGE_ROOT.parent
 DATA_DIR = PROJECT_ROOT / "data"
 FROZEN_DIR = DATA_DIR / "frozen"          # committed: one folder per case
 REPLAY_DIR = DATA_DIR / "replay"          # committed: cached LLM responses
+REVIEW_DIR = DATA_DIR / "reviews" / "v1"  # committed: explicit human decisions
+B1_REPLAY_DIR = REPLAY_DIR / "auditors" / "b1"
 STATE_DIR = DATA_DIR / "state"            # ignored: live SQLite files
 EVIDENCE_DIR = PROJECT_ROOT / "evidence" / "runs"
+REVIEW_PACK_DIR = PROJECT_ROOT / "evidence" / "review-pack-v1"
+BENCHMARK_DIR = EVIDENCE_DIR / "benchmark"
 
 # --------------------------------------------------------------------------- #
-# Model — ONE model for every role (agent, B0, B1, claim extractor).
-# Overridable only globally via PROOFTRAIL_MODEL to keep the comparison fair.
+# Legacy global model default used by the paid agent and the B1 contract.
+# The executable benchmark must replace implicit inheritance with an explicit
+# evaluation spec (provider, model and limits) before publishing any result.
+# The frozen v1 agent dataset itself records its real Gemini model per turn.
 # --------------------------------------------------------------------------- #
 DEFAULT_MODEL = "claude-opus-5"
 MODEL = os.environ.get("PROOFTRAIL_MODEL", DEFAULT_MODEL)
@@ -67,7 +73,9 @@ COST_LEDGER_PATH = REPLAY_DIR / "cost_ledger.jsonl"
 
 
 # --------------------------------------------------------------------------- #
-# Fairness constants — shared by B0, B1 and ProofTrail's LLM stage.
+# Auditor limits. B1 uses one model call. The current ProofTrail implementation
+# is fully deterministic and uses zero calls; a future LLM extractor must use
+# these same caps and be evaluated as a separately named ablation.
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class AuditorLimits:
@@ -75,9 +83,7 @@ class AuditorLimits:
 
     max_output_tokens: int = 4096
     effort: str = "high"
-    # Max LLM calls an auditor may make per case. B0/B1 are one-shot (1).
-    # ProofTrail uses exactly 1 as well: the claim extractor. The reconciler
-    # and temporal verifier are deterministic code and cost zero tokens.
+    # Maximum for any auditor configuration that uses an LLM. B1 is one-shot.
     max_llm_calls_per_case: int = 1
 
 

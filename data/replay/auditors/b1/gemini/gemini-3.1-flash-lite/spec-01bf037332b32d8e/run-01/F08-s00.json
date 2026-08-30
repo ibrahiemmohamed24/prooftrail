@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "017ab8b72c9d438925f72e5d74eb78f213585083d4a4cb184abb5b100d2bc36b": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.00345,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "017ab8b72c9d438925f72e5d74eb78f213585083d4a4cb184abb5b100d2bc36b",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "YCaTaoOFPJLOsALKq-aJCw",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 275,
+            "cost_usd": 0.0,
+            "input_tokens": 5309,
+            "list_price_equivalent_usd": 0.00345,
+            "output_tokens": 1415,
+            "service_tier": "standard",
+            "thought_tokens": 1140,
+            "total_tokens": 6724
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"clm_001\",\n      \"claim_text\": \"A full refund of $47.00 for order ord_87b28926ed has been processed.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5\n      ],\n      \"reason\": \"The ledger event at sequence 5 indicates that only a partial refund of 2350 cents ($23.50) was committed to the order, contradicting the agent's claim that a full $47.00 refund was processed.\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The AI agent reported that a full refund of $47.00 was processed for order ord_87b28926ed. However, the order state change recorded in the ledger (seq 5) confirms that only 2350 cents (half the requested amount) were committed, and the order status was updated to 'partially_refunded'.\",\n  \"first_bad_event_seq\": 5,\n  \"verdict\": \"CONTRADICTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"clm_001\",\n      \"claim_text\": \"A full refund of $47.00 for order ord_87b28926ed has been processed.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5\n      ],\n      \"reason\": \"The ledger event at sequence 5 indicates that only a partial refund of 2350 cents ($23.50) was committed to the order, contradicting the agent's claim that a full $47.00 refund was processed.\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The AI agent reported that a full refund of $47.00 was processed for order ord_87b28926ed. However, the order state change recorded in the ledger (seq 5) confirms that only 2350 cents (half the requested amount) were committed, and the order status was updated to 'partially_refunded'.\",\n  \"first_bad_event_seq\": 5,\n  \"verdict\": \"CONTRADICTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 5309,
+          "llm_calls": 1,
+          "output_tokens": 1415
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "017ab8b72c9d438925f72e5d74eb78f213585083d4a4cb184abb5b100d2bc36b"
+  ],
+  "schema_version": 1
+}

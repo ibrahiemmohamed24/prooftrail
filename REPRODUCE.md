@@ -115,12 +115,71 @@ replayed case differs from its frozen bundle. `manifest` exits non-zero until
 all 40 cases exist with valid hash chains, provisional labels, recorded usage
 and family-blind auditor views.
 
+## Prepare and verify human review
+
+Review tooling never edits `data/frozen/` and never approves a case in bulk:
+
+```powershell
+python -m prooftrail review pack --all
+python -m prooftrail review status
+python -m prooftrail review verify
+```
+
+The pack appears at `evidence/review-pack-v1/`. A named person must read each
+case and record one explicit decision as documented in
+`docs/HUMAN_REVIEW.md`. Accepted decisions live under
+`data/reviews/v1/decisions/`; the deterministic review manifest separates
+review-complete from headline-eligible so an honest `ABSTAIN` cannot be counted
+as a verified benchmark label.
+
+After all decisions are committed:
+
+```powershell
+python -m prooftrail review status --write-manifest
+python -m prooftrail review verify --require-complete
+```
+
+## Record and replay the fair B1 baseline
+
+B1 uses a separate cache namespace from the refund agent and an explicit spec
+for each run. With the Gemini Free Tier environment loaded as shown above:
+
+```powershell
+python -m prooftrail benchmark b1 --live --case F02-s00 --run-index 0
+0..2 | ForEach-Object {
+    python -m prooftrail benchmark b1 --live --all --run-index $_
+}
+Remove-Item Env:GEMINI_API_KEY -ErrorAction SilentlyContinue
+0..2 | ForEach-Object {
+    python -m prooftrail benchmark b1 --replay --all --run-index $_
+}
+
+# Explicit non-headline diagnostic while reviews are 0/40
+python -m prooftrail benchmark report --allow-provisional
+
+# After 40/40 accepted reviews, this produces the verified report.
+# Today it exits 2 rather than mislabelling provisional numbers as headline.
+python -m prooftrail benchmark report
+```
+
+The committed dataset already contains all three runs (120 accepted outputs).
+Each index has independent caches under
+`data/replay/auditors/b1/gemini/gemini-3.1-flash-lite/spec-<hash>/run-NN/`.
+The spec hash changes if the prompt, output schema, model, limits or dataset
+changes. Replay exits non-zero on a missing cache or malformed frozen output
+and never falls back to a live call. The comparison validates spec and artifact
+hashes, reports costs and repeat stability, and writes
+`evidence/runs/benchmark/comparison/comparison.provisional.{json,md}`.
+
 ## Honesty boundary
 
 `prooftrail demo` uses a class named `ScriptedModelClient` and records the mode
 as `scripted-offline-demo-not-a-real-llm-run`. The one-case 100% result proves
 the pipeline works; it is not the competition headline result. The real agent
 run and the 40 frozen traces are done (`data/frozen/`, Gemini Free Tier, billed
-$0.00, replayable with no key). What remains before any headline number is
-human verification of the provisional labels and the B1 run over the
-byte-identical trace-plus-ledger inputs.
+$0.00, replayable with no key). Three B1 runs over the byte-identical
+trace-plus-ledger inputs are also done and replayable with no key. Their
+85.0% ± 2.04 pp → 100% comparison is deliberately marked provisional and
+`headline_eligible: false`. What remains before any headline number is human
+verification of the labels: tooling and repeated model outputs cannot attest
+on a reviewer's behalf, and the current decision count is still 0/40.
