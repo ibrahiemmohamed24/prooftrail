@@ -2,88 +2,34 @@
 
 **Evidence-linked auditing of what an AI agent *says* it did versus what the ledger *proves* it did.**
 
-> Status: repeated same-evidence evaluation is complete (85 / 100 of the submission plan).
-> The $47 → $94 path runs end to end: stateful tools, trace recording, ledger reconciliation,
-> first-bad-event detection, certificates, fair-baseline contract, metrics and CLI. A paid
-> Anthropic adapter (budget guard, prompt hashing) and a zero-billed Gemini Free Tier adapter
-> use the same provider-namespaced replay mechanism. **All 40 real-model traces are frozen in
-> `data/frozen/` (Gemini Free Tier, `gemini-3.1-flash-lite`, billed $0.00) and replay with no
-> key. Three independent B1 runs (120 accepted outputs) are also committed and replay
-> with no key; 212 tests pass, none of them touch the network.** The provisional diagnostic
-> reports B1 at 85.0% ± 2.04 pp family-mean accuracy versus ProofTrail at 100%, but is
-> machine-marked `headline_eligible: false`. Human label verification and final competition
-> assets are still pending. See
-> [PROJECT_STATUS.md](PROJECT_STATUS.md) for the stable scoring model and handoff target.
+> Same evidence. Independent truth. Frozen traces.
 
----
+## The result
 
-## Who this is for, and what hurts
+<!-- UPDATE-AFTER-VERIFIED-REPORT: replace this block with the outcome table from
+     evidence/runs/benchmark/comparison/comparison.verified.md once
+     `python -m prooftrail review verify --require-complete` passes. -->
 
-**Intended user:** the engineer or support lead who owns a tool-using agent that performs
-irreversible actions (refunds, cancellations, account changes) and who today reads agent
-transcripts by hand to answer one question: *"did it actually do what it claims?"*
+**Verified result: not yet available.** Human review of the 40 labels is
+`0/40` (`python -m prooftrail review status`), and the benchmark report refuses
+verified mode until every case carries an accepted human decision.
 
-**Bottleneck:** an agent's final message is written by the same model that may have been
-lied to by a flaky tool, timed out mid-commit, or retried blindly. Reading the transcript
-tells you what the agent *believed*. Only the system of record tells you what *happened*.
-Today reconciling the two is a manual, per-case job — and the worst cases (double refund
-after a post-commit timeout) look completely normal in the transcript.
+What is already committed and replays with **no API key**:
 
-**Value:** a verdict per report (`SUPPORTED` / `CONTRADICTED` / `UNVERIFIABLE`) with every
-claim linked to the ledger events that support or contradict it, plus the **first event where
-things went wrong** — so the human reviews one event instead of one transcript.
+- 40 real traces of a tool-using refund agent (`gemini-3.1-flash-lite`, Gemini
+  Free Tier, billed **$0.00**), frozen in `data/frozen/`;
+- three independent runs of the fair one-shot LLM baseline **B1** over the same
+  evidence (120 accepted outputs, billed $0.00);
+- a provisional diagnostic, machine-marked `headline_eligible: false`, in which
+  B1 scores 85.0% ± 2.04 pp family-mean accuracy and deterministic ProofTrail
+  agrees with all 40 ledger-derived provisional labels at zero model cost. This
+  is a diagnostic, not a result: the labels are not human-reviewed yet.
 
----
-
-## The idea in one diagram
-
-```
-Real LLM Refund Agent ──► Mock Tools ──► SQLite State + Append-only Ledger
-                                                   │
-                    Frozen Trace + Same Raw Ledger ◄┘
-                    ├── B1  (fair baseline): one-shot LLM sees trace + ledger
-                    └── ProofTrail: deterministic claim extraction (LLM-backed extractor planned)
-                                    → deterministic reconciliation + temporal/intent verification
-                                    → evidence certificate
-```
-
-Three rules that make the comparison worth anything:
-
-1. **Same evidence** — B1 and ProofTrail receive the same frozen trace + ledger
-   (byte-identical input, same schema). B1's three explicit specs pin the provider,
-   model, caps, prompt/schema hashes, run index and dataset-manifest hash.
-2. **Independent truth** — labels come from the ledger, never from any model's opinion.
-3. **Frozen traces** — the agent runs once; every evaluation replays. Judges need no API key.
-
----
-
-## Quickstart — zero API calls
-
-PowerShell / VS Code terminal:
+## The killer case in five seconds
 
 ```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
-python -m pytest
-
-# See all 10 scenario families
-python -m prooftrail cases
-
-# Run the killer case and write a review certificate
 python -m prooftrail demo
-
-# Score the provisional demo and write metrics/report files
-python -m prooftrail eval-demo
 ```
-
-The main artifact is written to:
-
-```text
-evidence/runs/demo-f02/certificate.md
-```
-
-Expected terminal result:
 
 ```text
 Agent claimed : I refunded $47.00 for order ord_82efdfe20a.
@@ -93,213 +39,181 @@ First bad     : ledger event #6
 Hash chain    : valid
 ```
 
-This command deliberately uses `ScriptedModelClient`, a deterministic offline
-fixture. It proves the integration and replay path; it is **not** reported as
-evidence of real-model behaviour. Live LLM traces are generated with the
-command below and frozen once, after which judges replay them with no key.
+The timeout is **not** the bad event — the first refund had already committed.
+The first harmful action is the second `state_changed` under the same intent,
+event #6. ProofTrail hands a reviewer that one event instead of a transcript.
 
----
+This command runs `ScriptedModelClient`, a deterministic offline fixture, and
+records `mode: scripted-offline-demo-not-a-real-llm-run`. It shows the failure
+shape; it is not real-model evidence. The real F02 traces are different — see
+[docs/TRAJECTORIES.md](docs/TRAJECTORIES.md): the real agent called
+`list_refunds` after the timeout and did **not** double-refund.
 
-## Live run — one real-model case, then replay it for free
+## The problem
 
-```powershell
-python -m pip install -e ".[dev,live]"     # adds the anthropic SDK
-$env:ANTHROPIC_API_KEY = "<your key>"      # never committed; read from the environment only
-$env:PROOFTRAIL_BUDGET_USD = "30"          # hard spend ceiling across ALL live runs
+The engineer or support lead who owns an agent that performs irreversible
+actions (refunds, cancellations, account changes) reads transcripts to answer
+one question: *did it actually do what it claims?* The transcript records what
+the agent *believed*. Only the system of record says what *happened* — and the
+worst cases (a double refund after a post-commit timeout, a tool that says
+`ok: true` and commits nothing) look completely normal in the transcript.
 
-python -m prooftrail agent run --live --fresh --family F02 --seed 0   # record a NEW trace
-python -m prooftrail agent run --replay --family F02 --seed 0          # no key, no network
+ProofTrail returns a verdict per report — `SUPPORTED` / `CONTRADICTED` /
+`UNVERIFIABLE` — with every material claim linked to the ledger events that
+support or contradict it, and the first event where things went wrong.
+
+## One diagram
+
+```text
+Real LLM refund agent ──► mock refund tools ──► SQLite state + append-only hash-chained ledger
+                                                          │
+                              frozen trace + raw ledger ◄─┘   (family / seed / case id stripped)
+                              ├── B1  fair baseline: one-shot LLM judges the same evidence (3 runs)
+                              └── ProofTrail: deterministic claim extraction → evidence linking
+                                              → state reconciliation → temporal verification
+                                              → evidence certificate  (0 model calls)
+                                                          │
+                              ledger-derived provisional label ──► explicit human decision ──► benchmark truth
 ```
 
-`--fresh` discards `data/replay/F02-s00.json` before recording. Without it a live
-run first serves every prompt it already has in that cache and only calls the API
-for prompts it has not seen — useful to resume an interrupted recording cheaply,
-but it means the result is a continuation of the earlier trace, not a fresh
-sample of model behaviour. A cache recorded with a different model is refused
-before any request is sent.
+Three rules: **same evidence** (B1 and ProofTrail get the identical
+`auditor_view`), **independent truth** (labels come from the ledger, then from a
+named human, never from any model), **frozen traces** (the agent runs once;
+everything else replays).
 
-What a live run records, per assistant turn, inside `evidence/runs/live/<case>/case.json`:
-
-| Field | Where |
-|---|---|
-| model name | `trace.model`, `messages[].provider.model` |
-| prompt hash (sha256 of model + transcript + tools + caps) | `messages[].provider.prompt_sha256` |
-| input / output / cache tokens and USD cost | `messages[].provider.usage`, summed in `trace.usage` |
-| stop reason (`tool_use`, `end_turn`, `max_tokens`, `refusal`) | `messages[].provider.stop_reason` |
-| provider tool-call ids and verbatim content blocks (thinking included) | `messages[].tool_calls[].provider_call_id`, `messages[].provider_content` |
-
-Freezing the dataset uses the same machinery for all 40 cases. The committed
-dataset in `data/frozen/` was recorded on the Gemini Free Tier
-(`gemini-3.1-flash-lite`, billed $0.00), so its caches live in
-`data/replay/gemini/` and the judge commands need `--provider gemini`:
+## Quickstart — zero API calls
 
 ```powershell
-python -m prooftrail replay --provider gemini --all                 # judges: no key, no network
-python -m prooftrail manifest --provider gemini                     # 40/40 + invariants
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+python -m pytest                                      # 212 passed, no network
+python -m prooftrail demo                             # scripted killer case
+python -m prooftrail replay --provider gemini --all   # 40 real traces, byte-for-byte, no key
+python -m prooftrail manifest --provider gemini       # 40/40, invariants
 ```
 
-Recording a fresh dataset (either provider; a dataset never mixes providers or models):
+macOS/Linux: `python3 -m venv .venv && . .venv/bin/activate`, same commands.
+Full judge walkthrough with expected outputs: [docs/JUDGE_CHECKLIST.md](docs/JUDGE_CHECKLIST.md).
 
-```powershell
-python -m prooftrail freeze --live --provider gemini --case F02-s00,F03-s00,F10-s00   # smoke first
-python -m prooftrail freeze --live --provider gemini --all --skip-frozen              # then everything, resumable
-python -m prooftrail freeze --live --case F02-s00,F03-s00,F10-s00                    # paid Anthropic route, budget-guarded
-```
+## Comparison — same evidence, three B1 runs
 
-Guard rails: the `BudgetGuard` refuses any call whose worst-case cost would push
-the cumulative spend in `data/replay/cost_ledger.jsonl` past `PROOFTRAIL_BUDGET_USD`
-(worst case = every UTF-8 byte of the request counted as an input token, the full
-output cap, and every retry attempt billed; models without a configured price are refused);
-transient network / 429 / 5xx failures are retried at most three times, and a retry
-only re-sends the model request — tool actions are never re-executed. Every live
-response is written to `data/replay/<case>.json` keyed by prompt hash, so `--replay`
-reproduces the identical trace with zero API calls and fails loudly on any divergence.
+<!-- UPDATE-AFTER-VERIFIED-REPORT: replace with comparison.verified.md outcome table. -->
 
-### Zero-billed real calls with Gemini Free Tier
+**Verified table: pending human review.** The provisional diagnostic below is
+reproduced for transparency only; every label in it is ledger-derived and
+`verified_by_human: false`.
 
-The competition does not require a paid provider. ProofTrail can record the same
-real tool-using agent loop with Google's documented Gemini Free Tier. The selected
-Gemini 3.1 Flash Lite route supports the structured-output request used here,
-and Egypt is an available region. The free
-tier bills input and output tokens at USD 0, subject to the active project's
-rate limits. Free-tier content may be used by Google to improve its products,
-so this path is restricted to ProofTrail's synthetic benchmark data.
+| Auditor (provisional labels — not headline) | Family-mean accuracy | Macro-F1 | First-bad hit rate | Evidence coverage | Model calls |
+|---|---:|---:|---:|---:|---:|
+| B1 one-shot LLM, 3-run mean ± SD | 85.0% ± 2.0% | 86.5% ± 1.4% | 66.7% ± 7.8% | 86.1% ± 1.1% | 1 / case |
+| ProofTrail (deterministic) | 100.0% | 100.0% | 100.0% | 81.5% | 0 |
 
-Create a key in [Google AI Studio](https://aistudio.google.com/apikey) and check
-that its **Plan** column says **Free**. Do not enable billing and do not paste the
-key into this repository or a chat. In PowerShell:
+- B1 verdict unanimity across runs: 35/40. It is wrong in **all three runs** on
+  every F04 case (phantom success: it trusts `tool_call_completed{ok:true}`
+  over an empty ledger) and flips verdict on F06-s00/s01/s03 and F07-s02/s03.
+- Disabling ProofTrail's temporal verifier changes **0** verdicts on this
+  dataset. We report that as a negative result; no gain is claimed for it.
+- ProofTrail's 40/40 is a consistency check against labels derived from the
+  same ledger until the human review lands.
 
-```powershell
-$geminiSecret = Read-Host "Gemini API key" -AsSecureString
-$env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new("", $geminiSecret).Password
-$env:PROOFTRAIL_GEMINI_FREE_TIER = "1"
-$env:PROOFTRAIL_MODEL = "gemini-3.1-flash-lite"
+Regenerate: `python -m prooftrail benchmark report --allow-provisional`
+(diagnostic) or `python -m prooftrail benchmark report` (verified; fails by
+design until the review is complete).
 
-python -m prooftrail agent run --live --provider gemini --family F02 --seed 0 --fresh
-Remove-Item Env:GEMINI_API_KEY
-python -m prooftrail agent run --replay --provider gemini --family F02 --seed 0
-```
+## Cost
 
-The REST adapter has no third-party dependency. It records model version,
-prompt hash, provider function-call IDs, token usage, stop reason and Gemini 3
-thought signatures. `cost_usd` is the billed Free Tier amount (`0.0`); provider
-metadata also records a paid-tier list-price equivalent so the report does not
-hide the economic value of the calls. Requests are paced and replay caches make
-a quota-interrupted 40-case recording resumable. See Google's official
-[pricing](https://ai.google.dev/gemini-api/docs/pricing),
-[function-calling guide](https://ai.google.dev/gemini-api/docs/function-calling),
-and [available regions](https://ai.google.dev/gemini-api/docs/available-regions).
+| Item | Billed | List-price equivalent |
+|---|---:|---:|
+| Agent: 40 cases, 175 calls, 142,227 in / 16,950 out tokens | $0.00 | $0.061 |
+| B1: 3 × 40 predictions, 891,687 in / 190,214 out tokens | $0.00 | $0.508 ($0.004235 per prediction) |
+| ProofTrail: 40 audits | $0.00 | $0.00 (no model calls) |
 
-### Source-bound human review (no auto-approval)
+All recording used the Gemini Free Tier on synthetic data; list prices are
+recorded per call so the economic value is not hidden. Human review time will be
+recorded in a time log during the review, never estimated; see
+[docs/HUMAN_REVIEW_RESULTS.md](docs/HUMAN_REVIEW_RESULTS.md) (pending).
 
-The frozen files stay byte-identical during review. Generate a reviewer pack
-from the raw trace, tool calls and ledger:
+## Review integrity
 
-```powershell
-python -m prooftrail review pack --all
-python -m prooftrail review status
-```
+- `labels.provisional.json` is derived from the ledger and always says
+  `verified_by_human: false`; it is never edited.
+- A named person records one decision per case —
+  `python -m prooftrail review decide --case F04-s00 --approve|--amend|--abstain … --attest-reviewed` —
+  bound by SHA-256 to the dataset manifest, frozen case, provisional label,
+  exact review material and ledger tip. There is no `--all`.
+- `ABSTAIN` is honest and valid; it removes the case from any headline.
+- `python -m prooftrail benchmark report` refuses verified mode until
+  `review verify --require-complete` passes. No AI, script or author may
+  attest for the reviewer. Procedure: [docs/HUMAN_REVIEW.md](docs/HUMAN_REVIEW.md);
+  reading aid: [docs/REVIEW_FOCUS_v1.md](docs/REVIEW_FOCUS_v1.md).
 
-Each case must then receive an explicit human `APPROVE`, `AMEND` or `ABSTAIN`
-decision. Decisions bind the dataset manifest, case, provisional label, exact
-review material and ledger tip by SHA-256. There is deliberately no bulk
-approval command, and headline evaluation loads only accepted decisions whose
-source and decision hashes still validate. See
-[docs/HUMAN_REVIEW.md](docs/HUMAN_REVIEW.md) for the reviewer procedure.
+## Architecture
 
-### Fair B1 baseline (record once, replay without a key)
-
-B1 sees the same family-blind frozen trace and raw ledger as ProofTrail. Its
-provider, model, limits, system-prompt hash, run index and dataset-manifest hash
-are written to `spec.json`; nothing is inherited silently from the agent run.
-
-```powershell
-# With the confirmed Gemini Free Tier key loaded: one smoke case first
-python -m prooftrail benchmark b1 --live --case F02-s00 --run-index 0
-
-# Then three independent full runs; resumable because cached cases do not call the provider
-0..2 | ForEach-Object {
-    python -m prooftrail benchmark b1 --live --all --run-index $_
-}
-
-# Judge path: the same 120 B1 outputs, no key and no network
-Remove-Item Env:GEMINI_API_KEY -ErrorAction SilentlyContinue
-0..2 | ForEach-Object {
-    python -m prooftrail benchmark b1 --replay --all --run-index $_
-}
-
-# Offline comparison. Explicitly provisional until human review is complete.
-python -m prooftrail benchmark report --allow-provisional
-```
-
-The strict adapter requests JSON and rejects malformed output, unknown fields,
-nonexistent evidence IDs and aggregate-verdict mismatches instead of repairing
-them. The committed report validates each run's spec and artifact hashes before
-scoring, discloses repeat stability and cost, and refuses verified/headline mode
-while the source-bound review manifest remains 0/40 accepted.
-
----
-
-## What exists right now
-
-| Area | Files | Tested |
+| Layer | Where | LLM? |
 |---|---|---|
-| Contracts | `schemas/{events,trace,verdict,review}.py` | ✅ |
-| Identity model | `ids.py` — intent / tool_call / transaction / idempotency | ✅ |
-| Environment | Stateful refund tools + six fault modes + atomic state/ledger commit | ✅ |
-| Scenarios | 10 families, deterministic seed data, generator, provisional ground truth | ✅ |
-| Agent | Provider-neutral tool loop, trace recorder and explicit offline replay client | ✅ |
-| ProofTrail | Claims → evidence → reconciliation → temporal verifier → certificate | ✅ |
-| Fair baseline | B1 one-call runner sees the same trace + ledger and fails closed | ✅ 3×40 real B1 outputs, separate specs/caches, no-key replay and artifact hashes |
-| Evaluation | Family weighting, Macro-F1, first-bad hit rate, coverage, reports | ✅ |
-| Reproduction | CLI demo + JSON/Markdown evidence + secret scan | ✅ offline milestone |
-| Live providers | Anthropic paid adapter or Gemini Free Tier REST adapter + prompt-hash replay | ✅ offline provider tests; 40 real traces frozen (Gemini Free Tier, $0.00) |
-| Human review | Source-bound packs, per-case decisions, stale/tamper checks, reviewed-truth loader | ✅ tooling; ⏳ real human decisions 0/40 |
-| Live benchmark | 40 frozen traces, human-approved labels, repeats | ✅ traces 40/40 + B1 repeats 3×40; ⏳ human labels 0/40 |
+| Stateful world, fault injection, atomic state + ledger commit | `prooftrail/env/` | no |
+| Ten scenario families, deterministic seeds, provisional truth | `prooftrail/scenarios/` | no |
+| Refund agent loop, Anthropic (paid, budget-guarded) and Gemini (free) adapters, prompt-hash replay | `prooftrail/agent/` | yes — data creation only |
+| Freeze / replay / manifest integrity | `prooftrail/freeze.py` | no |
+| B1 one-shot baseline, strict JSON, explicit spec per run, fail-closed | `prooftrail/baselines/`, `prooftrail/benchmark.py` | yes |
+| ProofTrail: deterministic extractor → linker → reconciler → temporal verifier → certificate | `prooftrail/auditor/` | **no** |
+| Family-balanced metrics, hash-validated comparison, ablation | `prooftrail/eval/`, `prooftrail/benchmark_report.py` | no |
+| Source-bound human review packs, decisions, manifest | `prooftrail/review.py` | no |
 
-Run `pytest` from this folder.
+ProofTrail's claim extractor is deterministic and refund-domain specific. An
+LLM-backed extractor is a planned ablation, not part of any reported number.
+Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
----
+## Limitations
 
-## Evaluation design (what the tables will contain)
+- Synthetic refund domain; nothing here transfers to other domains untested.
+- One provider and one model (`gemini-3.1-flash-lite`) for both agent and B1.
+- The deterministic claim extractor is narrow; unfamiliar phrasing surfaces as
+  `UNVERIFIABLE`, not as a confident verdict.
+- The temporal verifier showed no measured gain on dataset v1.
+- Single, author-affiliated reviewer; no inter-annotator agreement.
+- Human time *with vs without* ProofTrail was not measured and is not claimed.
 
-* **Primary metric:** verdict accuracy, averaged *per family* then across families (unweighted),
-  so no family can dominate. Macro-F1 over all instances reported alongside.
-* **Secondary:** first-bad-event hit rate, evidence coverage (claims with ≥1 cited event).
-* **Required rows:** primary outcome · human time per task · cost per task — for B0, B1, ProofTrail.
-* **Cases:** 10 families × 4 seeds = 40 instances, with provisional ledger-derived labels; human review pending.
-* **Repeats:** every LLM-dependent number is mean ± spread over 3 runs.
+## Demo video
 
-See [docs/SCENARIO_FAMILIES.md](docs/SCENARIO_FAMILIES.md).
+<!-- UPDATE-AFTER-VERIFIED-REPORT: add the link. -->
 
----
+Link: **to be added by the authors after the verified report exists** — script
+and recording rules in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
 
-## Improvement Changelog
+## Reproduction
 
-_Entries are appended after every eval iteration. None yet — the harness comes before the solution._
+[REPRODUCE.md](REPRODUCE.md) covers the offline path, recording a new dataset
+on either provider, freezing, B1 runs and the clean-clone verification list.
+Recording is optional: every number in this repository replays from committed
+caches without a key. Keys, when used, are read from the environment only;
+`scripts/check_no_secrets.py` runs in CI.
+
+## Repository map
+
+```text
+prooftrail/              package (stdlib-only core; the Anthropic SDK is optional, for --live)
+data/frozen/<case>/      40 immutable real-model cases + provisional labels + manifest
+data/replay/gemini/      agent response caches (prompt-hash keyed)
+data/replay/auditors/    three B1 cache namespaces (spec-hashed)
+data/reviews/v1/         human decisions, review manifest, time log
+evidence/runs/           demo bundle, live smoke bundle, B1 run artifacts, comparison reports
+docs/                    ARCHITECTURE, SCENARIO_FAMILIES, HUMAN_REVIEW, HUMAN_REVIEW_RESULTS,
+                         REVIEW_FOCUS_v1, SUBMISSION_REPORT, TRAJECTORIES, DEMO_SCRIPT, JUDGE_CHECKLIST
+scripts/                 check_no_secrets.py, gen_review_focus.py
+tests/                   212 offline tests (mock transports; no network)
+PROJECT_STATUS.md        scoring model and earned points; CHANGELOG.md evidence-backed rows
+```
+
+## Improvement changelog (historical; provisional rows stay labelled)
 
 | # | Date | Change | Family-mean acc. (B1 → PT) | Notes |
 |---|---|---|---|---|
 | 0 | 2026-08-28 | Foundation: schemas, SQLite state, hash-chained ledger, families | — | No end-to-end path |
-| 1 | 2026-08-28 | Atomic tools + agent replay + deterministic auditor + certificate + CLI | Pending real B1 run | F02 demo detects event #6; provisional only |
-| 2 | 2026-08-29 | Three real B1 repeats + strict offline comparison + no-temporal ablation | 85.0% ± 2.04 pp → 100% | **Provisional only**; verified mode refuses 0/40 human labels |
+| 1 | 2026-08-28 | Atomic tools + agent replay + deterministic auditor + certificate + CLI | — | F02 demo detects event #6; scripted fixture |
+| 2 | 2026-08-29 | 40 real traces frozen (Gemini Free Tier, $0.00) | — | replay 40/40 without a key |
+| 3 | 2026-08-30 | Three real B1 repeats + strict offline comparison + no-temporal ablation | 85.0% ± 2.04 pp → 100% | **Provisional only**; `headline_eligible: false` |
+| 4 | — | Human review of all 40 labels → verified report | *pending* | fills the tables above |
 
----
-
-## Main observed failure mode & hot take
-
-In the offline integration run, the timeout is **not** the bad event. The first
-refund had already committed, so the first harmful action is the second
-`STATE_CHANGED` under the same intent at event #6. Treating every timeout retry
-as wrong would also misclassify F03; treating every repeated call as wrong would
-misclassify F10's idempotent replay.
-
-The provisional hot take is that an LLM does not need to perform arithmetic or
-state reconciliation. Across three same-evidence runs, B1 reaches 85.0% ± 2.04 pp
-family-mean accuracy and changes verdict on 5/40 cases, while deterministic
-ProofTrail agrees with all 40 provisional ledger-derived labels at zero model cost.
-That is a diagnostic, not a headline result: the labels still need human review.
-The ablation is also deliberately unflattering to our own design—disabling the
-temporal verifier changes no verdict or first-bad localization on this dataset,
-because amount/count/state reconciliation already catches these cases. We claim
-no measured temporal-verifier gain until a dataset exposes one.
+License: MIT.

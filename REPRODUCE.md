@@ -183,3 +183,47 @@ trace-plus-ledger inputs are also done and replayable with no key. Their
 `headline_eligible: false`. What remains before any headline number is human
 verification of the labels: tooling and repeated model outputs cannot attest
 on a reviewer's behalf, and the current decision count is still 0/40.
+
+## Final verification from a clean clone (no key)
+
+Run this from `git archive` output or a fresh `git clone`, never only from a
+working tree that may hold uncommitted files. No `GEMINI_API_KEY` or
+`ANTHROPIC_API_KEY` may be present in the environment.
+
+```powershell
+python -m pip install -e ".[dev]"
+python -m pytest                                      # 212 passed
+python -m prooftrail demo --json                      # CONTRADICTED, first bad event 6, scripted mode
+python -m prooftrail replay --provider gemini --all   # Replayed 40/40 cases with no API key; 0 failure(s).
+python -m prooftrail manifest --provider gemini       # 40/40 cases frozen, every invariant yes
+
+0..2 | ForEach-Object {
+    python -m prooftrail benchmark b1 --replay --all `
+        --provider gemini `
+        --model gemini-3.1-flash-lite `
+        --run-index $_ `
+        --json
+    if ($LASTEXITCODE -ne 0) { throw "B1 replay run $_ failed" }
+}
+
+python -m prooftrail review verify --require-complete
+python -m prooftrail benchmark report --json
+python scripts/check_no_secrets.py
+git diff --check
+```
+
+Before the human review is complete, `review verify --require-complete` and
+`benchmark report` exit non-zero **by design** (`human-reviewed truth is not
+headline eligible`); everything else must pass. After 40/40 accepted decisions
+they succeed and `benchmark report` writes
+`evidence/runs/benchmark/comparison/comparison.verified.{json,md}` with
+`label_mode: verified` and `headline_eligible: true`.
+
+Also check that the committed reports and docs contain no absolute local path
+and no credential:
+
+```powershell
+git grep -n -E "C:\\Users|/home/[a-z]" -- docs README.md REPRODUCE.md PROJECT_STATUS.md evidence/runs/benchmark/comparison
+```
+
+That command must print nothing.

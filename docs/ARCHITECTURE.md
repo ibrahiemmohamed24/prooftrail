@@ -2,9 +2,10 @@
 
 > Same evidence. Independent truth. Frozen traces.
 
-This document describes the code that exists at the 75/100 milestone plus the
-human-review tooling being built on `feat/verified-benchmark`. It deliberately
-separates implemented paths from planned benchmark work.
+This document describes the code that exists at the 85/100 milestone
+(`feat/verified-benchmark`, closing on `feat/final-submission`). It deliberately
+separates implemented paths from planned work; nothing described as planned is
+part of any reported number.
 
 ## End-to-end data flow
 
@@ -165,7 +166,17 @@ data/
 docs/
 ├── ARCHITECTURE.md         this file
 ├── HUMAN_REVIEW.md         reviewer procedure and attestation boundary
-└── SCENARIO_FAMILIES.md    pressure conditions and controls
+├── HUMAN_REVIEW_RESULTS.md reviewer identity, counts, measured time (filled by the reviewer)
+├── REVIEW_FOCUS_v1.md      generated per-case reading aid; records no decision
+├── SCENARIO_FAMILIES.md    pressure conditions and controls
+├── SUBMISSION_REPORT.md    final write-up; verified metrics only, limitations first
+├── TRAJECTORIES.md         seven real traces walked event by event
+├── DEMO_SCRIPT.md          2:30 video script and recording rules
+└── JUDGE_CHECKLIST.md      15-minute offline verification with expected outputs
+
+scripts/
+├── check_no_secrets.py     credential-shaped string scan (CI and pre-merge)
+└── gen_review_focus.py     deterministic generator for docs/REVIEW_FOCUS_v1.md
 ```
 
 ## Remaining work from 85 to 95
@@ -180,3 +191,11 @@ docs/
 
 Final submission media and any optional evidence viewer belong after the
 verified benchmark, not before it.
+
+## Closing branch: what exists before the review
+
+`feat/final-submission` adds only documents, templates and a deterministic
+generator; it changes no code path, no frozen data and no B1 artifact. The
+review decisions themselves, the verified comparison, the measured review time
+and the demo video are the remaining inputs for 95 and 100 and cannot be
+produced by tooling.
