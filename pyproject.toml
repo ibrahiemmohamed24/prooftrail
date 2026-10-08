@@ -28,6 +28,9 @@ prooftrail = "prooftrail.cli:main"
 where = ["."]
 include = ["prooftrail*"]
 
+[tool.setuptools.package-data]
+"prooftrail.ui" = ["assets/*", "assets/fonts/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q -p no:cacheprovider"

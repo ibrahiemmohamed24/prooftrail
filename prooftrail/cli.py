@@ -71,6 +71,8 @@ from .review import (
 )
 from .scenarios import FAMILIES, FAMILY_IDS
 from .schemas import ReviewAction
+from .ui import DEFAULT_UI_DIR, build_ui
+from .ui.model import COMPARISON_PATH
 
 
 DEFAULT_DEMO_DIR = EVIDENCE_DIR / "demo-f02"
@@ -285,6 +287,18 @@ def _parser() -> argparse.ArgumentParser:
     report.add_argument("--benchmark-dir", type=Path, default=BENCHMARK_DIR)
     report.add_argument("--output", type=Path, default=DEFAULT_COMPARISON_DIR)
     report.add_argument("--json", action="store_true")
+
+    ui = commands.add_parser("ui", help="build the static, offline UI over the frozen evidence")
+    ui_commands = ui.add_subparsers(dest="ui_command", required=True)
+    ui_build_parser = ui_commands.add_parser(
+        "build",
+        help="write evidence/ui/*.html from data/frozen and the verified comparison; no network",
+    )
+    ui_build_parser.add_argument("--output", type=Path, default=DEFAULT_UI_DIR)
+    ui_build_parser.add_argument("--frozen-dir", type=Path, default=FROZEN_DIR)
+    ui_build_parser.add_argument("--review-dir", type=Path, default=REVIEW_DIR)
+    ui_build_parser.add_argument("--comparison", type=Path, default=COMPARISON_PATH)
+    ui_build_parser.add_argument("--json", action="store_true")
     return parser
 
 
@@ -921,6 +935,23 @@ def _benchmark_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def _ui_build(args: argparse.Namespace) -> int:
+    written = build_ui(
+        args.output,
+        frozen_dir=args.frozen_dir,
+        review_dir=args.review_dir,
+        comparison_path=args.comparison,
+    )
+    index = Path(args.output) / "index.html"
+    if args.json:
+        print(json.dumps({"files": len(written), "index": str(index.resolve())}, sort_keys=True))
+    else:
+        print(f"UI written    : {Path(args.output).resolve()}")
+        print(f"Files         : {len(written)}")
+        print(f"Open          : {index.resolve()}")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "demo":
@@ -951,6 +982,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _benchmark_b1(args)
     if args.command == "benchmark" and args.benchmark_command == "report":
         return _benchmark_report(args)
+    if args.command == "ui" and args.ui_command == "build":
+        return _ui_build(args)
     raise AssertionError(f"unhandled command {args.command}")
 
 

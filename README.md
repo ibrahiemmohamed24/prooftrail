@@ -96,6 +96,17 @@ python -m prooftrail manifest --provider gemini       # 40/40, invariants
 macOS/Linux: `python3 -m venv .venv && . .venv/bin/activate`, same commands.
 Full judge walkthrough with expected outputs: [docs/JUDGE_CHECKLIST.md](docs/JUDGE_CHECKLIST.md).
 
+## Browse the evidence in a browser — zero network
+
+```powershell
+python -m prooftrail ui build
+```
+
+Writes `evidence/ui/index.html`: the overview, a case list, and for each of the 40 cases a
+case page (AGENT SAID, LEDGER PROVED and the evidence inspector) plus a printable Evidence
+Certificate. Everything is rebuilt from the committed `data/` and `evidence/` files, with no
+network and no model calls.
+
 ## Comparison — same evidence, three B1 runs
 
 The table below is rendered from
