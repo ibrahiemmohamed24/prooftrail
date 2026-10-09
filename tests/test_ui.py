@@ -7,6 +7,8 @@ from prooftrail.ui import build_ui
 from prooftrail.ui import render
 from prooftrail.ui.build import ASSET_DIR
 from prooftrail.ui.model import COMPARISON_PATH, CaseView, load_site
+from prooftrail.ui.model import load_case
+from prooftrail.config import FROZEN_DIR
 
 HEX_COLOR = re.compile(r"#[0-9a-fA-F]{3,8}\b")
 ROOT_BLOCK = re.compile(r":root\s*\{.*?\}", re.S)
@@ -28,7 +30,12 @@ def test_build_writes_every_page_and_asset(tmp_path):
     for name in ("prooftrail.css", "fonts.css", "app.js", "fonts/SpaceGrotesk-latin.woff2"):
         assert (tmp_path / "assets" / name).is_file()
     asset_count = sum(1 for path in ASSET_DIR.rglob("*") if path.is_file() and "__pycache__" not in path.parts)
-    assert len(written) == 2 + 2 * len(case_ids) + asset_count
+    assert len(written) == 2 + 4 * len(case_ids) + asset_count
+    for case_id in case_ids:
+        for suffix in ("json", "md"):
+            exported = tmp_path / "certificates" / f"{case_id}.{suffix}"
+            source = FROZEN_DIR / case_id / f"certificate.{suffix}"
+            assert exported.read_bytes() == source.read_bytes()
 
 
 def test_build_is_byte_for_byte_repeatable(tmp_path):
@@ -39,6 +46,19 @@ def test_build_is_byte_for_byte_repeatable(tmp_path):
     assert files
     for relative in files:
         assert (first / relative).read_bytes() == (second / relative).read_bytes(), relative
+
+
+def test_chain_status_checks_raw_ledger_not_saved_summary(tmp_path):
+    import shutil
+
+    case_id = "F02-s00"
+    directory = tmp_path / case_id
+    shutil.copytree(FROZEN_DIR / case_id, directory)
+    payload = json.loads(_read(directory / "case.json"))
+    payload["ledger"][0]["hash"] = "0" * 64
+    (directory / "case.json").write_text(json.dumps(payload), encoding="utf-8")
+    assert json.loads(_read(directory / "summary.json"))["ledger_chain_valid"] is True
+    assert load_case(case_id, frozen_dir=tmp_path).chain_valid is False
 
 
 def test_overview_states_the_verified_numbers(tmp_path):

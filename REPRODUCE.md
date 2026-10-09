@@ -185,6 +185,22 @@ historical diagnostic and is never presented as the result.
 
 ## Final verification from a clean clone (no key)
 
+### Versions, measured runtime and cost
+
+- Python requirement: `>=3.11`; final Windows verification used Python `3.14.3`.
+- Test dependencies are pinned in `pyproject.toml`; the core runtime has no
+  mandatory third-party dependency.
+- One-time editable development install: normally 1–3 minutes on a typical
+  connection; subsequent verification is offline.
+- Measured on the final Windows machine: demo `0.53 s`, 40-case agent replay
+  `0.53 s`, three B1 replays (120 predictions) `1.07 s`, review verification
+  plus report generation `1.08 s`, and 212 tests approximately 7–10 seconds.
+  Hardware and filesystem caching will change these values.
+- Reproducing every reported result from committed caches costs **$0.00** and
+  needs no API key. Historical live recording was also billed `$0.00` on the
+  Gemini Free Tier; recorded list-price equivalents are in the manifest and
+  verified report.
+
 Run this from `git archive` output or a fresh `git clone`, never only from a
 working tree that may hold uncommitted files. No `GEMINI_API_KEY` or
 `ANTHROPIC_API_KEY` may be present in the environment.
@@ -220,7 +236,7 @@ Also check that the committed reports and docs contain no absolute local path
 and no credential:
 
 ```powershell
-git grep -n -E "C:\\Users|/home/[a-z]" -- docs README.md REPRODUCE.md PROJECT_STATUS.md evidence/runs/benchmark/comparison
+git grep -n -E "C:\\Users|/home/[a-z]" -- docs README.md REPRODUCE.md PROVENANCE.md evidence/runs/benchmark/comparison
 ```
 
 That command must print nothing.

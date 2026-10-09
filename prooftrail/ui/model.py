@@ -15,6 +15,7 @@ from ..config import FROZEN_DIR, REVIEW_DIR
 from ..freeze import all_case_ids
 from ..review import DECISIONS_DIR_NAME
 from ..scenarios import FAMILIES
+from ..schemas.events import LedgerEvent, verify_chain
 
 COMPARISON_PATH = Path(DEFAULT_COMPARISON_DIR) / "comparison.verified.json"
 
@@ -112,7 +113,7 @@ def load_case(case_id: str, *, frozen_dir: Path = FROZEN_DIR, review_dir: Path =
         final_report=case["trace"]["final_report"],
         claims=tuple(certificate["claims"]),
         events=tuple(sorted(case["ledger"], key=lambda event: event["seq"])),
-        chain_valid=bool(summary["ledger_chain_valid"]),
+        chain_valid=verify_chain([LedgerEvent.from_dict(event) for event in case["ledger"]])[0],
         coverage=(int(coverage["cited"]), int(coverage["total"])),
         auditor_llm_calls=int(certificate["usage"].get("llm_calls", 0)),
         agent_tool_calls=int(summary["tool_call_count"]),

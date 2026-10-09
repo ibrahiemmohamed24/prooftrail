@@ -12,7 +12,7 @@
 | GitHub identity used in every decision | `github:ibrahiemmohamed24` |
 | Display name | Ibrahiem Mohamed |
 | Relationship to the project | Project author and repository owner |
-| Review branch and commit | `feat/final-submission`; see the commit containing `data/reviews/v1/decisions/` |
+| Review snapshot | Final submission; see `data/reviews/v1/decisions/` and the hash-bound manifest |
 
 Decision files bind this identity to the dataset manifest, frozen case,
 provisional label, exact review material and ledger tip. Git history and the
@@ -95,7 +95,7 @@ correctness, evidence coverage and first-bad localization, not reviewer speedup.
 
 - The reviewer personally read the 40 cases, selected every decision and
   executed every explicit attestation. No bulk-approval path was used.
-- AI assistance generated reading aids and helped transcribe the reviewer's
+- OpenAI Codex generated reading aids and helped transcribe the reviewer's
   already-made conclusions into case-specific CLI rationales and amendment
   JSON. It did not choose a verdict, inspect evidence on the reviewer's behalf
   or execute the human attestation.

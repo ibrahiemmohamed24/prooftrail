@@ -22,6 +22,7 @@ data/state/*.db-journal
 
 # derived human-review aids (regenerate from immutable frozen sources)
 evidence/review-pack-v1/
+evidence/ui/
 
 # NOTE: data/frozen/ and data/replay/ are COMMITTED on purpose — they are the
 # frozen traces + cached LLM responses that make replay mode free for judges.

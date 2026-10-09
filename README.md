@@ -49,7 +49,7 @@ shape; it is not real-model evidence. The real F02 traces are different — see
 [docs/TRAJECTORIES.md](docs/TRAJECTORIES.md): the real agent called
 `list_refunds` after the timeout and did **not** double-refund.
 
-## The problem
+## Intended user, bottleneck, and value
 
 The engineer or support lead who owns an agent that performs irreversible
 actions (refunds, cancellations, account changes) reads transcripts to answer
@@ -81,6 +81,22 @@ Three rules: **same evidence** (B1 and ProofTrail get the identical
 named human, never from any model), **frozen traces** (the agent runs once;
 everything else replays).
 
+## Agent instructions and purposeful design
+
+The complete instructions that shape each model call are committed with the
+solution, not hidden in an external service:
+
+| Agent | Exact instructions | Why a model is used |
+|---|---|---|
+| Refund agent under test | `prooftrail/agent/prompts.py` | Interprets the user's refund request, selects tools and writes a natural-language report. |
+| B1 one-shot baseline | `prooftrail/baselines/prompts.py` | Judges the same frozen trace and ledger in one sampled JSON completion. |
+| ProofTrail auditor | `prooftrail/auditor/` | No model call: exact amount, entity, count and event-order checks stay deterministic and auditable. |
+
+Every recorded model response is bound to a prompt SHA-256. This split is the
+central engineering choice: models handle language and tool selection; the
+system of record, not another sampled opinion, decides whether an irreversible
+side effect actually happened.
+
 ## Quickstart — zero API calls
 
 ```powershell
@@ -95,17 +111,6 @@ python -m prooftrail manifest --provider gemini       # 40/40, invariants
 
 macOS/Linux: `python3 -m venv .venv && . .venv/bin/activate`, same commands.
 Full judge walkthrough with expected outputs: [docs/JUDGE_CHECKLIST.md](docs/JUDGE_CHECKLIST.md).
-
-## Browse the evidence in a browser — zero network
-
-```powershell
-python -m prooftrail ui build
-```
-
-Writes `evidence/ui/index.html`: the overview, a case list, and for each of the 40 cases a
-case page (AGENT SAID, LEDGER PROVED and the evidence inspector) plus a printable Evidence
-Certificate. Everything is rebuilt from the committed `data/` and `evidence/` files, with no
-network and no model calls.
 
 ## Comparison — same evidence, three B1 runs
 
@@ -187,10 +192,53 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - Single, author-affiliated reviewer; no inter-annotator agreement.
 - Human time *with vs without* ProofTrail was not measured and is not claimed.
 
+## Main failure mode and hot take
+
+**Main failure mode:** transcript trust after a side effect. A timeout or an
+`ok: true` tool response is only an observation available to the agent; it is
+not proof that the refund committed. B1's persistent F04 error demonstrates the
+consequence: it trusted a successful-looking tool event while the ledger had no
+state change.
+
+**Hot take:** agent reliability is not mainly a better-prompt problem. Once an
+agent can change state, its transcript is an untrusted witness. Use an LLM to
+understand language and choose actions, but use deterministic reconciliation
+against an append-only system-of-record ledger to adjudicate what happened.
+Dataset v1 adds a second practical lesson: the temporal verifier delivered no
+measured gain, so teams should add the smallest verifier justified by observed
+failures instead of adding fashionable agent complexity.
+
+## Required submission package
+
+| Required item | Repository evidence | Status |
+|---|---|---|
+| Complete solution code and improvement changelog | `prooftrail/`, `tests/`, `CHANGELOG.md` | ready |
+| Reproduction guide | `REPRODUCE.md`, `docs/JUDGE_CHECKLIST.md` | ready |
+| Solution video, up to five minutes | [YouTube demo](https://www.youtube.com/watch?v=-sR2mYTQO68); script in `docs/DEMO_SCRIPT.md` | ready |
+| Agent trajectories | `docs/CODEX_TRAJECTORIES.md`, `docs/TRAJECTORIES.md` and committed caches | ready |
+
+## Competition authorship and AI use
+
+The following disclosure describes the archived competition submission.
+Active development in this repository preserves the original Git history and
+later frontend contributions, including the static viewer in `af79e4f`.
+
+ProofTrail is an individual submission by **Ibrahiem Mohamed**. OpenAI Codex
+was the only AI coding assistant used during development. Google Gemini appears
+in the repository as the runtime model used to record the synthetic refund
+agent and B1 benchmark outputs; it was not a coding assistant. Full authorship,
+machine-metadata correction, review and model-use disclosure:
+[docs/AI_TOOL_DISCLOSURE.md](docs/AI_TOOL_DISCLOSURE.md) and
+[PROVENANCE.md](PROVENANCE.md). Representative development-agent traces:
+[docs/CODEX_TRAJECTORIES.md](docs/CODEX_TRAJECTORIES.md).
+
 ## Demo video
 
-Link: **pending recording and upload** — the verified numbers are now frozen;
-script and recording rules are in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md).
+Link: [ProofTrail solution video](https://www.youtube.com/watch?v=-sR2mYTQO68)
+
+The verified numbers are frozen; script and recording rules are in
+[docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). A standalone video reference is
+also preserved in [docs/SOLUTION_VIDEO.md](docs/SOLUTION_VIDEO.md).
 
 ## Reproduction
 
@@ -209,11 +257,12 @@ data/replay/gemini/      agent response caches (prompt-hash keyed)
 data/replay/auditors/    three B1 cache namespaces (spec-hashed)
 data/reviews/v1/         human decisions, review manifest, time log
 evidence/runs/           demo bundle, live smoke bundle, B1 run artifacts, comparison reports
-docs/                    ARCHITECTURE, SCENARIO_FAMILIES, HUMAN_REVIEW, HUMAN_REVIEW_RESULTS,
-                         REVIEW_FOCUS_v1, SUBMISSION_REPORT, TRAJECTORIES, DEMO_SCRIPT, JUDGE_CHECKLIST
+docs/                    architecture, AI disclosure, Codex + runtime trajectories,
+                         review evidence, submission report, demo script and judge checklist
 scripts/                 check_no_secrets.py, gen_review_focus.py
 tests/                   212 offline tests (mock transports; no network)
-PROJECT_STATUS.md        scoring model and earned points; CHANGELOG.md evidence-backed rows
+CHANGELOG.md             evidence-backed improvement iterations
+PROVENANCE.md            sole-author, AI-use and evidence provenance
 ```
 
 ## Improvement changelog (historical; provisional rows stay labelled)
@@ -227,3 +276,18 @@ PROJECT_STATUS.md        scoring model and earned points; CHANGELOG.md evidence-
 | 4 | 2026-08-30 | Human review: 40/40 accepted (33 approve, 7 amend) → verified report | 85.0% ± 2.04 pp → 100% | `headline_eligible: true`; 298 active review minutes |
 
 License: MIT.
+
+## Offline evidence viewer
+
+Build the static frontend from the frozen cases and verified comparison:
+
+```powershell
+python -m prooftrail ui build
+python -m http.server 8000 --bind 127.0.0.1 --directory evidence/ui
+```
+
+Open http://127.0.0.1:8000. The viewer includes an overview, 40 case pages,
+claim-linked ledger events, before/after state and printable certificates.
+Fonts and assets are local; viewing does not call a model or require a key.
+The active development repository is [prooftrail](https://github.com/ibrahiemmohamed24/prooftrail).
+The competition repository is an [archived submission snapshot](https://github.com/ibrahiemmohamed24/prooftrail-submission).

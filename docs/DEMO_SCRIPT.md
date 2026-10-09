@@ -1,4 +1,4 @@
-# Demo video script (2:30, target ≤ 3:00)
+# Demo video script (target 4:10, hard limit 5:00)
 
 Ready to record now that the verified report exists. Every number spoken on
 camera must be read from `evidence/runs/benchmark/comparison/comparison.verified.md`
@@ -15,16 +15,29 @@ Before recording:
 - Font size ≥ 16 pt; terminal width ≥ 110 columns so the demo lines do not wrap.
 - Keep `docs/TRAJECTORIES.md` and the verified Markdown report open in a second window.
 
-## 0:00–0:20 — the problem, in one sentence
+## 0:00–0:30 — intended user, bottleneck and value
 
-Say: *"An agent's final message is written by the same model that can be lied to
-by a flaky tool. ProofTrail checks what the agent says it did against what the
-system of record proves it did, and points at the first event where they diverge."*
+Say: *"ProofTrail is for the engineer or support lead responsible for an agent
+that performs irreversible actions such as refunds. Today they inspect a long
+transcript to answer one question: did the action actually happen? The agent's
+final message can be misled by a flaky tool, so ProofTrail checks its claims
+against the system-of-record ledger and points to the first divergent event."*
 
 Show: the README diagram (agent → tools → ledger; B1 and ProofTrail both read the
 frozen trace + ledger).
 
-## 0:20–0:50 — the killer case, scripted fixture
+## 0:30–0:55 — the simple baseline
+
+Show: README comparison/architecture table and
+`prooftrail/baselines/prompts.py`.
+
+Say: *"The simple baseline, B1, gets the same frozen trace and raw ledger in one
+prompt and returns a strict JSON audit. It is fair on information access but
+sampled: across three runs it changed verdict on five cases and trusted a
+successful-looking tool event over an empty ledger on every phantom-success
+case."*
+
+## 0:55–1:25 — the killer case, scripted fixture
 
 Run:
 
@@ -39,7 +52,7 @@ agent says it refunded $47 once. The ledger shows two commits and $94."*
 Point at: `Verdict: CONTRADICTED`, `First bad: ledger event #6`, `Hash chain: valid`,
 and the `Mode:` line that says the run is scripted.
 
-## 0:50–1:15 — event #6, state before/after
+## 1:25–1:50 — event #6, state before/after
 
 Open `evidence/runs/demo-f02/certificate.md`. Scroll to the claim table.
 
@@ -48,7 +61,18 @@ committed. The first harmful action is the second `state_changed` under the same
 intent, event #6: `refunded_cents` goes from 4700 to 9400. That is the event a
 human should look at, instead of a whole transcript."*
 
-## 1:15–1:45 — same evidence for B1 and ProofTrail, real model traces
+## 1:50–2:20 — purposeful agent design and instructions
+
+Show: README “Agent instructions and purposeful design”, then briefly open
+`prooftrail/agent/prompts.py` and `prooftrail/baselines/prompts.py`.
+
+Say: *"The instructions for every agent are committed here. The Gemini refund
+agent needs a model to understand the request, select tools and write its
+report. B1 is a fair one-shot LLM baseline over the same evidence. ProofTrail
+uses no model: exact amount, entity, count and event checks remain deterministic.
+Models handle language; the ledger adjudicates side effects."*
+
+## 2:20–2:50 — same evidence, real-model traces
 
 Run:
 
@@ -65,7 +89,7 @@ calls — it extracts the action claims and reconciles them against ledger write
 Show one real trace from `docs/TRAJECTORIES.md` — F04-s00 (tool says
 `refunded`, ledger has no write; B1 believed the tool in all three runs).
 
-## 1:45–2:10 — the verified comparison
+## 2:50–3:35 — verified comparison, changelog and removed experiment
 
 Open `evidence/runs/benchmark/comparison/comparison.verified.md`.
 
@@ -77,9 +101,24 @@ prediction. Then say the honest caveat that is also printed in the report:
 amount, count and entity reconciliation already catch these cases. We report
 that, we do not hide it."*
 
+Then say: *"The main failure mode is transcript trust after a side effect. My
+hot take is that agent reliability is not mainly a better-prompt problem. Once
+an agent changes state, its transcript is an untrusted witness. Use models for
+language and tool choice, but deterministic reconciliation for truth. The
+zero-gain temporal ablation also says to add the smallest verifier justified by
+measured failures."*
+
+Briefly show `CHANGELOG.md` and say: *"The build moved from a stateful ledger,
+to evidence certificates, to forty real traces, a fair repeated baseline, and
+finally source-bound human truth. The change that contributed most was making
+the append-only ledger—not the transcript—the authority. I tested the temporal
+verifier as an extra experiment; it changed zero of forty outcomes, so I
+removed it from the recommended minimal deployment and do not credit it with
+the improvement. Its code remains only to reproduce that ablation."*
+
 Do not read any number from `comparison.provisional.md`.
 
-## 2:10–2:30 — the human-review guard, replay without a key
+## 3:35–4:05 — human-review guard and reproducibility
 
 Run:
 
@@ -91,11 +130,12 @@ python -m prooftrail review verify --require-complete
 Say: *"The headline exists only because a named person reviewed all forty labels
 one by one — there is no bulk approval, every decision is hash-bound to the frozen
 case, and the report refuses verified mode otherwise. Everything you just saw ran
-with no API key."*
+with no API key. The repository also contains the complete code and improvement
+changelog, reproduction guide, and selected agent trajectories."*
 
 ## Closing card (5 s)
 
-- `github.com/ibrahiemmohamed24/prooftrail`
+- `github.com/ibrahiemmohamed24/prooftrail-submission`
 - One command: `python -m pip install -e ".[dev]" && python -m pytest && python -m prooftrail replay --provider gemini --all`
 - "Same evidence. Independent truth. Frozen traces."
 
@@ -103,6 +143,7 @@ with no API key."*
 
 - Upload the video outside Git (YouTube unlisted or a competition drive). Put
   the link in the README "Demo video" section and in `docs/SUBMISSION_REPORT.md` §17.
+- Submitted video link: <https://www.youtube.com/watch?v=-sR2mYTQO68>
 - Do not commit the video file unless the competition rules require it.
 - Re-check the recording for: API keys, personal absolute paths, notifications,
   personal accounts, any non-synthetic data.

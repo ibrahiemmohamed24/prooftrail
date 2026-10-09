@@ -93,6 +93,11 @@ ProofTrail does **not** use an LLM-backed extractor today. A hybrid
 configuration (one extractor call, then the same deterministic checks) is an
 explicit future ablation and is claimed nowhere in the results.
 
+Development assistance is separate from runtime model use. OpenAI Codex was
+the only AI coding assistant used to implement and document this submission.
+Gemini generated the frozen system-under-test and B1 outputs; it did not act as
+a coding assistant. Full disclosure is in `PROVENANCE.md`.
+
 ## 7. Why reconciliation must be deterministic
 
 Reconciliation is counting commits per intent, comparing
@@ -118,8 +123,8 @@ but excludes the case from any headline. `benchmark report` refuses verified
 mode until `review verify --require-complete` passes; `--allow-provisional`
 exists only to produce a diagnostic file that says `headline_eligible: false`.
 
-No AI, script or project author may attest on the reviewer's behalf. AI
-assistance in this project prepared reading aids (`docs/REVIEW_FOCUS_v1.md`)
+No AI, script or project author may attest on the reviewer's behalf. OpenAI
+Codex assistance prepared reading aids (`docs/REVIEW_FOCUS_v1.md`)
 and templates (`docs/HUMAN_REVIEW_RESULTS.md`); it produced no decision.
 
 ## 9. Dataset: 10 families × 4 seeds
@@ -212,7 +217,23 @@ From the verified comparison:
   (email outside the configured ledger) and `first_bad_event_seq: null` did not
   change, so headline verdict metrics are unchanged.
 
-## 14. Limitations
+## 14. Main failure mode and hot take
+
+The main observed failure mode is **transcript trust after a side effect**.
+A timeout or `tool_call_completed{ok:true}` is an observation available to the
+agent, not proof of a committed refund. B1's persistent F04 error shows the
+consequence: it trusted a successful-looking tool event while the append-only
+ledger contained no `state_changed` event.
+
+**Hot take:** agent reliability is not mainly a better-prompt problem. Once an
+agent can change state, its transcript is an untrusted witness. LLMs should
+interpret language and select tools; deterministic reconciliation against the
+system-of-record ledger should adjudicate whether an irreversible action
+actually happened. The negative ablation matters too: the temporal verifier
+changed 0/40 outcomes, so teams should deploy the smallest verifier supported
+by measured failure modes instead of adding agent complexity by default.
+
+## 15. Limitations
 
 - **Synthetic refund domain.** Customers, orders, amounts and faults are
   generated; no production data was used. Results say nothing about other
@@ -231,7 +252,7 @@ From the verified comparison:
 - **Free Tier terms.** Google may use free-tier content to improve its
   products; only synthetic data was sent.
 
-## 15. Security and privacy
+## 16. Security and privacy
 
 - No API key is stored in any file; keys are read from the environment and
   `scripts/check_no_secrets.py` runs in CI and before every merge.
@@ -243,7 +264,7 @@ From the verified comparison:
 - The paid route has a hard budget guard; the free route rejects
   `--budget-usd` so it cannot be mistaken for a funded run.
 
-## 16. Reproducibility
+## 17. Reproducibility
 
 From a fresh clone with no key (full list with expected outputs in
 `docs/JUDGE_CHECKLIST.md`):
@@ -265,7 +286,7 @@ Spec hashes for the three B1 runs are recorded in each `spec.json` and
 re-validated by the report before scoring; the report performs no network
 calls.
 
-## 17. Evidence and media
+## 18. Evidence and media
 
 - Verified comparison: `evidence/runs/benchmark/comparison/comparison.verified.{json,md}`
 - Provisional diagnostic (historical, not headline): `comparison.provisional.{json,md}`
@@ -273,4 +294,15 @@ calls.
 - B1 runs: `evidence/runs/benchmark/b1/…`, caches in `data/replay/auditors/b1/…`
 - Human review: `data/reviews/v1/decisions/`, `data/reviews/v1/manifest.json`, `docs/HUMAN_REVIEW_RESULTS.md`
 - Trajectories: `docs/TRAJECTORIES.md`; judge steps: `docs/JUDGE_CHECKLIST.md`
-- Demo video: **pending recording and upload** per `docs/DEMO_SCRIPT.md`
+- Coding-agent disclosure and representative Codex trajectories:
+  `docs/AI_TOOL_DISCLOSURE.md`, `docs/CODEX_TRAJECTORIES.md`
+- Demo video: <https://www.youtube.com/watch?v=-sR2mYTQO68>
+
+## 19. Required submission package
+
+| Required item | Location | Status |
+|---|---|---|
+| Complete solution code and improvement changelog | `prooftrail/`, `tests/`, `CHANGELOG.md` | ready |
+| Reproduction guide | `REPRODUCE.md`, `docs/JUDGE_CHECKLIST.md` | ready |
+| Solution video, up to five minutes | external link in README, `docs/SOLUTION_VIDEO.md` and this report | ready |
+| Agent trajectories | `docs/CODEX_TRAJECTORIES.md`, `docs/TRAJECTORIES.md`, committed caches | ready |

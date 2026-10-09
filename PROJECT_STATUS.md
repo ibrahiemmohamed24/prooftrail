@@ -4,10 +4,10 @@
 
 ## Snapshot
 
-- **Overall completion:** 95 / 100
-- **Last verified:** 2026-08-31
+- **Current state:** competition snapshot integrated; offline evidence viewer available; API/skill/plugin work remains planned.
+- **Last verified:** 2026-10-09
 - **Default branch:** `main`
-- **Offline tests:** 212 passed, 0 skipped (no test uses the network or an API key; the Anthropic SDK is exercised over an in-process mock transport, Gemini over a fake transport; the committed agent and B1 artifacts are loaded and validated by integration tests)
+- **Offline tests:** 222 passed, 0 skipped, including UI export and raw-chain integrity regression tests.
 - **Real spend to date:** $0.00 — committed accepted caches contain 295 LLM calls: 175 agent calls plus 120 B1 calls, all on Gemini Free Tier (`gemini-3.1-flash-lite`). Their recorded list-price equivalent is $0.569219 ($0.060977 agent + $0.508242 B1). Malformed B1 completions were rejected and re-recorded rather than counted as accepted outputs.
 - **Working demo:** F02 claims one $47 refund; the ledger proves two commits and $94; ProofTrail returns `CONTRADICTED` with first bad event `#6`.
 - **Live providers:** paid `AnthropicModelClient` plus a tested zero-billed `GeminiModelClient` Free Tier route behind the same `ModelClient`; both use the prompt-hash replay cache. The validated Gemini default is `gemini-3.1-flash-lite`.
@@ -15,10 +15,15 @@
 - **Human-reviewed truth:** 40/40 source-bound decisions are accepted: 33 `APPROVE`, 7 `AMEND`, 0 `ABSTAIN`, 0 invalid/stale. The seven amendments add ledger-supported refund claims to reports that also contain an out-of-ledger email claim; no verdict or first-bad event changed. The manifest is `headline_eligible: true`.
 - **B1 execution path:** complete for 3/3 independent runs and 120/120 accepted outputs. Each run pins provider/model/limits/prompt/dataset hashes, has its own cache namespace, and replays 40/40 with no key or network. The committed comparison validates artifact hashes, costs, repeat stability and a no-temporal ablation.
 - **Verified headline result:** B1 family-mean accuracy is 85.0% ± 2.04 percentage points over three runs; deterministic ProofTrail is 100% against accepted human truth. B1 is unanimous on 35/40 cases. `comparison.verified.json` records `label_mode: verified` and `headline_eligible: true`.
-- **Submission assets:** final README/report/trajectories, human-review results, demo script and judge checklist are present. The only remaining submission-experience gate is a recorded, uploaded and linked demo video followed by clean-clone verification.
+- **Submission assets:** final README/report/trajectories, human-review results, demo script, judge checklist and uploaded video link are present. The archived `prooftrail-submission` snapshot is retained; active development continues in `prooftrail`.
 - **Honesty boundary:** the five-second killer demo uses `ScriptedModelClient` and is labelled as a fixture. Real-model results come only from the 40 frozen Gemini traces. AI assistance helped format review records after the reviewer made the decisions; the named reviewer personally read the cases and executed each attestation.
 
 ## Scoring model
+
+The following milestone tables describe the historical competition workflow.
+They are not a percentage measure of the current product roadmap. The video
+and final submission documents have since been integrated, along with the static
+viewer. Future API/MCP/skill integrations have not been implemented.
 
 The weights below are stable. Change earned points only when the stated
 definition of done is satisfied and linked evidence exists in the PR.

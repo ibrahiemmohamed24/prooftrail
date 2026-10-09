@@ -116,7 +116,10 @@ git diff --check
 ## 8. What to read if you have five more minutes
 
 - `docs/SUBMISSION_REPORT.md` — the full write-up, limitations first.
-- `docs/TRAJECTORIES.md` — six real traces walked event by event.
+- `docs/AI_TOOL_DISCLOSURE.md` — sole-human/Codex/Gemini responsibility split.
+- `docs/CODEX_TRAJECTORIES.md` — representative coding-agent instructions,
+  actions, tool feedback, retries and human checkpoints.
+- `docs/TRAJECTORIES.md` — seven real runtime traces walked event by event.
 - `evidence/runs/benchmark/comparison/comparison.verified.md` (or the provisional
   diagnostic if the review is incomplete).
 - `docs/HUMAN_REVIEW_RESULTS.md` — who reviewed, how long it took, what changed.

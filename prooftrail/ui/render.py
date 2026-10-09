@@ -786,6 +786,8 @@ def render_certificate(case: CaseView) -> str:
     toolbar = (
         '<div class="toolbar no-print">'
         f'<a class="btn btn--ghost" href="../cases/{_e(case.case_id)}.html">{_icon("back")}Back to case</a>'
+        f'<a class="btn btn--ghost" href="{_e(case.case_id)}.json" download>Download JSON</a>'
+        f'<a class="btn btn--ghost" href="{_e(case.case_id)}.md" download>Download Markdown</a>'
         '<button class="btn btn--primary" type="button" data-print>'
         f'{_icon("print")}Print or save as PDF</button></div>'
     )

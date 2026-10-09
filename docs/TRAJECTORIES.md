@@ -1,4 +1,8 @@
-# Selected trajectories
+# Runtime-agent trajectories
+
+Development-agent disclosure and representative OpenAI Codex trajectories are
+in `docs/AI_TOOL_DISCLOSURE.md` and `docs/CODEX_TRAJECTORIES.md`. This document
+covers the tool-using refund agent and the B1 audit behaviour.
 
 Seven real traces from the frozen dataset (`data/frozen/<case>/case.json`,
 recorded with `gemini-3.1-flash-lite` on the Gemini Free Tier, billed $0.00),

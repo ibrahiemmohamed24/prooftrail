@@ -2,8 +2,8 @@
 
 > Same evidence. Independent truth. Frozen traces.
 
-This document describes the code and verified evidence at the 95/100 milestone
-on `feat/final-submission`. It deliberately
+This document describes the code and human-verified evidence in the final
+submission snapshot. It deliberately
 separates implemented paths from planned work; nothing described as planned is
 part of any reported number.
 
@@ -179,15 +179,12 @@ scripts/
 └── gen_review_focus.py     deterministic generator for docs/REVIEW_FOCUS_v1.md
 ```
 
-## Remaining work from 95 to 100
+## Submission readiness
 
-The verified benchmark is complete. The remaining submission work is to record
-and upload the short demo video, add its link to README and the submission
-report, reproduce the full no-key checklist from a clean clone, and merge the
-green final pull request. An optional evidence viewer is not required.
-
-## Closing branch
-
-`feat/final-submission` contains the source-bound decisions, verified report,
-measured review time and final written assets. It does not modify frozen agent
-traces or B1 responses. The only remaining external artifact is the demo video.
+The verified benchmark, source-bound decisions, measured review time and final
+written assets and the [solution video](SOLUTION_VIDEO.md) are present.
+The archived competition snapshot is preserved separately. Active development
+continues in `ibrahiemmohamed24/prooftrail`, including the offline viewer in
+`prooftrail/ui/`. It reads existing artifacts and produces static HTML, local
+fonts, and downloadable JSON/Markdown certificates under ignored `evidence/ui/`.
+It does not expose a web API or a skill/plugin adapter yet.

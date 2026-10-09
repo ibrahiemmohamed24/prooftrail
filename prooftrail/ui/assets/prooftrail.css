@@ -724,6 +724,7 @@ code {
 }
 
 .filters {
+  position: static;
   display: block;
   width: auto;
   height: auto;
@@ -764,6 +765,7 @@ code {
 }
 
 .field {
+  min-width: 0;
   display: grid;
   gap: 6px;
 }
@@ -775,6 +777,8 @@ code {
 }
 
 .field select {
+  width: 100%;
+  min-width: 0;
   padding: 9px 10px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
@@ -1559,6 +1563,9 @@ code {
   }
 
   .filters[open] {
+    position: fixed;
+    inset: 0;
+    margin: auto;
     width: min(92vw, 380px);
     max-height: 88vh;
     overflow: auto;

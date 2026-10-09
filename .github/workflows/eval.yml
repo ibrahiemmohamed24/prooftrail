@@ -39,5 +39,7 @@ jobs:
           python -m prooftrail benchmark report --json
       - name: Check for committed secrets
         run: python scripts/check_no_secrets.py
+      - name: Build offline evidence viewer
+        run: python -m prooftrail ui build
       - name: Assert deterministic artifacts stay clean
         run: git diff --exit-code

@@ -40,6 +40,12 @@ def build_ui(
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(text, encoding="utf-8", newline="\n")
         written.append(target)
+    for case in site.cases:
+        for name in ("certificate.json", "certificate.md"):
+            source = Path(frozen_dir) / case.case_id / name
+            target = root / "certificates" / f"{case.case_id}.{name.rsplit('.', 1)[1]}"
+            shutil.copyfile(source, target)
+            written.append(target)
     for source in sorted(ASSET_DIR.rglob("*")):
         if not source.is_file() or "__pycache__" in source.parts:
             continue
