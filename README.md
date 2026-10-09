@@ -302,3 +302,20 @@ claim-linked ledger events, before/after state and printable certificates.
 Fonts and assets are local; viewing does not call a model or require a key.
 The active development repository is [prooftrail](https://github.com/ibrahiemmohamed24/prooftrail).
 The competition repository is an [archived submission snapshot](https://github.com/ibrahiemmohamed24/prooftrail-submission).
+
+## GitHub execution verifier
+
+ProofTrail can also check structured claims about one GitHub pull request and one
+revision: the PR exists, targets the expected base branch, has the expected head SHA,
+is merged (only when claimed), and its named required checks succeeded on that SHA.
+Each claim gets `SUPPORTED`, `CONTRADICTED` or `UNVERIFIABLE`, a reason code, evidence
+references, collection times, and JSON and Markdown certificates.
+
+It does not review code, prove that a fix works, or verify deployment. Offline mode audits
+saved bundles with no network or credentials. Live mode performs read-only requests to
+`api.github.com`; public repositories need no token. See [docs/GITHUB_VERIFIER.md](docs/GITHUB_VERIFIER.md).
+
+```powershell
+python -m prooftrail github audit --request request.json --bundle bundle.json
+python -m prooftrail github audit --request request.json --live
+```

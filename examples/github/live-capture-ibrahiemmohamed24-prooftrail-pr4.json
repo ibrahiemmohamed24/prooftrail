@@ -1,0 +1,185 @@
+{
+  "bundle": {
+    "bundle_schema_version": 1,
+    "check_runs": [
+      {
+        "completed_at": "2026-10-09T10:27:12Z",
+        "conclusion": "success",
+        "head_sha": "ae327d60aeaafda41a18a5f88168960f680238e4",
+        "html_url": "https://github.com/ibrahiemmohamed24/prooftrail/actions/runs/37917642899/job/113777620999",
+        "id": 113777620999,
+        "name": "mcp-adapter",
+        "producer": "github-actions",
+        "started_at": "2026-10-09T10:26:50Z",
+        "status": "completed"
+      },
+      {
+        "completed_at": "2026-10-09T10:27:12Z",
+        "conclusion": "success",
+        "head_sha": "ae327d60aeaafda41a18a5f88168960f680238e4",
+        "html_url": "https://github.com/ibrahiemmohamed24/prooftrail/actions/runs/37917642899/job/113777621555",
+        "id": 113777621555,
+        "name": "replay",
+        "producer": "github-actions",
+        "started_at": "2026-10-09T10:26:50Z",
+        "status": "completed"
+      },
+      {
+        "completed_at": "2026-10-09T10:27:29Z",
+        "conclusion": "success",
+        "head_sha": "ae327d60aeaafda41a18a5f88168960f680238e4",
+        "html_url": "https://github.com/ibrahiemmohamed24/prooftrail/actions/runs/37917670038/job/113777711951",
+        "id": 113777711951,
+        "name": "replay",
+        "producer": "github-actions",
+        "started_at": "2026-10-09T10:27:06Z",
+        "status": "completed"
+      },
+      {
+        "completed_at": "2026-10-09T10:27:27Z",
+        "conclusion": "success",
+        "head_sha": "ae327d60aeaafda41a18a5f88168960f680238e4",
+        "html_url": "https://github.com/ibrahiemmohamed24/prooftrail/actions/runs/37917670038/job/113777712243",
+        "id": 113777712243,
+        "name": "mcp-adapter",
+        "producer": "github-actions",
+        "started_at": "2026-10-09T10:27:06Z",
+        "status": "completed"
+      }
+    ],
+    "commit_statuses": [
+      {
+        "context": "CodeRabbit",
+        "sha": "ae327d60aeaafda41a18a5f88168960f680238e4",
+        "state": "success",
+        "target_url": null,
+        "updated_at": "2026-10-09T10:27:10Z"
+      }
+    ],
+    "observations": [
+      {
+        "collected_at": "2026-10-09T11:33:15Z",
+        "complete": true,
+        "endpoint": "/repos/ibrahiemmohamed24/prooftrail",
+        "http_status": 200,
+        "message": "",
+        "name": "repository",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T11:33:16Z",
+        "complete": true,
+        "endpoint": "/repos/ibrahiemmohamed24/prooftrail/pulls/4",
+        "http_status": 200,
+        "message": "",
+        "name": "pull_request",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T11:33:17Z",
+        "complete": true,
+        "endpoint": "/repos/ibrahiemmohamed24/prooftrail/commits/ae327d60aeaafda41a18a5f88168960f680238e4/check-runs",
+        "http_status": 200,
+        "message": "",
+        "name": "check_runs",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T11:33:20Z",
+        "complete": true,
+        "endpoint": "/repos/ibrahiemmohamed24/prooftrail/commits/ae327d60aeaafda41a18a5f88168960f680238e4/status",
+        "http_status": 200,
+        "message": "",
+        "name": "commit_statuses",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T11:33:21Z",
+        "complete": true,
+        "endpoint": "/repos/ibrahiemmohamed24/prooftrail/pulls/4",
+        "http_status": 200,
+        "message": "",
+        "name": "pull_request_recheck",
+        "pages": 1,
+        "status": "ok"
+      }
+    ],
+    "provenance": {
+      "api_host": "api.github.com",
+      "collected_at": "2026-10-09T11:33:14Z",
+      "kind": "saved_live_capture",
+      "label": "Saved live capture collected at 2026-10-09T11:33:14Z",
+      "synthetic": false
+    },
+    "pull_request": {
+      "base": {
+        "ref": "main",
+        "repo": "ibrahiemmohamed24/prooftrail"
+      },
+      "head": {
+        "ref": "feat/control-room-app",
+        "repo": "ibrahiemmohamed24/prooftrail",
+        "sha": "ae327d60aeaafda41a18a5f88168960f680238e4"
+      },
+      "html_url": "https://github.com/ibrahiemmohamed24/prooftrail/pull/4",
+      "merged": false,
+      "merged_at": null,
+      "number": 4,
+      "state": "open",
+      "title": "feat: local audit control room + read-only MCP tools"
+    },
+    "pull_request_recheck_head_sha": "ae327d60aeaafda41a18a5f88168960f680238e4",
+    "repository": {
+      "default_branch": "main",
+      "full_name": "ibrahiemmohamed24/prooftrail",
+      "private": false
+    }
+  },
+  "description": "Read-only GitHub REST API snapshot of a public repository. Not synthetic.",
+  "id": "live-capture-ibrahiemmohamed24-prooftrail-pr4",
+  "note": "Saved live capture collected at 2026-10-09T11:33:14Z.",
+  "pack_schema_version": 1,
+  "request": {
+    "claims": [
+      {
+        "id": "c1",
+        "type": "pr_exists"
+      },
+      {
+        "id": "c2",
+        "type": "base_branch"
+      },
+      {
+        "id": "c3",
+        "type": "head_sha"
+      },
+      {
+        "id": "c4",
+        "type": "pr_merged"
+      },
+      {
+        "id": "c5",
+        "type": "required_checks_passed"
+      }
+    ],
+    "domain": "github",
+    "expected_base_branch": "main",
+    "expected_head_sha": "ae327d60aeaafda41a18a5f88168960f680238e4",
+    "pull_request": 4,
+    "repository": {
+      "name": "prooftrail",
+      "owner": "ibrahiemmohamed24"
+    },
+    "required_checks": [
+      "replay",
+      "mcp-adapter"
+    ],
+    "schema_version": 1
+  },
+  "synthetic": false,
+  "title": "Saved live capture: ibrahiemmohamed24/prooftrail PR #4"
+}

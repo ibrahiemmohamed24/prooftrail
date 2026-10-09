@@ -71,6 +71,8 @@ from .review import (
 )
 from .scenarios import FAMILIES, FAMILY_IDS
 from .schemas import ReviewAction
+from .github import ContractError, collect_live, load_bundle, parse_request, run_audit
+from .github.examples import live_capture_pack, write_synthetic_packs
 from .ui import DEFAULT_UI_DIR, build_ui
 from .ui.model import COMPARISON_PATH
 
@@ -299,6 +301,22 @@ def _parser() -> argparse.ArgumentParser:
     ui_build_parser.add_argument("--review-dir", type=Path, default=REVIEW_DIR)
     ui_build_parser.add_argument("--comparison", type=Path, default=COMPARISON_PATH)
     ui_build_parser.add_argument("--json", action="store_true")
+
+    github = commands.add_parser("github", help="verify GitHub PR, revision, merge and required-check claims")
+    github_commands = github.add_subparsers(dest="github_command", required=True)
+    github_audit = github_commands.add_parser(
+        "audit", help="audit a saved bundle offline, or read api.github.com with --live (read-only)")
+    github_audit.add_argument("--request", type=Path, required=True, help="schema-v1 GitHub request JSON")
+    github_source = github_audit.add_mutually_exclusive_group(required=True)
+    github_source.add_argument("--bundle", type=Path, help="saved evidence bundle JSON; no network")
+    github_source.add_argument("--live", action="store_true",
+                               help="read the GitHub REST API; optional token from PROOFTRAIL_GITHUB_TOKEN")
+    github_audit.add_argument("--save-pack", type=Path, help="with --live: write the snapshot as a saved capture")
+    github_audit.add_argument("--certificate-json", type=Path)
+    github_audit.add_argument("--certificate-md", type=Path)
+    github_audit.add_argument("--json", action="store_true")
+    github_examples = github_commands.add_parser("examples", help="write the synthetic scenario packs")
+    github_examples.add_argument("--write", type=Path, required=True)
     return parser
 
 
@@ -952,6 +970,54 @@ def _ui_build(args: argparse.Namespace) -> int:
     return 0
 
 
+def _github_audit(args: argparse.Namespace) -> int:
+    try:
+        request = parse_request(json.loads(args.request.read_text(encoding="utf-8")))
+    except (ContractError, ValueError) as exc:
+        print(f"error: invalid request: {exc}", file=sys.stderr)
+        return 2
+    if args.live:
+        snapshot = collect_live(request)
+    else:
+        try:
+            snapshot = load_bundle(json.loads(args.bundle.read_text(encoding="utf-8")))
+        except (ContractError, ValueError) as exc:
+            print(f"error: invalid bundle: {exc}", file=sys.stderr)
+            return 2
+    if args.save_pack and not args.live:
+        print("error: --save-pack needs --live", file=sys.stderr)
+        return 2
+    result = run_audit(request, snapshot)
+    certificate = result["certificate"]
+    if args.save_pack:
+        identifier = f"live-capture-{request.repository.owner}-{request.repository.name}-pr{request.pull_request}"
+        pack = live_capture_pack(request, snapshot, identifier)
+        args.save_pack.write_text(json.dumps(pack, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+                                  encoding="utf-8", newline="\n")
+    if args.certificate_json:
+        args.certificate_json.write_text(json.dumps(certificate, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+                                         encoding="utf-8", newline="\n")
+    if args.certificate_md:
+        args.certificate_md.write_text(result["certificate_markdown"], encoding="utf-8", newline="\n")
+    if args.json:
+        print(json.dumps(result, sort_keys=True, ensure_ascii=False))
+        return 0
+    print(f"GitHub verdict : {result['verdict']}")
+    print(f"Source         : {certificate['source']['label']}")
+    print(f"Bundle SHA-256 : {certificate['source']['bundle_sha256']}")
+    for claim in result["claims"]:
+        print(f"  {claim['claim_id']:<6} {claim['status']:<13} {claim['claim_type']:<24} {claim['reason_code']}")
+    for warning in result["warnings"]:
+        print(f"  warning: {warning}")
+    return 0
+
+
+def _github_examples(args: argparse.Namespace) -> int:
+    written = write_synthetic_packs(args.write)
+    print(f"Synthetic packs written: {len(written)} in {args.write.resolve()}")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "demo":
@@ -984,6 +1050,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _benchmark_report(args)
     if args.command == "ui" and args.ui_command == "build":
         return _ui_build(args)
+    if args.command == "github" and args.github_command == "audit":
+        return _github_audit(args)
+    if args.command == "github" and args.github_command == "examples":
+        return _github_examples(args)
     raise AssertionError(f"unhandled command {args.command}")
 
 

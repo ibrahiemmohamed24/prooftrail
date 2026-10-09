@@ -77,6 +77,10 @@ def make_handler(port):
                     result = {"cases": [asdict(case) for case in site.cases]}
                 elif path in ("/api/v1/benchmark", "/benchmark.json"):
                     result = service.get_benchmark_summary()
+                elif path == "/api/v1/github/examples":
+                    result = service.list_github_examples()
+                elif path.startswith("/api/v1/github/examples/"):
+                    result = service.get_github_example(path.rsplit("/", 1)[1])
                 elif path.startswith("/api/v1/cases/"):
                     parts = path.split("/")
                     if len(parts) == 5:
@@ -104,7 +108,8 @@ def make_handler(port):
         def do_POST(self):
             if not self.safe_host():
                 return
-            routes = {"/api/v1/audits": service.audit_evidence, "/api/v1/ledgers/verify": service.verify_ledger}
+            routes = {"/api/v1/audits": service.audit_evidence, "/api/v1/ledgers/verify": service.verify_ledger,
+                      "/api/v1/github/audits": service.audit_github_request}
             action = routes.get(urlsplit(self.path).path)
             if action is None:
                 return self.respond(404, {"error": "Not found."})

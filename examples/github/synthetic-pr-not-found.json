@@ -1,0 +1,107 @@
+{
+  "bundle": {
+    "bundle_schema_version": 1,
+    "check_runs": [],
+    "commit_statuses": [],
+    "observations": [
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": true,
+        "endpoint": "/repos/example-owner/example-repo",
+        "http_status": 200,
+        "message": "",
+        "name": "repository",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": false,
+        "endpoint": "/repos/example-owner/example-repo/pulls/4",
+        "http_status": 404,
+        "message": "",
+        "name": "pull_request",
+        "pages": 0,
+        "status": "not_found"
+      },
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": true,
+        "endpoint": "/repos/example-owner/example-repo/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs",
+        "http_status": 200,
+        "message": "",
+        "name": "check_runs",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": true,
+        "endpoint": "/repos/example-owner/example-repo/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/status",
+        "http_status": 200,
+        "message": "",
+        "name": "commit_statuses",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": false,
+        "endpoint": "/repos/example-owner/example-repo/pulls/4",
+        "http_status": 404,
+        "message": "",
+        "name": "pull_request_recheck",
+        "pages": 0,
+        "status": "not_found"
+      }
+    ],
+    "provenance": {
+      "api_host": null,
+      "collected_at": "2026-10-09T10:00:00Z",
+      "fixture_note": "Synthetic fixture for tests and demonstrations. Not production evidence.",
+      "kind": "synthetic_fixture",
+      "label": "PR not found",
+      "synthetic": true
+    },
+    "pull_request": null,
+    "pull_request_recheck_head_sha": null,
+    "repository": {
+      "default_branch": "main",
+      "full_name": "example-owner/example-repo",
+      "private": false
+    }
+  },
+  "description": "The repository is readable, but the requested pull request number does not exist.",
+  "expected": {
+    "claims": {
+      "c1": "CONTRADICTED"
+    },
+    "verdict": "CONTRADICTED"
+  },
+  "id": "synthetic-pr-not-found",
+  "note": "Synthetic fixture for tests and demonstrations. Not production evidence.",
+  "pack_schema_version": 1,
+  "request": {
+    "claims": [
+      {
+        "id": "c1",
+        "type": "pr_exists"
+      }
+    ],
+    "domain": "github",
+    "expected_base_branch": "main",
+    "expected_head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "pull_request": 4,
+    "repository": {
+      "name": "example-repo",
+      "owner": "example-owner"
+    },
+    "required_checks": [
+      "replay",
+      "mcp-adapter"
+    ],
+    "schema_version": 1
+  },
+  "synthetic": true,
+  "title": "Pull request does not exist"
+}

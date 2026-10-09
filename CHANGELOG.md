@@ -1,5 +1,21 @@
 # Improvement Changelog
 
+## 2026-10-09 — GitHub execution verifier
+
+- Observation: the refund auditor could not check claims about a coding agent's
+  pull request, its revision or its required CI checks.
+- Change: added a `github` domain with a versioned request contract, bundle and
+  live evidence sources, deterministic rules, JSON and Markdown certificates,
+  the local New audit option, HTTP route `POST /api/v1/github/audits`, CLI
+  `github audit|examples`, and MCP tool `audit_github_execution` (offline only).
+- Live collection is read-only, host-pinned to `api.github.com`, does not follow
+  redirects, and bounds timeouts, response size, pages and total time. Errors become
+  `UNVERIFIABLE` observations; no credential is printed, stored or certified.
+- Tests: 445 offline tests pass; two read-only live tests against
+  `ibrahiemmohamed24/prooftrail` pass with `PROOFTRAIL_LIVE_TESTS=1`.
+- Limits: deterministic rules only; no code review, deployment, or test-count
+  verification; a green check is not a test report.
+
 ## 2026-10-09 — local control room and adapter boundary
 
 - Observation: the static viewer could only display existing evidence; operators

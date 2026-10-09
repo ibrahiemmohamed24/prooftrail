@@ -64,10 +64,74 @@ NO_EVIDENCE_ROW = '<tr><td colspan="5">No ledger event is cited by any claim.</t
 NO_STATE_ROW = '<tr><td colspan="4">No state fields were recorded for this event.</td></tr>'
 
 
+def _domain_switch() -> str:
+    return (
+        '<div class="domain-switch"><label for="audit-domain">Evidence type</label>'
+        '<select id="audit-domain" data-audit-domain>'
+        '<option value="refund" selected>Refund trace with sealed ledger</option>'
+        '<option value="github">GitHub pull request and required checks</option>'
+        "</select></div>"
+    )
+
+
+def _github_audit_panel() -> str:
+    claims = (
+        ("pr_exists", "The pull request exists in this repository", True),
+        ("base_branch", "It targets the expected base branch", True),
+        ("head_sha", "Its current head is the expected SHA", True),
+        ("pr_merged", "It is merged (the merged flag only; no deployment claim)", False),
+        ("required_checks_passed", "The required checks succeeded on the expected SHA", True),
+    )
+    rows = []
+    for value, label, on in claims:
+        checked = " checked" if on else ""
+        rows.append(f'<label><input type="checkbox" name="claim" value="{value}"{checked}> {label}</label>')
+    boxes = "".join(rows)
+    return (
+        '<section class="table-card audit-workspace" data-domain-panel="github" hidden>'
+        '<h2>Verify a GitHub pull request</h2>'
+        '<p>Checks observable facts about one pull request and one revision: existence, base branch, head SHA, '
+        'the merged flag (only when claimed) and named required checks. It does not review code, does not prove '
+        'that a change fixes a bug, and does not verify deployment.</p>'
+        '<form class="github-form" data-github-form>'
+        '<div class="field-grid">'
+        '<label>Repository owner<input name="owner" required maxlength="39" '
+        'pattern="[A-Za-z0-9][A-Za-z0-9-]{0,38}" autocomplete="off"></label>'
+        '<label>Repository name<input name="repo" required maxlength="100" '
+        'pattern="[A-Za-z0-9._-]{1,100}" autocomplete="off"></label>'
+        '<label>Pull request number<input name="number" type="number" required min="1" max="2147483647" value="4"></label>'
+        '<label>Expected head SHA (40 lowercase hex)<input name="sha" required pattern="[0-9a-f]{40}" '
+        'autocomplete="off" spellcheck="false"></label>'
+        '<label>Expected base branch<input name="base" required maxlength="250" value="main" autocomplete="off"></label>'
+        '</div>'
+        f"<fieldset><legend>Claims to verify</legend>{boxes}</fieldset>"
+        '<label>Required checks (one name per line)<textarea name="checks" rows="3" spellcheck="false">'
+        "replay\nmcp-adapter</textarea></label>"
+        '<fieldset><legend>Evidence source</legend>'
+        '<label><input type="radio" name="mode" value="offline" checked> Saved evidence bundle (no network)</label>'
+        '<label><input type="radio" name="mode" value="live"> Live GitHub read (read-only)</label>'
+        '</fieldset>'
+        '<div data-gh-offline>'
+        '<label>Evidence bundle JSON<textarea name="bundle" rows="10" spellcheck="false" data-gh-bundle></textarea></label>'
+        '<div class="audit-actions"><label>Synthetic example<select data-gh-example></select></label>'
+        '<button class="btn btn--ghost" type="button" data-gh-load-example>Load example</button></div>'
+        '</div>'
+        '<p class="note" data-gh-live hidden>Live mode reads GitHub with the server’s optional read-only token. '
+        'No token can be entered on this page.</p>'
+        '<div class="audit-actions"><button class="btn btn--primary" type="submit" data-github-submit>'
+        "Run GitHub audit</button></div>"
+        '<p role="status" aria-live="polite" data-github-status>'
+        "Requires the local application: python -m prooftrail.web</p>"
+        '</form>'
+        '<section class="audit-workspace" data-github-result hidden aria-label="GitHub audit result"></section>'
+        '</section>'
+    )
+
+
 def render_new_audit() -> str:
     body = (
         '<header class="page-head"><p class="eyebrow">Bring your own evidence</p>'
-        '<h1>Audit a new trace</h1><p class="lede">Compare a refund agent’s final report with its sealed ledger. '
+        '<h1>Audit new evidence</h1><p class="lede">Choose an evidence type. Refund traces are compared with their sealed ledger. '
         'No model calls. No saved uploads. No changes to the frozen benchmark.</p></header>'
         '<section class="table-card audit-workspace"><h2>Upload evidence</h2>'
         '<p>Use a schema-v1 case.json containing trace and ledger, or paste that JSON below. '
@@ -82,7 +146,9 @@ def render_new_audit() -> str:
         '<noscript>JavaScript is required to submit evidence. Use the Python application interface otherwise.</noscript></section>'
         '<section class="table-card audit-workspace" data-audit-result hidden aria-label="Audit result"></section>'
     )
-    return _page(title="New audit", description="Audit supplied refund evidence locally.", body=body,
+    head, rest = body.split("<section", 1)
+    body = head + _domain_switch() + '<div data-domain-panel="refund"><section' + rest + "</div>" + _github_audit_panel()
+    return _page(title="New audit", description="Audit supplied evidence locally: refund traces and GitHub execution claims.", body=body,
                  root="", active="audit", body_class="page-audit")
 
 
@@ -301,8 +367,10 @@ def _page(*, title: str, description: str, body: str, root: str, active: str, bo
         f'<meta name="description" content="{_e(description)}">\n'
         f'<link rel="stylesheet" href="{root}assets/fonts.css">\n'
         f'<link rel="stylesheet" href="{root}assets/prooftrail.css">\n'
+        f'<link rel="stylesheet" href="{root}assets/github-audit.css">\n'
         f'<script src="{root}assets/app.js" defer></script>\n'
         f'<script src="{root}assets/control-room.js" defer></script>\n'
+        f'<script src="{root}assets/github-audit.js" defer></script>\n'
         "</head>\n"
         f'<body class="{body_class}">\n'
         '<a class="skip-link" href="#main">Skip to content</a>\n'
