@@ -4,6 +4,17 @@
 
 > Same evidence. Independent truth. Frozen traces.
 
+## Local control room
+
+Run `python -m prooftrail.web` from the checkout, then open
+http://127.0.0.1:8766. Browse the recorded cases or audit a new schema-v1 refund
+trace + sealed ledger and download its certificate. No cloud account, API key
+or model call is needed. Uploads are processed in memory, not saved.
+
+See [UI guide](docs/WEB_UI.md) and [local MCP / skill setup](docs/INTEGRATIONS.md).
+This is a local, single-user refund-domain app, not a hosted general-purpose
+verification service. The archived competition artifacts remain unchanged.
+
 ## The result
 
 **HUMAN-VERIFIED:** all 40 labels have accepted, source-bound human decisions

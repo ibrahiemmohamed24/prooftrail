@@ -1,4 +1,4 @@
-# Offline evidence viewer
+# Local evidence control room
 
 The active repository is https://github.com/ibrahiemmohamed24/prooftrail.
 The competition snapshot remains archived at
@@ -7,6 +7,17 @@ https://github.com/ibrahiemmohamed24/prooftrail-submission.
 ## Windows quickstart
 
 From the repository root:
+
+```powershell
+python -m prooftrail.web --port 8766
+```
+
+Open http://127.0.0.1:8766. Use **New audit** to select or paste a schema-v1
+`case.json` (trace + sealed ledger). Use **Load frozen example** for a working
+sample. Run the audit and download its JSON/Markdown certificate. Evidence stays
+in memory; closing the server does not save it. No API key or cloud account is needed.
+
+For the read-only static export instead:
 
 ```powershell
 python -m prooftrail ui build
@@ -19,29 +30,48 @@ You may also open `evidence/ui/index.html` directly. No provider key is needed.
 ## Implemented
 
 - Verified benchmark overview and explicit dataset limitations.
-- All 40 cases with verdict/family/review filters.
+- All 40 cases with verdict/family/review/model/first-bad filters, text search,
+  ascending/descending case sorting and URL-persisted selections.
 - Agent report, claim cards, cited ledger events and first harmful event.
 - Evidence inspector with state before/after and agent-visible tool calls.
 - Printable certificates and original JSON/Markdown downloads.
 - Bundled fonts and local assets using the navy/orange brand palette.
 - Deterministic static output, generated under ignored `evidence/ui/`.
 - Raw ledger chain verification during view-model loading.
+- New audit: file/paste input, validation, loading/error states, exact claim
+  evidence sequences, integrity verdict and JSON/Markdown downloads.
+- Separate Benchmark page with per-family accuracy, repeated-run stability,
+  failures, ablation results and limitations from committed comparison data.
+- Separate Integrations page and local HTTP API backed by the same Python engine.
+- Optional stdio MCP adapter and portable audit skill; see `INTEGRATIONS.md`.
 
 The viewer renders existing artifacts. It does not edit frozen traces or make
 model calls. Rebuild it after changes to evidence; a previously built site is
 a snapshot and does not monitor source files for updates.
 
-## Remaining product work
+## Design and limits
 
-There is no HTTP auditing API, upload workflow, authentication, React app,
-MCP server, or Codex/Claude/Manus plugin in this version. Benchmark information
-is on Overview rather than a separate benchmark route. Case search, sorting,
-URL-persisted filters and interactive human review remain future work.
+The implementation extends the existing Python-generated HTML and vanilla JS
+rather than introducing a second React build chain. The HTTP boundary uses the
+standard library, preserving the zero-mandatory-dependency offline core. The
+optional MCP adapter uses the official SDK pinned separately.
 
-The next integration should wrap `audit_trace` and the existing certificate
-builders in a platform-neutral application service, with thin HTTP/MCP/skill
-adapters. Keep verdict and reconciliation logic in Python. Preserve the
-competition evidence separately from new domain or provider datasets.
+This is a **local, single-user refund-domain application**, not a hosted SaaS.
+It has no login, remote hosting, background jobs or interactive label editor.
+It deliberately does not create provider calls, mutate refunds, fix tools, or
+write uploads into the frozen benchmark. Unsupported language may be uncheckable.
+
+The server binds only to loopback; Host/Origin checks reject cross-site access.
+JSON requests are capped at 2 MiB, nesting at 40 levels and ledgers at 2,000
+events. Unknown schema fields, duplicate keys and invalid types are rejected.
+Frozen reads use allow-listed case IDs, never caller-supplied filesystem paths.
+No request bodies are logged. Do not expose this development server through a
+tunnel or bind it publicly: production deployment needs a separate security design.
+
+Hash integrity is not source authenticity: a party able to fabricate an entire
+ledger can also seal it. Trust the source separately from the audit verdict.
+Host-specific installation and Manus compatibility are not established by the
+local stdio smoke test. Marketplace publishing remains separate work.
 
 ## Metadata follow-up
 

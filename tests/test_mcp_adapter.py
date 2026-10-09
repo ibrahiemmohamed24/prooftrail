@@ -1,0 +1,30 @@
+import asyncio
+import sys
+
+import pytest
+
+mcp = pytest.importorskip("mcp", reason="optional MCP adapter not installed")
+from mcp import Client
+from mcp.client.stdio import StdioServerParameters
+
+from prooftrail import application as app
+from prooftrail.config import PROJECT_ROOT
+
+
+def test_real_stdio_mcp_tools():
+    async def run():
+        params = StdioServerParameters(command=sys.executable, args=["-m", "prooftrail.mcp_server"], cwd=str(PROJECT_ROOT))
+        async with Client(params, read_timeout_seconds=20) as client:
+            tools = await client.list_tools()
+            assert {tool.name for tool in tools.tools} == {
+                "audit_trace", "verify_ledger", "list_frozen_cases", "get_case",
+                "get_evidence_certificate", "get_benchmark_summary"}
+            assert all(tool.annotations.read_only_hint for tool in tools.tools)
+            result = await client.call_tool("list_frozen_cases", {})
+            assert len(result.structured_content["case_ids"]) == 40
+            result = await client.call_tool("audit_trace", {"evidence": app.get_case("F02-s00")})
+            assert not result.is_error
+            assert result.structured_content["certificate"] == app.get_evidence_certificate("F02-s00")
+            result = await client.call_tool("get_case", {"case_id": "../../.env"})
+            assert result.is_error
+    asyncio.run(run())

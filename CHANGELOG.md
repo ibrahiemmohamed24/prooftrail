@@ -1,5 +1,23 @@
 # Improvement Changelog
 
+## 2026-10-09 — local control room and adapter boundary
+
+- Observation: the static viewer could only display existing evidence; operators
+  could not submit new traces or route the same auditor through a host tool.
+- Change: added a shared read-only application interface, local-only HTTP server,
+  in-memory upload audit workflow and exact certificate downloads. Reused existing
+  HTML/JS rather than adding a second frontend toolchain or mandatory dependencies.
+- Added URL-persisted search/sort/filter controls and separate measured Benchmark
+  and Integrations pages. The zero-effect temporal ablation is shown explicitly.
+- Added optional SDK-backed stdio MCP tools and a portable evidence-audit skill.
+- Evidence: all 40 supplied frozen cases reproduce their original certificates;
+  tests reject invalid JSON, unknown fields, empty/unsealed ledgers, path traversal
+  and cross-origin requests. A real stdio client discovers all six tools and
+  audits an existing case. Browser checks exercise the actual HTTP upload path.
+- Limits: refund-domain only, no remote SaaS or auth, no claim of Manus/host
+  installation or marketplace publication, no invented confidence. Historical
+  frozen evidence and human labels are unchanged.
+
 This is the evidence-linked history of meaningful design iterations. Each row
 states the observed limitation, the change it motivated, the evidence produced
 and the decision that followed. Historical provisional results remain labelled

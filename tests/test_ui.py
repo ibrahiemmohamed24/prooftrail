@@ -30,7 +30,8 @@ def test_build_writes_every_page_and_asset(tmp_path):
     for name in ("prooftrail.css", "fonts.css", "app.js", "fonts/SpaceGrotesk-latin.woff2"):
         assert (tmp_path / "assets" / name).is_file()
     asset_count = sum(1 for path in ASSET_DIR.rglob("*") if path.is_file() and "__pycache__" not in path.parts)
-    assert len(written) == 2 + 4 * len(case_ids) + asset_count
+    assert len(written) == 6 + 4 * len(case_ids) + asset_count
+    assert (tmp_path / "benchmark.json").read_bytes() == COMPARISON_PATH.read_bytes()
     for case_id in case_ids:
         for suffix in ("json", "md"):
             exported = tmp_path / "certificates" / f"{case_id}.{suffix}"
