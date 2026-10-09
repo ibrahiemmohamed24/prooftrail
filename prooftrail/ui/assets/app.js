@@ -91,6 +91,15 @@
     var controls = Array.prototype.slice.call(document.querySelectorAll("[data-filter]"));
     var counter = document.querySelector("[data-count]");
     var empty = document.querySelector("[data-empty]");
+    var search = document.querySelector("[data-case-search]");
+    var sort = document.querySelector("[data-case-sort]");
+    var params = new URLSearchParams(window.location.search);
+    controls.forEach(function (control) {
+      var value = params.get(control.getAttribute("data-filter"));
+      if (value !== null) { control.value = value; }
+    });
+    if (search) { search.value = params.get("q") || ""; }
+    if (sort) { sort.value = params.get("sort") === "desc" ? "desc" : "asc"; }
 
     var applyFilters = function () {
       var active = {};
@@ -102,6 +111,7 @@
         var matches = Object.keys(active).every(function (key) {
           return !active[key] || row.getAttribute("data-" + key) === active[key];
         });
+        matches = matches && (!search || row.textContent.toLowerCase().includes(search.value.trim().toLowerCase()));
         row.hidden = !matches;
         if (matches) {
           shown += 1;
@@ -113,21 +123,38 @@
       if (empty) {
         empty.hidden = shown !== 0;
       }
+      rows.sort(function (a, b) {
+        var order = a.cells[0].textContent.localeCompare(b.cells[0].textContent);
+        return sort && sort.value === "desc" ? -order : order;
+      }).forEach(function (row) { caseTable.tBodies[0].appendChild(row); });
+      var query = new URLSearchParams();
+      Object.keys(active).forEach(function (key) { if (active[key]) { query.set(key, active[key]); } });
+      if (search && search.value) { query.set("q", search.value); }
+      if (sort && sort.value === "desc") { query.set("sort", "desc"); }
+      if (window.location.protocol !== "file:") {
+        window.history.replaceState(null, "", window.location.pathname + (query.size ? "?" + query.toString() : "") + window.location.hash);
+      }
     };
 
     controls.forEach(function (control) {
       control.addEventListener("change", applyFilters);
     });
+    if (search) { search.addEventListener("input", applyFilters); }
+    if (sort) { sort.addEventListener("change", applyFilters); }
     var reset = document.querySelector("[data-reset-filters]");
     if (reset) {
       reset.addEventListener("click", function () {
         controls.forEach(function (control) {
           control.value = "";
         });
+        if (search) { search.value = ""; }
+        if (sort) { sort.value = "asc"; }
         applyFilters();
       });
     }
   }
+
+  if (caseTable) { applyFilters(); }
 
   // Mobile starts the long sections collapsed. A deep link still opens its own section.
   if (window.matchMedia && window.matchMedia("(max-width: 767px)").matches) {

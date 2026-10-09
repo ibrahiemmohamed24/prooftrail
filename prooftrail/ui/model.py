@@ -6,7 +6,7 @@ same inputs always render the same pages.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -50,6 +50,7 @@ class CaseView:
     auditor_llm_calls: int
     agent_tool_calls: int
     review_action: str | None
+    agent_model: str = "unknown"
 
     def events_by_seq(self) -> dict[int, dict[str, Any]]:
         return {event["seq"]: event for event in self.events}
@@ -91,6 +92,7 @@ class Overview:
 class Site:
     overview: Overview
     cases: tuple[CaseView, ...]
+    benchmark: dict[str, Any] = field(default_factory=dict)
 
 
 def load_case(case_id: str, *, frozen_dir: Path = FROZEN_DIR, review_dir: Path = REVIEW_DIR) -> CaseView:
@@ -118,6 +120,7 @@ def load_case(case_id: str, *, frozen_dir: Path = FROZEN_DIR, review_dir: Path =
         auditor_llm_calls=int(certificate["usage"].get("llm_calls", 0)),
         agent_tool_calls=int(summary["tool_call_count"]),
         review_action=review_action,
+        agent_model=str(case["trace"]["model"]),
     )
 
 
@@ -152,4 +155,4 @@ def load_site(
     comparison_path: Path = COMPARISON_PATH,
 ) -> Site:
     cases = tuple(load_case(case_id, frozen_dir=frozen_dir, review_dir=review_dir) for case_id in all_case_ids())
-    return Site(overview=load_overview(comparison_path), cases=cases)
+    return Site(overview=load_overview(comparison_path), cases=cases, benchmark=_read_json(Path(comparison_path)))

@@ -4,7 +4,7 @@
 
 ## Snapshot
 
-- **Current state:** competition snapshot integrated; offline evidence viewer available; API/skill/plugin work remains planned.
+- **Current state:** local control room with new-evidence audits, read-only HTTP API, search/sort/URL filters and separate benchmark/integration pages. Optional stdio MCP adapter is protocol-tested; portable audit skill included. Host installation, marketplace publishing and Manus connectivity are not claimed.
 - **Last verified:** 2026-10-09
 - **Default branch:** `main`
 - **Offline tests:** 222 passed, 0 skipped, including UI export and raw-chain integrity regression tests.
@@ -23,7 +23,8 @@
 The following milestone tables describe the historical competition workflow.
 They are not a percentage measure of the current product roadmap. The video
 and final submission documents have since been integrated, along with the static
-viewer. Future API/MCP/skill integrations have not been implemented.
+viewer and the local API/MCP/skill integration. Production hosting and
+host-specific installation remain separate from this historical score.
 
 The weights below are stable. Change earned points only when the stated
 definition of done is satisfied and linked evidence exists in the PR.

@@ -53,12 +53,104 @@ REVIEW_TEXT = {
 NAV = (
     ("overview", "Overview", "index.html", "overview"),
     ("cases", "Cases", "cases.html", "cases"),
+    ("audit", "New audit", "audit.html", "check"),
+    ("benchmark", "Benchmark", "benchmark.html", "overview"),
+    ("integrations", "Integrations", "integrations.html", "jump"),
 )
 
 NO_CLAIMS_LI = '<li class="muted">No claims were extracted from the final report.</li>'
 NO_CLAIMS_ROW = '<tr><td colspan="6">No claims were extracted from the final report.</td></tr>'
 NO_EVIDENCE_ROW = '<tr><td colspan="5">No ledger event is cited by any claim.</td></tr>'
 NO_STATE_ROW = '<tr><td colspan="4">No state fields were recorded for this event.</td></tr>'
+
+
+def render_new_audit() -> str:
+    body = (
+        '<header class="page-head"><p class="eyebrow">Bring your own evidence</p>'
+        '<h1>Audit a new trace</h1><p class="lede">Compare a refund agent’s final report with its sealed ledger. '
+        'No model calls. No saved uploads. No changes to the frozen benchmark.</p></header>'
+        '<section class="table-card audit-workspace"><h2>Upload evidence</h2>'
+        '<p>Use a schema-v1 case.json containing trace and ledger, or paste that JSON below. '
+        'Maximum 2 MiB / 2,000 ledger events. This auditor supports the existing refund-domain contract, not arbitrary agent workflows.</p>'
+        '<p><label for="evidence-file">JSON evidence file</label></p>'
+        '<input id="evidence-file" type="file" accept=".json,application/json" data-evidence-file>'
+        '<p><label for="evidence-json">Evidence JSON</label></p>'
+        '<textarea id="evidence-json" rows="12" spellcheck="false" data-evidence-json placeholder="Paste trace + ledger JSON here"></textarea>'
+        '<div class="audit-actions"><button class="btn btn--primary" type="button" data-audit-submit>Run audit</button>'
+        '<button class="btn btn--ghost" type="button" data-audit-example>Load frozen example</button></div>'
+        '<p role="status" aria-live="polite" data-audit-status>Requires the local application: python -m prooftrail.web</p>'
+        '<noscript>JavaScript is required to submit evidence. Use the Python application interface otherwise.</noscript></section>'
+        '<section class="table-card audit-workspace" data-audit-result hidden aria-label="Audit result"></section>'
+    )
+    return _page(title="New audit", description="Audit supplied refund evidence locally.", body=body,
+                 root="", active="audit", body_class="page-audit")
+
+
+def render_benchmark(site: Site) -> str:
+    overview = site.overview
+    rows = ''.join(f'<tr><th scope="row">{_e(row.label)}</th><td>{_pct(row.proof_trail)}</td>'
+                   f'<td>{_pct(row.b1_mean)} ± {_pct(row.b1_stddev)}</td></tr>' for row in overview.metrics)
+    report = site.benchmark
+    detail = ""
+    if report:
+        family_rows = []
+        for family, value in sorted(report["prooftrail"]["metrics"]["per_family"].items()):
+            means = [run["metrics"]["per_family"][family]["accuracy"] for run in report["b1"]["runs"]]
+            family_rows.append(f'<tr><th scope="row">{_e(family)}</th><td>{value["total"]}</td><td>{_pct(value["accuracy"])}</td><td>{_pct(sum(means) / len(means))}</td></tr>')
+        detail = ('<section class="table-card audit-workspace"><h2>Per-family accuracy</h2><div class="table-wrap">'
+                  '<table><thead><tr><th scope="col">Family</th><th scope="col">Cases</th><th scope="col">ProofTrail</th><th scope="col">B1 mean</th></tr></thead>'
+                  f'<tbody>{"".join(family_rows)}</tbody></table></div></section>')
+        for title, value in (("Repeated-run stability", report["b1"]["stability"]),
+                             ("Failure analysis", report["failure_analysis"]),
+                             ("Ablation: temporal verifier removed", report["ablations"]["prooftrail_without_temporal_verifier"]["metric_values"])):
+            detail += f'<section class="table-card audit-workspace"><h2>{_e(title)}</h2><pre class="json">{_e(json.dumps(value, indent=2))}</pre></section>'
+        detail += ('<section class="table-card audit-workspace"><h2>Ablation conclusion</h2>'
+                   f'<p>Cases changed without temporal verification: {len(report["ablations"]["changed_cases_without_temporal"])}. '
+                   'This dataset does not demonstrate a marginal benefit from that component; no improvement is claimed.</p></section>')
+    body = (
+        '<header class="page-head"><p class="eyebrow">Frozen, human-reviewed evaluation</p><h1>Benchmark</h1>'
+        f'<p class="lede">{overview.case_count} cases across {overview.family_count} families. '
+        f'B1 uses the same evidence over {overview.b1_run_count} runs.</p></header>'
+        '<section class="table-card audit-workspace"><div class="table-wrap"><table><caption>Measured comparison</caption>'
+        '<thead><tr><th scope="col">Metric</th><th scope="col">ProofTrail</th><th scope="col">B1 mean ± population SD</th></tr></thead>'
+        f'<tbody>{rows}</tbody></table></div></section>'
+        + detail + '<section class="table-card audit-workspace"><h2>What these results do not prove</h2>'
+        '<p>This is a small, synthetic refund-domain dataset. Variants within a family are correlated. '
+        '100% on this benchmark does not mean 100% on new evidence or general-purpose agents. '
+        'Evidence coverage is lower than B1 and must not be hidden.</p>'
+        '<p>Hash chains detect alteration relative to recorded hashes; they do not authenticate who produced the ledger. '
+        'The deterministic extractor can miss unsupported language. No confidence calibration is claimed.</p>'
+        '<p><a href="benchmark.json" download>Download the complete comparison JSON</a></p></section>'
+    )
+    return _page(title="Benchmark", description="Measured outcomes and limitations.", body=body,
+                 root="", active="benchmark", body_class="page-benchmark")
+
+
+def render_integrations() -> str:
+    body = (
+        '<header class="page-head"><p class="eyebrow">One engine, multiple entry points</p><h1>Integrations</h1>'
+        '<p class="lede">Local UI and HTTP API share the same read-only application boundary.</p></header>'
+        '<section class="table-card audit-workspace"><h2>No provider needed</h2>'
+        '<p>Auditing supplied evidence needs no Gemini, Anthropic or OpenAI account. '
+        'Live agent generation remains an optional, separate workflow; never upload credentials in evidence.</p>'
+        '<h2>Application contracts</h2><ul><li>audit_trace: trace + sealed ledger → verdict and certificate</li>'
+        '<li>verify_ledger: sealed ledger → integrity status and first invalid sequence</li>'
+        '<li>list_frozen_cases / get_case: allow-listed, read-only frozen evidence</li>'
+        '<li>get_evidence_certificate: original certificate for an allow-listed case</li>'
+        '<li>get_benchmark_summary: full recorded benchmark comparison</li></ul>'
+        '<h2>HTTP</h2><pre class="json">POST /api/v1/audits\nPOST /api/v1/ledgers/verify\nGET /api/v1/health\n'
+        'GET /api/v1/overview\nGET /api/v1/cases\nGET /api/v1/cases/{case_id}\n'
+        'GET /api/v1/cases/{case_id}/certificate\nGET /api/v1/benchmark</pre>'
+        '<h2>Codex / Claude / Manus</h2><p>A local stdio MCP server is implemented and protocol-tested: '
+        'python -m prooftrail.mcp_server (requires the optional mcp extra). '
+        'A portable prooftrail-audit skill is included under integrations/skills/. '
+        'Host installation is separate; no installed or marketplace plugin is claimed. '
+        'Manus connectivity has not been validated.</p>'
+        '<p>Local development server only: no remote hosting, user accounts or multi-user access control. '
+        'Bind address is intentionally restricted to 127.0.0.1.</p></section>'
+    )
+    return _page(title="Integrations", description="Local API contracts and integration status.", body=body,
+                 root="", active="integrations", body_class="page-integrations")
 
 
 def _e(value: object) -> str:
@@ -197,7 +289,7 @@ def _page(*, title: str, description: str, body: str, root: str, active: str, bo
         'aria-controls="sidebar">'
         f'{_icon("menu")}<span class="sr-only">Toggle navigation</span></button>'
         f'<nav aria-label="Main"><ul class="nav-list">{nav_html}</ul></nav>'
-        '<p class="sidebar-foot">Frozen evidence<br>No network, no model calls</p>'
+        '<p class="sidebar-foot">Offline-first evidence<br>No cloud or model calls</p>'
         "</aside>"
     )
     return (
@@ -210,6 +302,7 @@ def _page(*, title: str, description: str, body: str, root: str, active: str, bo
         f'<link rel="stylesheet" href="{root}assets/fonts.css">\n'
         f'<link rel="stylesheet" href="{root}assets/prooftrail.css">\n'
         f'<script src="{root}assets/app.js" defer></script>\n'
+        f'<script src="{root}assets/control-room.js" defer></script>\n'
         "</head>\n"
         f'<body class="{body_class}">\n'
         '<a class="skip-link" href="#main">Skip to content</a>\n'
@@ -408,12 +501,24 @@ def render_cases(site: Site) -> str:
         '<div class="filters-body">'
         '<div class="filters-head"><h2 id="filters-title">Filters</h2>'
         '<button class="btn btn--ghost filters-close" type="button" data-close-filters>Done</button></div>'
+        '<div class="field"><label for="case-search">Search cases</label>'
+        '<input id="case-search" type="search" data-case-search placeholder="Case ID, family or verdict"></div>'
+        '<div class="field"><label for="case-sort">Sort</label>'
+        '<select id="case-sort" data-case-sort><option value="asc">Case ID ascending</option>'
+        '<option value="desc">Case ID descending</option></select></div>'
         '<div class="field"><label for="f-verdict">Verdict</label>'
         '<select id="f-verdict" data-filter="verdict"><option value="">All verdicts</option>'
         f"{verdict_options}</select></div>"
         '<div class="field"><label for="f-family">Family</label>'
         '<select id="f-family" data-filter="family"><option value="">All families</option>'
         f"{family_options}</select></div>"
+        '<div class="field"><label for="f-bad">First bad event</label>'
+        '<select id="f-bad" data-filter="bad"><option value="">Any</option>'
+        '<option value="yes">Present</option><option value="no">None</option></select></div>'
+        '<div class="field"><label for="f-model">Agent model</label>'
+        '<select id="f-model" data-filter="model"><option value="">All models</option>'
+        + ''.join(f'<option value="{_e(model)}">{_e(model)}</option>' for model in sorted({case.agent_model for case in site.cases}))
+        + '</select></div>'
         '<div class="field"><label for="f-review">Labels</label>'
         '<select id="f-review" data-filter="review"><option value="">All labels</option>'
         '<option value="verified">Human-verified</option>'
@@ -452,7 +557,7 @@ def _case_row(case: CaseView) -> str:
     first_bad = "None" if case.first_bad_event_seq is None else f"#{case.first_bad_event_seq}"
     return (
         f'<tr data-verdict="{_e(case.verdict)}" data-family="{_e(case.family_id)}" '
-        f'data-review="{review_key}">'
+        f'data-review="{review_key}" data-model="{_e(case.agent_model)}" data-bad="{"yes" if case.first_bad_event_seq is not None else "no"}">'
         f'<th scope="row" data-label="Case"><a class="mono" href="cases/{_e(case.case_id)}.html">'
         f"{_e(case.case_id)}</a></th>"
         f'<td data-label="Family">{_e(case.family_name)}</td>'

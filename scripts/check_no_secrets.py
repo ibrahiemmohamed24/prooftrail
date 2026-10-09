@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import os
 import sys
 from pathlib import Path
 
@@ -18,7 +19,11 @@ PATTERNS = {
 
 def scan(root: Path = ROOT) -> list[str]:
     findings: list[str] = []
-    for path in sorted(root.rglob("*")):
+    paths = []
+    for directory, directories, files in os.walk(root):
+        directories[:] = sorted(name for name in directories if name not in SKIP_PARTS)
+        paths.extend(Path(directory) / name for name in files)
+    for path in sorted(paths):
         if not path.is_file() or any(part in SKIP_PARTS for part in path.parts):
             continue
         try:

@@ -1,5 +1,21 @@
 /* ProofTrail static UI. Every color and font lives in :root; components read tokens only. */
 
+.audit-workspace { padding: 1.5rem; margin-bottom: 1.5rem; }
+.audit-workspace textarea { width: 100%; box-sizing: border-box; font: 0.85rem monospace; padding: 1rem; }
+.audit-workspace pre { overflow: auto; max-height: 32rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.audit-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+.audit-claim { border-top: 1px solid var(--line); padding: 1rem 0; }
+.field input { width: 100%; min-width: 0; box-sizing: border-box; padding: 0.6rem; }
+.page-audit .page-head, .page-benchmark .page-head, .page-integrations .page-head { display: block; }
+.audit-workspace table { width: 100%; border-collapse: collapse; text-align: left; }
+.audit-workspace th, .audit-workspace td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--line); }
+.audit-workspace caption { text-align: left; font-weight: 600; margin-bottom: 1rem; }
+.audit-workspace p { line-height: 1.7; }
+.audit-workspace textarea { border: 1px solid var(--line-strong); border-radius: var(--radius-sm); color: var(--brand-navy); background: var(--brand-white); }
+.audit-workspace a { margin-right: 0.5rem; }
+.audit-workspace button:disabled { cursor: wait; opacity: 0.65; }
+.audit-workspace input[type="file"] { max-width: 100%; }
+
 :root {
   --brand-orange: #FF6B2C;
   --brand-orange-hover: #F25A1C;

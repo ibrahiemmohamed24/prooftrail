@@ -17,6 +17,9 @@ def page_files(site: Site) -> dict[str, str]:
     pages = {
         "index.html": render.render_overview(site),
         "cases.html": render.render_cases(site),
+        "audit.html": render.render_new_audit(),
+        "benchmark.html": render.render_benchmark(site),
+        "integrations.html": render.render_integrations(),
     }
     for case in site.cases:
         pages[f"cases/{case.case_id}.html"] = render.render_case(case)
@@ -40,6 +43,9 @@ def build_ui(
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(text, encoding="utf-8", newline="\n")
         written.append(target)
+    comparison_target = root / "benchmark.json"
+    shutil.copyfile(comparison_path, comparison_target)
+    written.append(comparison_target)
     for case in site.cases:
         for name in ("certificate.json", "certificate.md"):
             source = Path(frozen_dir) / case.case_id / name
