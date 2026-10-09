@@ -117,6 +117,24 @@ the recorded submission experience.
   key; the working tree is clean and PR checks are green. The optional
   evidence viewer is not required and is not started before the video.
 
+### Branch `feat/github-execution-verifier` — tested capabilities and future plans
+
+Stacked on [PR #4](https://github.com/ibrahiemmohamed24/prooftrail/pull/4) (`feat/control-room-app`),
+which is still open; this branch does not duplicate its application, HTTP or MCP code.
+
+- **Tested now:** GitHub request contract (strict validation); bundle loader with
+  canonical SHA-256; deterministic rules for the five supported claims; explicit
+  `UNVERIFIABLE` for `production_deployment` and `all_tests_passed`; read-only live
+  collector with bounded timeouts, pages and size, refused redirects and no credential
+  output; JSON and Markdown certificates; New audit domain selector; HTTP route;
+  CLI; stdio MCP tool (offline); 18 synthetic scenario packs plus one saved live capture.
+- **Measured live:** `ibrahiemmohamed24/prooftrail` PR #4 and merged PR #3 (see
+  `docs/GITHUB_VERIFIER_QA.md`).
+- **Not done (future milestones):** free-text claim extraction; test-report parsing;
+  deployment verification; live MCP mode with an explicit data-sharing decision;
+  Enterprise hosts; a newer REST API version; a private-repository test with a
+  fine-grained token (check-run permission on private repos is not documented).
+
 ## Required verification before every merge
 
 ```powershell

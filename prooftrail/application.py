@@ -8,11 +8,16 @@ from dataclasses import fields
 from typing import Any, get_args, get_origin, get_type_hints
 
 from .auditor import audit_trace, build_certificate, render_certificate_markdown
-from .config import FROZEN_DIR
+from .config import FROZEN_DIR, PROJECT_ROOT
 from .freeze import all_case_ids
+from .github import ContractError, collect_live, load_bundle, parse_request, run_audit
+from .github.client import token_from_environment
+from .github.examples import list_packs, load_pack
 from .schemas.events import LedgerEvent, verify_chain
 from .schemas.trace import AgentTrace
 from .ui.model import COMPARISON_PATH
+
+GITHUB_EXAMPLES_DIR = PROJECT_ROOT / "examples" / "github"
 
 MAX_BYTES = 2 * 1024 * 1024
 MAX_EVENTS = 2000
@@ -157,3 +162,36 @@ def get_evidence_certificate(case_id):
 
 def get_benchmark_summary():
     return json.loads(COMPARISON_PATH.read_text(encoding="utf-8"))
+
+
+def audit_github_request(payload):
+    """GitHub execution audit. mode=offline needs a saved bundle; mode=live reads api.github.com (read-only)."""
+    if not isinstance(payload, dict) or set(payload) - {"mode", "request", "bundle"}:
+        raise InvalidEvidence("Expected mode, request and, for offline mode, bundle. Unknown fields are rejected.")
+    mode = payload.get("mode", "offline")
+    if mode not in ("offline", "live"):
+        raise InvalidEvidence("mode must be offline or live.")
+    try:
+        request = parse_request(payload.get("request"))
+        if mode == "offline":
+            if "bundle" not in payload:
+                raise InvalidEvidence("Offline mode needs a saved evidence bundle.")
+            snapshot = load_bundle(payload["bundle"])
+        else:
+            if "bundle" in payload:
+                raise InvalidEvidence("Live mode reads GitHub itself and does not accept a bundle.")
+            snapshot = collect_live(request)
+    except ContractError as exc:
+        raise InvalidEvidence(str(exc)) from exc
+    return run_audit(request, snapshot)
+
+
+def list_github_examples():
+    return {"examples": list_packs(GITHUB_EXAMPLES_DIR), "live_token_configured": token_from_environment() is not None}
+
+
+def get_github_example(identifier):
+    """Return one allow-listed scenario pack without its expected verdicts."""
+    pack = load_pack(GITHUB_EXAMPLES_DIR, identifier)
+    pack.pop("expected", None)
+    return pack

@@ -1,0 +1,128 @@
+{
+  "bundle": {
+    "bundle_schema_version": 1,
+    "check_runs": [],
+    "commit_statuses": [],
+    "observations": [
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": true,
+        "endpoint": "/repos/example-owner/example-repo",
+        "http_status": 200,
+        "message": "",
+        "name": "repository",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": true,
+        "endpoint": "/repos/example-owner/example-repo/pulls/4",
+        "http_status": 200,
+        "message": "",
+        "name": "pull_request",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": true,
+        "endpoint": "/repos/example-owner/example-repo/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs",
+        "http_status": 200,
+        "message": "",
+        "name": "check_runs",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": true,
+        "endpoint": "/repos/example-owner/example-repo/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/status",
+        "http_status": 200,
+        "message": "",
+        "name": "commit_statuses",
+        "pages": 1,
+        "status": "ok"
+      },
+      {
+        "collected_at": "2026-10-09T10:00:00Z",
+        "complete": true,
+        "endpoint": "/repos/example-owner/example-repo/pulls/4",
+        "http_status": 200,
+        "message": "",
+        "name": "pull_request_recheck",
+        "pages": 1,
+        "status": "ok"
+      }
+    ],
+    "provenance": {
+      "api_host": null,
+      "collected_at": "2026-10-09T10:00:00Z",
+      "fixture_note": "Synthetic fixture for tests and demonstrations. Not production evidence.",
+      "kind": "synthetic_fixture",
+      "label": "Head mismatch",
+      "synthetic": true
+    },
+    "pull_request": {
+      "base": {
+        "ref": "main",
+        "repo": "example-owner/example-repo"
+      },
+      "head": {
+        "ref": "synthetic/feature",
+        "repo": "example-owner/example-repo",
+        "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "html_url": "https://github.com/example-owner/example-repo/pull/4",
+      "merged": false,
+      "merged_at": null,
+      "number": 4,
+      "state": "open",
+      "title": "Synthetic pull request"
+    },
+    "pull_request_recheck_head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "repository": {
+      "default_branch": "main",
+      "full_name": "example-owner/example-repo",
+      "private": false
+    }
+  },
+  "description": "The pull request head is stable at a different SHA from the expected revision.",
+  "expected": {
+    "claims": {
+      "c1": "SUPPORTED",
+      "c2": "CONTRADICTED"
+    },
+    "verdict": "CONTRADICTED"
+  },
+  "id": "synthetic-head-mismatch",
+  "note": "Synthetic fixture for tests and demonstrations. Not production evidence.",
+  "pack_schema_version": 1,
+  "request": {
+    "claims": [
+      {
+        "id": "c1",
+        "type": "pr_exists"
+      },
+      {
+        "id": "c2",
+        "type": "head_sha"
+      }
+    ],
+    "domain": "github",
+    "expected_base_branch": "main",
+    "expected_head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "pull_request": 4,
+    "repository": {
+      "name": "example-repo",
+      "owner": "example-owner"
+    },
+    "required_checks": [
+      "replay",
+      "mcp-adapter"
+    ],
+    "schema_version": 1
+  },
+  "synthetic": true,
+  "title": "Head SHA mismatch"
+}

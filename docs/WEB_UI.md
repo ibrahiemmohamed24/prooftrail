@@ -40,6 +40,13 @@ You may also open `evidence/ui/index.html` directly. No provider key is needed.
 - Raw ledger chain verification during view-model loading.
 - New audit: file/paste input, validation, loading/error states, exact claim
   evidence sequences, integrity verdict and JSON/Markdown downloads.
+- New audit also offers **GitHub pull request and required checks** as an
+  evidence type (the refund workflow is the default). It audits a saved bundle or
+  a synthetic example offline, or reads `api.github.com` read-only in live mode.
+  The page has no token field. Results show each claim, required check, evidence
+  source with collection times, warnings, limitations, and JSON/Markdown downloads.
+  API: `GET /api/v1/github/examples`, `GET /api/v1/github/examples/<id>`,
+  `POST /api/v1/github/audits`. See [GITHUB_VERIFIER.md](GITHUB_VERIFIER.md).
 - Separate Benchmark page with per-family accuracy, repeated-run stability,
   failures, ablation results and limitations from committed comparison data.
 - Separate Integrations page and local HTTP API backed by the same Python engine.

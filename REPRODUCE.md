@@ -170,6 +170,32 @@ and never falls back to a live call. The comparison validates spec and artifact
 hashes, reports costs and repeat stability, and writes the committed verified
 report. `--allow-provisional` reproduces the historical pre-review diagnostic.
 
+## GitHub execution verifier (offline; live optional)
+
+Audit the synthetic scenario packs and the saved live capture with no network and no key:
+
+```powershell
+python -m prooftrail github examples --write examples\github   # regenerates the synthetic packs
+python -m pytest tests\test_github_examples.py                  # committed packs match the generator
+```
+
+Audit a saved bundle (no network). Extract `request` and `bundle` from any pack first:
+
+```powershell
+python -m prooftrail github audit --request request.json --bundle bundle.json --certificate-md certificate.md
+```
+
+Optional live check (reads `api.github.com`; public repository; no token needed):
+
+```powershell
+$env:PROOFTRAIL_LIVE_TESTS = "1"
+python -m pytest tests\test_github_live.py
+Remove-Item Env:PROOFTRAIL_LIVE_TESTS
+```
+
+Optional token for private repositories or higher rate limits: set
+`PROOFTRAIL_GITHUB_TOKEN` to a read-only token in the shell only. It is never printed or saved.
+
 ## Honesty boundary
 
 `prooftrail demo` uses a class named `ScriptedModelClient` and records the mode

@@ -16,10 +16,14 @@ The executable entry point is `python -m prooftrail.mcp_server`, speaking stdio.
 Do not start it in an ordinary terminal expecting a web page. The host launches it.
 The checkout must remain available: the benchmark data is not bundled into a wheel.
 
-Six read-only tools are exposed: `audit_trace`, `verify_ledger`, `list_frozen_cases`,
-`get_case`, `get_evidence_certificate`, `get_benchmark_summary`. `audit_trace`
-accepts `evidence` containing a schema-v1 trace and sealed ledger; it returns the
+Seven read-only tools are exposed: `audit_trace`, `verify_ledger`, `list_frozen_cases`,
+`get_case`, `get_evidence_certificate`, `get_benchmark_summary`, and `audit_github_execution`.
+`audit_trace` accepts `evidence` containing a schema-v1 trace and sealed ledger; it returns the
 categorical audit, full certificate, Markdown, integrity status and limitations.
+`audit_github_execution` accepts a schema-v1 GitHub `request` and a saved `bundle` and returns
+per-claim verdicts and a certificate. It is offline only: it makes no network request, reads no
+token, and is declared `openWorldHint: false`. Live GitHub reads are not exposed through MCP, because
+sending private repository data to an assistant host is a separate data-sharing decision.
 Requests do not accept arbitrary local file paths. They do not save evidence.
 
 ## Codex configuration (user-approved installation)
