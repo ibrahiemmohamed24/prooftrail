@@ -1,0 +1,23 @@
+{
+  "action": "APPROVE",
+  "amendment": null,
+  "attestation_version": "prooftrail-human-review-v1",
+  "attested": true,
+  "case_id": "F03-s00",
+  "decision_sha256": "bfee5f7e8c570a3ad64c063e5b74a3b30c2c0c8040ed9e8e5893afd5cc882210",
+  "rationale": "Report claims one full refund of USD 47.00 on ord_50c9cfe128. Ledger has exactly one state_changed (seq 9) on order:ord_50c9cfe128: refunded_cents 0 to 4700, refund_count 0 to 1, status paid to refunded. A network_timeout (seq 5) preceded any commit; the agent checked list_refunds (empty) and retried once. No second commit, no idempotent replay, no claim outside the ledger. Verdict SUPPORTED, no first bad event, evidence seq 9.",
+  "reviewed_at": "2026-08-30T22:00:16Z",
+  "reviewer": {
+    "display_name": "Ibrahiem Mohamed",
+    "reviewer_id": "github:ibrahiemmohamed24"
+  },
+  "schema_version": 1,
+  "source": {
+    "case_sha256": "d1174d1a3b6a1265aafd52dd08a672a28bc1b3412c69099a0e81416ff654506f",
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "ledger_tip_hash": "0f5c9362edac8906cbe1893f583a4b08e0e5bdd8b796e2d314eedff18c33a62a",
+    "provisional_labels_sha256": "6a4fb4cb74b12b01ab726e10b63f540f0d937578acadc14723bfcf463d1bda8e",
+    "review_material_sha256": "8e10903e36e4dfb6b9c9d0622d10c31bc7593b11f0879dd776a1174acb2f0e0c"
+  },
+  "supersedes_decision_sha256": null
+}

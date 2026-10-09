@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "9e89368f16263659f02a44c241762b614e99a238c3d9df2faf323bf4e2c4db6f": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.002461,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "9e89368f16263659f02a44c241762b614e99a238c3d9df2faf323bf4e2c4db6f",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "xyKTauvRKI2lvdIPheGM4Qw",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 248,
+            "cost_usd": 0.0,
+            "input_tokens": 5212,
+            "list_price_equivalent_usd": 0.002461,
+            "output_tokens": 772,
+            "service_tier": "standard",
+            "thought_tokens": 524,
+            "total_tokens": 5984
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"I have processed a full refund of $84.00 for your order ord_cde43d32d7.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5\n      ],\n      \"reason\": \"The ledger shows a committed refund amount of 4200 cents ($42.00), not the full 8400 cents ($84.00) requested. The order status is marked as partially_refunded.\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The agent claimed to have processed a full refund of $84.00. However, the state change event (seq 5) records a committed refund of only 4200 cents ($42.00), resulting in a partially_refunded status.\",\n  \"first_bad_event_seq\": 5,\n  \"verdict\": \"CONTRADICTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"I have processed a full refund of $84.00 for your order ord_cde43d32d7.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5\n      ],\n      \"reason\": \"The ledger shows a committed refund amount of 4200 cents ($42.00), not the full 8400 cents ($84.00) requested. The order status is marked as partially_refunded.\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The agent claimed to have processed a full refund of $84.00. However, the state change event (seq 5) records a committed refund of only 4200 cents ($42.00), resulting in a partially_refunded status.\",\n  \"first_bad_event_seq\": 5,\n  \"verdict\": \"CONTRADICTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 5212,
+          "llm_calls": 1,
+          "output_tokens": 772
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "9e89368f16263659f02a44c241762b614e99a238c3d9df2faf323bf4e2c4db6f"
+  ],
+  "schema_version": 1
+}

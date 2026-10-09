@@ -1,41 +1,79 @@
-# Provenance
+# Provenance and AI use
 
-This repository had no Git history when the 2026-08-28 implementation milestone
-started, so this record states only what can be established from the inspected
-files and the current work session.
+This document records the archived competition snapshot. Active development
+continues in `ibrahiemmohamed24/prooftrail`, which preserves its existing Git
+history and subsequent frontend contributions. Historical sole-participant
+statements below apply to the competition submission.
 
-## Present before this milestone
+The detailed tool-by-tool responsibility statement and representative coding
+agent traces are in `docs/AI_TOOL_DISCLOSURE.md` and
+`docs/CODEX_TRAJECTORIES.md`.
 
-- Event, trace and verdict schemas.
-- Deterministic identity helpers.
-- SQLite customer/order/refund state.
-- Append-only hash-chained ledger.
-- Fault declarations and ten scenario-family specifications.
-- Foundation tests and architecture documents.
+## Sole human author
 
-Those files formed a tested foundation but there was no tool implementation,
-agent loop, auditor, baseline runner, evaluator, CLI or end-to-end demo.
+ProofTrail is an individual submission by **Ibrahiem Mohamed**
+(`github:ibrahiemmohamed24`). The author selected the problem, directed every
+development iteration, chose the acceptance criteria, ran the evaluation,
+personally reviewed and attested all 40 benchmark decisions, and prepared the
+final submission. There is no human co-author.
 
-## Added or materially completed in this milestone
+Some OpenAI Codex development sessions were run on a second computer whose
+local Git author configuration belonged to that computer's owner. That machine
+metadata did not represent human authorship. The final submission repository
+was exported from the verified tracked tree and initialized with the sole
+author's GitHub-linked identity. Exporting the snapshot did not alter the code,
+frozen traces, review decisions, hashes or benchmark results.
 
-- Stateful refund tools, deterministic seed data and scenario generation.
-- Atomic business-state plus `STATE_CHANGED` writes.
-- Provider-neutral agent loop, recorder and explicit scripted replay fixture.
-- Claim extraction contract, deterministic evidence linking/reconciliation,
-  temporal verifier and JSON/Markdown evidence certificate.
-- Fair B1 input/output contract, offline metrics, runner and report rendering.
-- CLI, reproducible F02 demo, 98-test suite, license and secret scanner.
-- Paid Anthropic and zero-billed Gemini Free Tier provider adapters, with
-  provider-neutral tool calls, usage metadata and prompt-hash replay.
+## Development AI assistance
 
-## Still to be produced
+**OpenAI Codex was the only AI coding assistant used to build and document the
+project.** Codex helped generate and revise code, tests, documentation, review
+reading aids and CLI transcription material under the author's direction.
+The author decided what to build, inspected the outputs, executed all commands
+used as evidence and accepted the final changes.
 
-- Forty frozen benchmark cases and cached model responses.
-- Human-approved labels and repeated B1/ProofTrail comparison.
-- Final trajectories, video and submission report.
+Codex did not make or attest any human-review decision. For the seven amended
+cases, it helped format conclusions the author had already reached; the author
+personally selected each decision and executed every case-specific
+`--attest-reviewed` acknowledgement.
 
-No generated demo output is described as a real-model result.
+## Runtime and evaluation models
 
-The Gemini free route sends only the synthetic refund benchmark to Google. Per
-Google's Free Tier terms, that content may be used to improve Google products.
-No customer data, personal data or repository credential is sent.
+Runtime model use is separate from development assistance:
+
+- The committed 40-case refund-agent dataset and the three B1 baseline runs
+  were recorded with Google Gemini `gemini-3.1-flash-lite` on synthetic data.
+- Gemini was the system under test and the comparison baseline, not a coding
+  assistant for the project.
+- An optional Anthropic adapter is included and tested over a local mock
+  transport, but no Anthropic live output contributes to the reported result.
+- ProofTrail itself makes zero model calls during auditing.
+
+## Evidence provenance
+
+- `data/frozen/` contains 40 real-model traces, provisional labels and a
+  hash-validating manifest: 10 scenario families × 4 deterministic seeds.
+- `data/replay/gemini/` contains the prompt-hash response caches used to freeze
+  those traces: 175 calls, billed `$0.00`.
+- `data/replay/auditors/` and `evidence/runs/benchmark/b1/` contain three
+  independent B1 runs: 120 accepted outputs, billed `$0.00`.
+- `data/reviews/v1/` contains 40 source-bound decisions by the sole author:
+  33 `APPROVE`, 7 `AMEND`, 0 `ABSTAIN`.
+- `comparison.verified.{json,md}` is generated offline from those committed
+  artifacts and reports `headline_eligible: true`.
+- The five-second F02 demonstration uses `ScriptedModelClient` and is labelled
+  as a fixture. It demonstrates the failure shape and is not represented as a
+  real-model result.
+
+## Privacy and cost boundary
+
+All benchmark data is synthetic. No API key, customer record or personal data
+is committed. The Gemini Free Tier route sent only synthetic benchmark prompts
+to Google and recorded billed cost `$0.00`; list-price equivalents remain in
+the artifacts for transparency. Reproduction uses committed caches and needs
+no key or network access.
+
+## Remaining external artifact
+
+The solution video is recorded outside Git and linked from `README.md` and
+`docs/SUBMISSION_REPORT.md` after upload.

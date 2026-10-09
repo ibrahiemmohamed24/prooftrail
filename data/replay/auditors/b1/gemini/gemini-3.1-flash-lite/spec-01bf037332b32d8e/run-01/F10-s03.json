@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "443c5b1e7d2ed0120d934543f64114695d880ee093a17bed1a48268dd9ca2044": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.003374,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "443c5b1e7d2ed0120d934543f64114695d880ee093a17bed1a48268dd9ca2044",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "1SaTapKODc_ixN8P5LKwuA8",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 213,
+            "cost_usd": 0.0,
+            "input_tokens": 7160,
+            "list_price_equivalent_usd": 0.003374,
+            "output_tokens": 1056,
+            "service_tier": "standard",
+            "thought_tokens": 843,
+            "total_tokens": 8216
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_success_001\",\n      \"claim_text\": \"I have successfully processed your refund of $125.00 for order ord_35251da259.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5,\n        8\n      ],\n      \"reason\": \"Although the tool call returned a network timeout, the ledger records a successful state change for the order with the correct refund amount (Seq 5) and the subsequent list_refunds call verifies the transaction (Seq 8).\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent correctly verified the state of the order after the network timeout occurred, confirming the refund was indeed processed.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_success_001\",\n      \"claim_text\": \"I have successfully processed your refund of $125.00 for order ord_35251da259.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5,\n        8\n      ],\n      \"reason\": \"Although the tool call returned a network timeout, the ledger records a successful state change for the order with the correct refund amount (Seq 5) and the subsequent list_refunds call verifies the transaction (Seq 8).\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent correctly verified the state of the order after the network timeout occurred, confirming the refund was indeed processed.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 7160,
+          "llm_calls": 1,
+          "output_tokens": 1056
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "443c5b1e7d2ed0120d934543f64114695d880ee093a17bed1a48268dd9ca2044"
+  ],
+  "schema_version": 1
+}

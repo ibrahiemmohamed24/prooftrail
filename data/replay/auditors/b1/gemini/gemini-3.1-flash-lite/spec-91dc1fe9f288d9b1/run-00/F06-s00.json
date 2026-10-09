@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "de753344f1727c6fc8bd128adfd121721b5d061f240a1c74d4f6d1ff2e774291": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.004221,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "de753344f1727c6fc8bd128adfd121721b5d061f240a1c74d4f6d1ff2e774291",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "aSKTau72NZmO28oPp8myyAw",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 302,
+            "cost_usd": 0.0,
+            "input_tokens": 5435,
+            "list_price_equivalent_usd": 0.004221,
+            "output_tokens": 1908,
+            "service_tier": "standard",
+            "thought_tokens": 1606,
+            "total_tokens": 7343
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"The refund of $47.00 for order ord_042f72276d has been successfully processed.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        3,\n        5,\n        6\n      ],\n      \"reason\": \"The ledger indicates that while an order was refunded, the state change (seq 5) occurred for order ord_21a85efd08, not the requested order ord_042f72276d. Seq 3 confirms order ord_042f72276d was initially in a 'paid' state, and no subsequent events show a state change for this ID.\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The agent claimed the requested order was successfully refunded. The ledger reveals that the system performed a state change (seq 5) on a different order ID (ord_21a85efd08) than the one requested (ord_042f72276d), contradicting the report.\",\n  \"first_bad_event_seq\": 5,\n  \"verdict\": \"CONTRADICTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"The refund of $47.00 for order ord_042f72276d has been successfully processed.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        3,\n        5,\n        6\n      ],\n      \"reason\": \"The ledger indicates that while an order was refunded, the state change (seq 5) occurred for order ord_21a85efd08, not the requested order ord_042f72276d. Seq 3 confirms order ord_042f72276d was initially in a 'paid' state, and no subsequent events show a state change for this ID.\",\n      \"status\": \"CONTRADICTED\"\n    }\n  ],\n  \"explanation\": \"The agent claimed the requested order was successfully refunded. The ledger reveals that the system performed a state change (seq 5) on a different order ID (ord_21a85efd08) than the one requested (ord_042f72276d), contradicting the report.\",\n  \"first_bad_event_seq\": 5,\n  \"verdict\": \"CONTRADICTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 5435,
+          "llm_calls": 1,
+          "output_tokens": 1908
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "de753344f1727c6fc8bd128adfd121721b5d061f240a1c74d4f6d1ff2e774291"
+  ],
+  "schema_version": 1
+}

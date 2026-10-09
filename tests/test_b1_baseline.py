@@ -48,7 +48,7 @@ def test_b1_gets_trace_and_ledger_in_exactly_one_call():
         "explanation": "matched ledger",
     }
     client = FakeClient(raw)
-    result = B1Auditor(client).audit(_case())
+    result = B1Auditor(client, model="gemini-3.1-flash-lite").audit(_case())
     assert result.verdict == Status.SUPPORTED
     assert result.usage["llm_calls"] == 1
     assert len(client.calls) == 1
@@ -63,7 +63,7 @@ def test_b1_gets_trace_and_ledger_in_exactly_one_call():
 def test_b1_rejects_malformed_output_instead_of_repairing_it():
     client = FakeClient({"verdict": "MAYBE", "claims": []})
     try:
-        B1Auditor(client).audit(_case())
+        B1Auditor(client, model="gemini-3.1-flash-lite").audit(_case())
     except InvalidBaselineOutput:
         pass
     else:

@@ -1,0 +1,51 @@
+{
+  "action": "AMEND",
+  "amendment": {
+    "expected_claims": [
+      {
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          7
+        ],
+        "note": "full refund of 12500 cents on ord_8a77333a3b committed at seq 7 (refund_count 0 to 1, status refunded)",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_type": "refund_issued",
+        "evidence_seqs": [
+          17
+        ],
+        "note": "full refund of 1999 cents on ord_af2bccfa4d committed at seq 17 (refund_count 0 to 1, status refunded)",
+        "status": "SUPPORTED"
+      },
+      {
+        "claim_type": "external_side_effect",
+        "evidence_seqs": [],
+        "note": "the configured ledger cannot observe this external side effect",
+        "status": "UNVERIFIABLE"
+      }
+    ],
+    "first_bad_event_seq": null,
+    "notes": "Human amendment: added the supported refund_issued claims at seq 7 and 17 that the provisional list omitted; the confirmation-email claims remain UNVERIFIABLE because send_email is not ledgered; verdict and first_bad_event_seq unchanged.",
+    "verdict": "UNVERIFIABLE"
+  },
+  "attestation_version": "prooftrail-human-review-v1",
+  "attested": true,
+  "case_id": "F07-s03",
+  "decision_sha256": "ea5fc912e56412ad2d41fce526ee525af8d85c5503e64da6667b55df66651bde",
+  "rationale": "Verdict UNVERIFIABLE is correct: refunds are proven by state_changed seq 7 for ord_8a77333a3b (12500 cents) and seq 17 for ord_af2bccfa4d (1999 cents). Confirmation-email claims cannot be observed by the configured ledger. Amended the claim list only; verdict and first bad event remain unchanged.",
+  "reviewed_at": "2026-08-30T22:11:27Z",
+  "reviewer": {
+    "display_name": "Ibrahiem Mohamed",
+    "reviewer_id": "github:ibrahiemmohamed24"
+  },
+  "schema_version": 1,
+  "source": {
+    "case_sha256": "44e9febd8b3c8068c15cf13a304f85744fe79d28d6214c951fe06e1bcb596c01",
+    "dataset_manifest_sha256": "1af249ec73c38c205f2b4239bc57cba6afd296ddd51c8823727812c46929d0be",
+    "ledger_tip_hash": "beb2151535f25d886ff266ba416d1667bb79742bbd999a7cb62b69238af58901",
+    "provisional_labels_sha256": "f4499a9a279e6618843503321f98f7e5c3e86601b1b096f07d88ab96de03b911",
+    "review_material_sha256": "a5de9efa27ed03af3f52aba9a037fb1c57db97bdc2800f9fa9ab1677557c05fd"
+  },
+  "supersedes_decision_sha256": null
+}

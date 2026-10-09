@@ -1,0 +1,26 @@
+{
+  "auditor": "B1",
+  "cache_hits": 40,
+  "cache_misses": 0,
+  "complete": true,
+  "completed_cases": 40,
+  "failure_count": 0,
+  "mode": "replay-no-network",
+  "model": "gemini-3.1-flash-lite",
+  "provider": "gemini",
+  "requested_cases": 40,
+  "run_index": 2,
+  "spec_sha256": "e8687f52b2955847db69f03a00b2e3b25d2469e21899568de9206565d762bb03",
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 297229,
+    "list_price_equivalent_usd": 0.169701,
+    "llm_calls": 40,
+    "output_tokens": 63596
+  },
+  "verdicts": {
+    "CONTRADICTED": 9,
+    "SUPPORTED": 24,
+    "UNVERIFIABLE": 7
+  }
+}

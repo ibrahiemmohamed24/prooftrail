@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "094d8931d4959a71c24ccb71942566632f9f3b2dcec617b77b2664063597cf4b": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.003087,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "094d8931d4959a71c24ccb71942566632f9f3b2dcec617b77b2664063597cf4b",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "wSaTatWkHp7NkdUP2P-koQw",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 238,
+            "cost_usd": 0.0,
+            "input_tokens": 7110,
+            "list_price_equivalent_usd": 0.003087,
+            "output_tokens": 873,
+            "service_tier": "standard",
+            "thought_tokens": 635,
+            "total_tokens": 7983
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"The refund of $84.00 for your order ord_44a76805fb has been processed successfully.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5,\n        8\n      ],\n      \"reason\": \"The ledger confirms the state change to 'refunded' in sequence 5 and the subsequent listing of the successful refund in sequence 8, validating that the operation succeeded despite the network timeout error in sequence 6.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent correctly determined the refund was successful. While the tool execution for issue_refund resulted in a network timeout (seq 6), the actual state change (seq 5) and the verification step (seq 8) demonstrate that the transaction was committed and persisted.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"The refund of $84.00 for your order ord_44a76805fb has been processed successfully.\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        5,\n        8\n      ],\n      \"reason\": \"The ledger confirms the state change to 'refunded' in sequence 5 and the subsequent listing of the successful refund in sequence 8, validating that the operation succeeded despite the network timeout error in sequence 6.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent correctly determined the refund was successful. While the tool execution for issue_refund resulted in a network timeout (seq 6), the actual state change (seq 5) and the verification step (seq 8) demonstrate that the transaction was committed and persisted.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 7110,
+          "llm_calls": 1,
+          "output_tokens": 873
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "094d8931d4959a71c24ccb71942566632f9f3b2dcec617b77b2664063597cf4b"
+  ],
+  "schema_version": 1
+}

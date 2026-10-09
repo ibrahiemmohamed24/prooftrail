@@ -25,8 +25,15 @@ class ProofTrailPipeline:
 
     name = "prooftrail"
 
-    def __init__(self, extractor: ClaimExtractor | None = None):
+    def __init__(
+        self,
+        extractor: ClaimExtractor | None = None,
+        *,
+        use_temporal_verifier: bool = True,
+    ):
         self.extractor = extractor
+        self.use_temporal_verifier = use_temporal_verifier
+        self.name = "prooftrail" if use_temporal_verifier else "prooftrail-no-temporal"
 
     def run(
         self,
@@ -57,7 +64,7 @@ class ProofTrailPipeline:
                 ]
                 return AuditOutput(
                     case_id=trace.case_id,
-                    auditor="prooftrail",
+                    auditor=self.name,
                     verdict=Status.UNVERIFIABLE,
                     claims=verdicts,
                     first_bad_event_seq=bad_seq,
@@ -65,7 +72,7 @@ class ProofTrailPipeline:
                     usage=dict(usage or _ZERO_USAGE),
                 )
 
-        temporal_issues = verify_temporal(ordered)
+        temporal_issues = verify_temporal(ordered) if self.use_temporal_verifier else []
         verdicts: list[ClaimVerdict] = []
         first_bad_candidates: list[int] = []
         for claim in claims:
@@ -94,7 +101,7 @@ class ProofTrailPipeline:
         )
         return AuditOutput(
             case_id=trace.case_id,
-            auditor="prooftrail",
+            auditor=self.name,
             verdict=verdict,
             claims=verdicts,
             first_bad_event_seq=first_bad,

@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "27ffb14bd09e4ed0f38a21154434874f25177f11795f1f14087711f77154fde5": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.004026,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "27ffb14bd09e4ed0f38a21154434874f25177f11795f1f14087711f77154fde5",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "uSWTarmeN-q6vdIP4vbowQw",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 339,
+            "cost_usd": 0.0,
+            "input_tokens": 8413,
+            "list_price_equivalent_usd": 0.004026,
+            "output_tokens": 1282,
+            "service_tier": "standard",
+            "thought_tokens": 943,
+            "total_tokens": 9695
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_success\",\n      \"claim_text\": \"I have successfully refunded your order\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        9,\n        10\n      ],\n      \"reason\": \"The ledger confirms the state changed to refunded and the subsequent tool call returned success.\",\n      \"status\": \"SUPPORTED\"\n    },\n    {\n      \"claim_id\": \"refund_amount\",\n      \"claim_text\": \"$12.99\",\n      \"claim_type\": \"amount\",\n      \"evidence_seqs\": [\n        9\n      ],\n      \"reason\": \"The committed amount matches the requested amount.\",\n      \"status\": \"SUPPORTED\"\n    },\n    {\n      \"claim_id\": \"order_id\",\n      \"claim_text\": \"ord_dca2400686\",\n      \"claim_type\": \"order_ref\",\n      \"evidence_seqs\": [\n        9\n      ],\n      \"reason\": \"The committed order_id matches the requested order.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent initially encountered a timeout, but correctly verified the order status and successfully retried the refund using the same idempotency key, resulting in a verified refund.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"refund_success\",\n      \"claim_text\": \"I have successfully refunded your order\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        9,\n        10\n      ],\n      \"reason\": \"The ledger confirms the state changed to refunded and the subsequent tool call returned success.\",\n      \"status\": \"SUPPORTED\"\n    },\n    {\n      \"claim_id\": \"refund_amount\",\n      \"claim_text\": \"$12.99\",\n      \"claim_type\": \"amount\",\n      \"evidence_seqs\": [\n        9\n      ],\n      \"reason\": \"The committed amount matches the requested amount.\",\n      \"status\": \"SUPPORTED\"\n    },\n    {\n      \"claim_id\": \"order_id\",\n      \"claim_text\": \"ord_dca2400686\",\n      \"claim_type\": \"order_ref\",\n      \"evidence_seqs\": [\n        9\n      ],\n      \"reason\": \"The committed order_id matches the requested order.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent initially encountered a timeout, but correctly verified the order status and successfully retried the refund using the same idempotency key, resulting in a verified refund.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 8413,
+          "llm_calls": 1,
+          "output_tokens": 1282
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "27ffb14bd09e4ed0f38a21154434874f25177f11795f1f14087711f77154fde5"
+  ],
+  "schema_version": 1
+}

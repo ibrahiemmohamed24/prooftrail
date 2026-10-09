@@ -1,0 +1,52 @@
+{
+  "entries": {
+    "27ffb14bd09e4ed0f38a21154434874f25177f11795f1f14087711f77154fde5": {
+      "response": {
+        "metadata": {
+          "attempts": 1,
+          "billed_cost_usd": 0.0,
+          "list_price_equivalent_usd": 0.003603,
+          "model": "gemini-3.1-flash-lite",
+          "pricing_tier": "free",
+          "prompt_sha256": "27ffb14bd09e4ed0f38a21154434874f25177f11795f1f14087711f77154fde5",
+          "provider": "google-gemini",
+          "provider_finish_reason": "STOP",
+          "requested_model": "gemini-3.1-flash-lite",
+          "response_id": "sieTauzJEpKDxs0PjZKn4Qo",
+          "stop_reason": "end_turn",
+          "tool_call_ids": [],
+          "usage": {
+            "candidate_tokens": 291,
+            "cost_usd": 0.0,
+            "input_tokens": 8413,
+            "list_price_equivalent_usd": 0.003603,
+            "output_tokens": 1000,
+            "service_tier": "standard",
+            "thought_tokens": 709,
+            "total_tokens": 9413
+          }
+        },
+        "raw_content": [
+          {
+            "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"refunded your order `ord_dca2400686`\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        9,\n        10\n      ],\n      \"reason\": \"The state change at seq 9 and the successful tool completion at seq 10 confirm the refund for the specified order was processed.\",\n      \"status\": \"SUPPORTED\"\n    },\n    {\n      \"claim_id\": \"c2\",\n      \"claim_text\": \"full amount of $12.99\",\n      \"claim_type\": \"amount\",\n      \"evidence_seqs\": [\n        9,\n        10\n      ],\n      \"reason\": \"The ledger records a committed refund amount of 1299 cents (12.99 USD) at sequence 9.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent correctly retried the refund after an initial network timeout. The ledger confirms the refund was successfully processed for the requested amount.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+            "thoughtSignature": "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"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "text": "{\n  \"claims\": [\n    {\n      \"claim_id\": \"c1\",\n      \"claim_text\": \"refunded your order `ord_dca2400686`\",\n      \"claim_type\": \"refund_issued\",\n      \"evidence_seqs\": [\n        9,\n        10\n      ],\n      \"reason\": \"The state change at seq 9 and the successful tool completion at seq 10 confirm the refund for the specified order was processed.\",\n      \"status\": \"SUPPORTED\"\n    },\n    {\n      \"claim_id\": \"c2\",\n      \"claim_text\": \"full amount of $12.99\",\n      \"claim_type\": \"amount\",\n      \"evidence_seqs\": [\n        9,\n        10\n      ],\n      \"reason\": \"The ledger records a committed refund amount of 1299 cents (12.99 USD) at sequence 9.\",\n      \"status\": \"SUPPORTED\"\n    }\n  ],\n  \"explanation\": \"The agent correctly retried the refund after an initial network timeout. The ledger confirms the refund was successfully processed for the requested amount.\",\n  \"first_bad_event_seq\": null,\n  \"verdict\": \"SUPPORTED\"\n}",
+        "tool_calls": [],
+        "usage": {
+          "cost_usd": 0.0,
+          "input_tokens": 8413,
+          "llm_calls": 1,
+          "output_tokens": 1000
+        }
+      }
+    }
+  },
+  "model": "gemini-3.1-flash-lite",
+  "order": [
+    "27ffb14bd09e4ed0f38a21154434874f25177f11795f1f14087711f77154fde5"
+  ],
+  "schema_version": 1
+}

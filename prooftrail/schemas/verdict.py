@@ -137,6 +137,10 @@ def validate_audit_output(raw: Any) -> list[str]:
     problems: list[str] = []
     if not isinstance(raw, dict):
         return ["output is not an object"]
+    allowed_root = {"verdict", "claims", "first_bad_event_seq", "explanation"}
+    unknown_root = set(raw) - allowed_root
+    if unknown_root:
+        problems.append(f"output has unsupported fields: {sorted(unknown_root)}")
     if raw.get("verdict") not in STATUSES:
         problems.append(f"verdict must be one of {STATUSES}, got {raw.get('verdict')!r}")
     fbe = raw.get("first_bad_event_seq")
@@ -146,12 +150,34 @@ def validate_audit_output(raw: Any) -> list[str]:
     if not isinstance(claims, list):
         problems.append("claims must be a list")
         return problems
+    claim_ids: set[str] = set()
+    claim_statuses: list[str] = []
     for i, c in enumerate(claims):
         if not isinstance(c, dict):
             problems.append(f"claims[{i}] is not an object")
             continue
+        allowed_claim = {
+            "claim_id",
+            "claim_text",
+            "claim_type",
+            "status",
+            "evidence_seqs",
+            "reason",
+        }
+        unknown_claim = set(c) - allowed_claim
+        if unknown_claim:
+            problems.append(f"claims[{i}] has unsupported fields: {sorted(unknown_claim)}")
         if c.get("status") not in STATUSES:
             problems.append(f"claims[{i}].status invalid: {c.get('status')!r}")
+        else:
+            claim_statuses.append(c["status"])
+        claim_id = c.get("claim_id")
+        if not isinstance(claim_id, str) or not claim_id.strip():
+            problems.append(f"claims[{i}].claim_id missing")
+        elif claim_id in claim_ids:
+            problems.append(f"claims[{i}].claim_id duplicates {claim_id!r}")
+        else:
+            claim_ids.add(claim_id)
         if c.get("claim_type") not in ClaimType.ALL:
             problems.append(f"claims[{i}].claim_type invalid: {c.get('claim_type')!r}")
         text = c.get("claim_text")
@@ -160,4 +186,10 @@ def validate_audit_output(raw: Any) -> list[str]:
         ev = c.get("evidence_seqs", [])
         if not isinstance(ev, list) or not all(isinstance(x, int) and not isinstance(x, bool) for x in ev):
             problems.append(f"claims[{i}].evidence_seqs must be a list of ints")
+        if not isinstance(c.get("reason"), str) or not c.get("reason", "").strip():
+            problems.append(f"claims[{i}].reason missing")
+    if not isinstance(raw.get("explanation"), str):
+        problems.append("explanation must be a string")
+    if len(claim_statuses) == len(claims) and aggregate_verdict(claim_statuses) != raw.get("verdict"):
+        problems.append("verdict must equal the aggregate of claim statuses")
     return problems
