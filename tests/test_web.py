@@ -48,6 +48,28 @@ def test_real_audit(server):
     assert json.loads(raw)["certificate"] == app.get_evidence_certificate("F02-s00")
 
 
+def test_overview_charts_work_without_inline_styles_under_strict_csp(server):
+    from xml.etree import ElementTree
+    import re
+    from prooftrail.ui.model import load_site
+    status, headers, raw = request(server, "GET", "/")
+    assert status == 200
+    assert "style-src 'self'" in headers["Content-Security-Policy"]
+    assert "'unsafe-inline'" not in headers["Content-Security-Policy"]
+    html = raw.decode("utf-8")
+    assert 'style="' not in html
+    charts = re.findall(r'<svg viewBox="0 0 100 1".*?</svg>', html)
+    metrics = load_site().overview.metrics
+    assert len(charts) == len(metrics) * 2
+    for index, metric in enumerate(metrics):
+        pt = ElementTree.fromstring(charts[index * 2])
+        b1 = ElementTree.fromstring(charts[index * 2 + 1])
+        assert float(pt.find("rect").get("width")) == round(metric.proof_trail * 100, 1)
+        assert float(b1.find("rect").get("width")) == round(metric.b1_mean * 100, 1)
+        band = b1.findall("rect")[1]
+        assert float(band.get("x")) == round(max(0, metric.b1_mean - metric.b1_stddev) * 100, 1)
+
+
 @pytest.mark.parametrize("headers", [{"Host": "evil.example"}, {"Origin": "https://evil.example"}, {"Sec-Fetch-Site": "cross-site"}])
 def test_origin_and_host_rejected(server, headers):
     assert request(server, "GET", "/api/v1/cases", headers=headers)[0] == 403

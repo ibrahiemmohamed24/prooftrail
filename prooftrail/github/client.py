@@ -300,6 +300,7 @@ class GithubCollector:
             check_runs=tuple(item for item in runs if item is not None),
             commit_statuses=tuple(item for item in statuses if item is not None),
             observations=(repo_obs, pr_obs, runs_obs, statuses_obs, recheck_obs),
+            network_used=True,
         )
 
 

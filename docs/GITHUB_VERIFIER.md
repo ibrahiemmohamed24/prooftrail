@@ -55,6 +55,9 @@ prove that the merge commit equals the expected revision, and it does not prove 
 
 - A check run or commit status counts only when its SHA equals the expected SHA. Successful runs
   on older commits are listed as `other_sha_run_ids` and never used.
+- A legacy commit status with no SHA is `UNVERIFIABLE` (`status_revision_unconfirmed`).
+- Evidence must describe the requested PR number. A different number contradicts `pr_exists`
+  and makes dependent claims `UNVERIFIABLE` (`pull_request_number_mismatch`).
 - `queued`, `in_progress`, `waiting`, `requested` and `pending` are not success; they stay
   `UNVERIFIABLE` (`check_pending`).
 - `success` is the only conclusion that counts as success. `failure`, `timed_out`, `cancelled` and
@@ -81,6 +84,10 @@ the pull request, a second read of its head, check runs, commit statuses and the
 each source. Its SHA-256 is computed over canonical JSON. The hash shows the bundle is unchanged since
 it was hashed; it does not authenticate who produced it. Bundles declare their provenance:
 `synthetic_fixture` (labelled as not production evidence), `saved_live_capture`, `offline_bundle` or `live`.
+Declared provenance is untrusted. `network_used` is runtime-only metadata set by the collector,
+never read from an uploaded bundle; an offline audit reports no network use even if the bundle
+declares `kind=live`. Uploaded and saved evidence does not establish source authenticity or
+the current state of GitHub.
 
 Scenario packs with hand-written expected verdicts live in `examples/github/`. They are synthetic:
 owner, SHAs and times are placeholders. The committed packs must match the generator byte for byte

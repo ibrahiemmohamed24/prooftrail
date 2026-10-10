@@ -1,3 +1,4 @@
+import copy
 import http.client
 import json
 import threading
@@ -41,6 +42,19 @@ def test_offline_application_call_returns_verdict_certificate_and_no_network_use
     assert result["verdict"] == "SUPPORTED"
     assert result["network_used"] is False
     assert result["certificate"]["source"]["synthetic"] is True
+
+
+def test_uploaded_live_label_cannot_claim_runtime_network_use(monkeypatch):
+    pack = copy.deepcopy(PACK)
+    pack["bundle"]["provenance"].update(kind="live", synthetic=False, fixture_note=None)
+    def forbidden_collect(*args, **kwargs):
+        raise AssertionError("Offline evidence must never invoke the collector")
+    monkeypatch.setattr(app, "collect_live", forbidden_collect)
+    result = app.audit_github_request({"mode": "offline", "request": pack["request"], "bundle": pack["bundle"]})
+    assert result["network_used"] is False
+    assert result["certificate"]["network_used"] is False
+    assert "**Network used:** no" in result["certificate_markdown"]
+    assert any("does not authenticate" in warning for warning in result["warnings"])
 
 
 def test_live_mode_reads_through_the_collector_and_refuses_a_bundle(monkeypatch):

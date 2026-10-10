@@ -137,7 +137,14 @@ def _status_state(status: CommitStatusRecord) -> tuple[str, str, str]:
 def _assess_check(name: str, snapshot: EvidenceSnapshot, expected_sha: str) -> CheckAssessment:
     runs = [run for run in snapshot.check_runs if run.name == name and run.head_sha == expected_sha]
     other = tuple(sorted(run.run_id for run in snapshot.check_runs if run.name == name and run.head_sha != expected_sha))
-    statuses = [item for item in snapshot.commit_statuses if item.context == name]
+    statuses = [item for item in snapshot.commit_statuses
+                if item.context == name and item.sha == expected_sha]
+    if any(item.context == name and item.sha is None for item in snapshot.commit_statuses):
+        return CheckAssessment(
+            name=name, status=UNVERIFIABLE, reason_code="status_revision_unconfirmed",
+            reason="A matching commit status has no SHA; its revision cannot be established.",
+            producers=(), attempt_ids=(), latest_run_id=None, latest_conclusion=None,
+            superseded_ids=(), other_sha_run_ids=other, evidence=())
     producers = sorted({f"check_run:{run.producer}" for run in runs} | {"commit_status" for _ in statuses})
     if not producers:
         note = " Successful runs on other SHAs were ignored." if other else ""
@@ -237,6 +244,7 @@ def verify(request: GithubRequest, snapshot: EvidenceSnapshot) -> Verification:
     repo = snapshot.repository
     repo_obs = snapshot.observation("repository")
     pr_ok = pr is not None and pr_obs is not None and pr_obs.status == "ok"
+    number_mismatch = pr_ok and pr.number != request.pull_request
     repo_identity = (repo_obs is not None and repo_obs.status == "ok" and repo is not None
                      and repo.full_name.lower() == expected_repo)
     identity = pr_ok and repo_identity and pr.base_repo is not None and pr.base_repo.lower() == expected_repo
@@ -253,6 +261,13 @@ def verify(request: GithubRequest, snapshot: EvidenceSnapshot) -> Verification:
         if claim.claim_type in UNSUPPORTED_REASONS:
             status, code, text = UNVERIFIABLE, UNSUPPORTED_REASONS[claim.claim_type], (
                 "This claim type is not verifiable in this milestone; see limitations.")
+        elif number_mismatch:
+            expected = {"pull_request": request.pull_request}
+            observed = {"pull_request": pr.number}
+            status = CONTRADICTED if claim.claim_type == "pr_exists" else UNVERIFIABLE
+            code, text = "pull_request_number_mismatch", (
+                "The evidence describes a different pull request; dependent claims cannot be verified.")
+            evidence = (f"pull_request:{pr.number}",)
         elif claim.claim_type == "pr_exists":
             expected = {"repository": request.repository.full_name, "pull_request": request.pull_request}
             if pr_ok and identity:
@@ -343,6 +358,9 @@ def verify(request: GithubRequest, snapshot: EvidenceSnapshot) -> Verification:
         warnings.append("Saved offline bundle: integrity is relative to its hash; source authenticity is not established.")
     if snapshot.provenance.kind == "saved_live_capture":
         warnings.append("Saved live capture: observations describe the time they were collected, not this audit's time.")
+    if not snapshot.network_used and not snapshot.provenance.synthetic:
+        warnings.append("Uploaded or saved evidence: no network was used for this audit. "
+                        "Declared provenance does not authenticate the source or establish current GitHub state.")
     if pr_ok and recheck_sha is not None and recheck_sha != pr.head_sha:
         warnings.append("The pull request head changed during collection; current-revision claims abstain.")
     for observation in snapshot.observations:

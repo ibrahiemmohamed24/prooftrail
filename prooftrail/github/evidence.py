@@ -104,6 +104,8 @@ class EvidenceSnapshot:
     check_runs: tuple[CheckRunRecord, ...]
     commit_statuses: tuple[CommitStatusRecord, ...]
     observations: tuple[Observation, ...]
+    # Runtime collection metadata, deliberately excluded from uploaded bundles.
+    network_used: bool = False
 
     def observation(self, name: str) -> Observation | None:
         for item in self.observations:

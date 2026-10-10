@@ -104,7 +104,7 @@ def build_certificate(request: GithubRequest, snapshot: EvidenceSnapshot, verifi
         "limitations": list(LIMITATIONS),
         "persisted": False,
         "model_calls": 0,
-        "network_used": provenance.kind == "live",
+        "network_used": snapshot.network_used,
     }
 
 

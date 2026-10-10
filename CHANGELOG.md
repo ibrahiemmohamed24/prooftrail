@@ -1,5 +1,18 @@
 # Improvement Changelog
 
+## 2026-10-09 — Review corrections (local, not yet merged)
+
+- Reject evidence for a different PR number and abstain on its dependent claims.
+- Match legacy commit statuses by both context and expected SHA; missing SHAs abstain.
+- Track network use as runtime-only collector metadata, never from uploaded provenance.
+  Saved or uploaded non-synthetic evidence carries an explicit authenticity warning.
+- Render comparison bars as SVG geometry rather than inline styles, preserving strict CSP.
+- Add regression coverage for wrong PRs, wrong/missing/matching status SHAs,
+  forged live provenance and chart dimensions under the HTTP security policy.
+- Verification: 451 tests passed, 2 opt-in live tests skipped; human review remains
+  40/40 and the verified benchmark is unchanged. Browser inspection confirms bar
+  dimensions and colors under the unchanged CSP, with no console errors/warnings.
+
 ## 2026-10-09 — GitHub execution verifier
 
 - Observation: the refund auditor could not check claims about a coding agent's

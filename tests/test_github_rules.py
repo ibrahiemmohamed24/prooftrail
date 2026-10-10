@@ -1,3 +1,5 @@
+import copy
+
 import pytest
 
 from prooftrail.github.audit import audit as run_audit
@@ -7,6 +9,40 @@ from prooftrail.github.examples import scenario_packs
 from prooftrail.github.verify import verify
 
 PACKS = {pack["id"]: pack for pack in scenario_packs()}
+
+
+def test_wrong_pr_number_never_supports_requested_pr_or_dependent_claims():
+    pack = copy.deepcopy(PACKS["synthetic-correct-open-pr"])
+    pack["bundle"]["pull_request"]["number"] = 999
+    result = verify(parse_request(pack["request"]), load_bundle(pack["bundle"]))
+    assert result.verdict == "CONTRADICTED"
+    for claim in result.claims:
+        assert claim.reason_code == "pull_request_number_mismatch"
+        assert claim.status == ("CONTRADICTED" if claim.claim_type == "pr_exists" else "UNVERIFIABLE")
+        assert claim.evidence == ("pull_request:999",)
+    assert result.checks == ()
+
+
+@pytest.mark.parametrize("sha, expected", [("b" * 40, "CONTRADICTED"), (None, "UNVERIFIABLE")])
+def test_commit_status_needs_the_expected_revision(sha, expected):
+    pack = copy.deepcopy(PACKS["synthetic-correct-open-pr"])
+    pack["bundle"]["check_runs"] = []
+    pack["bundle"]["commit_statuses"] = [
+        {"context": name, "state": "success", "sha": sha}
+        for name in pack["request"]["required_checks"]]
+    result = verify(parse_request(pack["request"]), load_bundle(pack["bundle"]))
+    assert _claim(result, "c4").status == expected
+    assert all(check.status == expected for check in result.checks)
+
+
+def test_matching_commit_status_revision_can_support_checks():
+    pack = copy.deepcopy(PACKS["synthetic-correct-open-pr"])
+    pack["bundle"]["check_runs"] = []
+    pack["bundle"]["commit_statuses"] = [
+        {"context": name, "state": "success", "sha": pack["request"]["expected_head_sha"]}
+        for name in pack["request"]["required_checks"]]
+    result = verify(parse_request(pack["request"]), load_bundle(pack["bundle"]))
+    assert result.verdict == "SUPPORTED"
 
 
 def _verification(pack_id):

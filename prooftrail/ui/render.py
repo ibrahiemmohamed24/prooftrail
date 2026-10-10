@@ -473,13 +473,13 @@ def _bar_row(metric: MetricRow) -> str:
         f'<p class="bar-label">{_e(metric.label)}</p>'
         '<div class="bar-group">'
         '<div class="bar-line"><span class="bar-name">ProofTrail</span>'
-        f'<div class="bar bar--pt" style="--value: {metric.proof_trail * 100:.1f}">'
-        '<span class="bar-fill"></span></div>'
+        '<div class="bar bar--pt"><svg viewBox="0 0 100 1" preserveAspectRatio="none" aria-hidden="true">'
+        f'<rect class="bar-fill" width="{metric.proof_trail * 100:.1f}" height="1" /></svg></div>'
         f'<span class="bar-value">{_pct(metric.proof_trail)}</span></div>'
         '<div class="bar-line"><span class="bar-name">B1</span>'
-        f'<div class="bar bar--b1" style="--value: {metric.b1_mean * 100:.1f}; '
-        f'--band-start: {band_start:.1f}; --band-end: {band_end:.1f}">'
-        '<span class="bar-fill"></span><span class="bar-band"></span></div>'
+        '<div class="bar bar--b1"><svg viewBox="0 0 100 1" preserveAspectRatio="none" aria-hidden="true">'
+        f'<rect class="bar-fill" width="{metric.b1_mean * 100:.1f}" height="1" />'
+        f'<rect class="bar-band" x="{band_start:.1f}" width="{band_end - band_start:.1f}" height="1" /></svg></div>'
         f'<span class="bar-value">{_pct(metric.b1_mean)} ± {metric.b1_stddev * 100:.1f}</span></div>'
         "</div></li>"
     )
